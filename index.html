@@ -3,168 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BIHAR MOVIE HUB - PREMIUM AI</title>
+    <title>WhatsApp AI Chat</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* Hide default scrollbars globally */
-        html, body {
-            background-color: #0b111e; color: #ffffff; font-family: 'Segoe UI', Arial, sans-serif;
+        body {
+            background-color: #0b141a; color: #e9edef; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center;
         }
         
-        /* Premium Header */
-        .gemini-verified-bar {
-            width: 100%; max-width: 600px; background: linear-gradient(90deg, #e11d48, #0f172a);
-            border-bottom: 2px solid #f43f5e; padding: 12px 15px; display: flex;
-            justify-content: space-between; align-items: center; font-size: 13px; font-weight: bold;
-            position: relative; z-index: 10;
+        /* WhatsApp Green Header */
+        .whatsapp-header {
+            width: 100%; max-width: 600px; background-color: #005c4b;
+            padding: 10px 16px; display: flex; justify-content: space-between;
+            align-items: center; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
-        .gemini-status { color: #fda4af; display: flex; align-items: center; gap: 6px; text-transform: uppercase; }
-        .gemini-sparkle { color: #fff; background: linear-gradient(45deg, #e11d48, #3b82f6); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
         
-        /* Corner Menu Button */
-        .menu-trigger {
-            background: rgba(255,255,255,0.1); width: 34px; height: 34px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 18px;
-            cursor: pointer; border: 1px solid rgba(255,255,255,0.2); transition: 0.2s;
+        .chat-info { display: flex; align-items: center; gap: 12px; }
+        
+        /* WhatsApp Profile Style Emoji */
+        .profile-pic {
+            width: 40px; height: 40px; background-color: #6a7f8c; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+            cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
         }
-        .menu-trigger:hover { background: #e11d48; }
+        
+        .user-details .name { font-size: 16px; font-weight: 500; color: #ffffff; }
+        .user-details .status { font-size: 13px; color: #8696a0; }
 
-        /* Sliding Top Dropdown Panel (Sleek Compact Size) */
+        /* Sliding Compact Dropdown Panel (Settings/History) */
         .dropdown-menu {
             position: absolute; top: -350px; right: 15px; width: 260px;
-            background: #0d1624; border: 1px solid #233554; border-radius: 12px;
-            padding: 12px; box-shadow: 0px 10px 25px rgba(0,0,0,0.6);
+            background: #233138; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            padding: 12px; box-shadow: 0px 8px 24px rgba(0,0,0,0.5);
             transition: all 0.3s ease-in-out; z-index: 9; opacity: 0;
         }
-        .dropdown-menu.active { top: 55px; opacity: 1; }
+        .dropdown-menu.active { top: 60px; opacity: 1; }
         
-        .menu-section-title { font-size: 10px; color: #f43f5e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: bold; }
+        .menu-section-title { font-size: 11px; color: #00a884; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; font-weight: bold; }
         
-        /* Logging box inside panel */
         .log-box { 
-            background: #050a12; border: 1px solid #152033; border-radius: 6px; 
-            padding: 6px; font-family: monospace; font-size: 9px; color: #8fa0dd; 
-            max-height: 75px; overflow-y: auto; margin-bottom: 10px;
+            background: #111b21; border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; 
+            padding: 6px; font-family: monospace; font-size: 10px; color: #8696a0; 
+            max-height: 80px; overflow-y: auto; margin-bottom: 10px;
         }
         .log-box::-webkit-scrollbar { display: none; }
-        .log-entry { margin-bottom: 2px; border-bottom: 1px dashed #152033; }
+        .log-entry { margin-bottom: 2px; }
         
-        /* History Action Button */
         .history-btn {
-            background: #151f32; color: #e2e8f0; border: 1px solid #233554;
-            width: 100%; padding: 7px; text-align: center; border-radius: 6px;
-            font-size: 11px; cursor: pointer; font-weight: bold; transition: 0.2s;
+            background: #005c4b; color: #ffffff; border: none;
+            width: 100%; padding: 8px; text-align: center; border-radius: 6px;
+            font-size: 12px; cursor: pointer; font-weight: 500; transition: 0.2s;
         }
-        .history-btn:hover { background: #be123c; color: white; }
+        .history-btn:hover { background-color: #007a64; }
 
-        /* Main Chat Area (Full View Setup) */
+        /* Main Chat Container with WhatsApp Background Pattern Effect */
         .chat-container {
-            flex: 1; width: 100%; max-width: 600px; background: #070c14; 
-            border-left: 1px solid #1e2d4a; border-right: 1px solid #1e2d4a;
+            flex: 1; width: 100%; max-width: 600px; background-color: #0b141a;
+            background-image: linear-gradient(rgba(11,20,26,0.95), rgba(11,20,26,0.95)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            border-left: 1px solid #222d34; border-right: 1px solid #222d34;
             display: flex; flex-direction: column; overflow: hidden; position: relative;
         }
         
-        /* Feed Screen */
-        .chat-box {
-            flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
-        }
-        .chat-box::-webkit-scrollbar { display: none; } /* Hide trackbar */
+        /* Chat Feed Screen */
+        .chat-box { flex: 1; padding: 12px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .chat-box::-webkit-scrollbar { display: none; }
         
-        /* Chat Bubbles Layout */
-        .msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+        /* WhatsApp Style Chat Bubbles */
+        .msg { max-width: 75%; padding: 8px 12px; font-size: 14.5px; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.15); }
+        
         .msg.user {
-            background: #e11d48; color: white; align-self: flex-end;
-            border-bottom-right-radius: 4px; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.2);
+            background-color: #005c4b; color: #e9edef; align-self: flex-end;
+            border-radius: 8px 0px 8px 8px;
         }
         .msg.bot {
-            background: #151f32; color: #e2e8f0; align-self: flex-start;
-            border-bottom-left-radius: 4px; border: 1px solid #233554;
+            background-color: #202c33; color: #e9edef; align-self: flex-start;
+            border-radius: 0px 8px 8px 8px;
         }
         
         .ai-generated-img {
-            width: 100%; max-width: 260px; border-radius: 10px; margin-top: 8px; 
-            border: 2px solid #e11d48; display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            width: 100%; max-width: 260px; border-radius: 8px; margin-top: 6px; 
+            display: block; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         
-        /* Scrollable Options horizontal row */
+        /* Options Chips Row */
         .options-wrapper {
-            padding: 10px 15px; background: #0d1624; border-top: 1px solid #1e2d4a;
-            display: flex; gap: 8px; overflow-x: auto; white-space: nowrap;
+            padding: 8px 12px; background: transparent;
+            display: flex; gap: 6px; overflow-x: auto; white-space: nowrap;
         }
         .options-wrapper::-webkit-scrollbar { display: none; }
         
         .opt-btn {
-            background: #151f32; color: #fda4af; border: 1px solid #233554;
-            padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;
+            background: #202c33; color: #00a884; border: 1px solid rgba(255,255,255,0.05);
+            padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 500;
             cursor: pointer; transition: 0.2s; display: inline-block;
         }
-        .opt-btn:hover { background: #e11d48; color: white; border-color: #e11d48; }
-        .opt-img-gen { background: #1e1b4b; color: #a5b4fc; border: 1px solid #3730a3; }
+        .opt-btn:hover { background: #2a3942; }
 
-        .typing-indicator { color: #8fa0dd; font-size: 12px; padding: 6px 15px; display: none; align-self: flex-start; font-style: italic; }
+        .typing-indicator { color: #8696a0; font-size: 12px; padding: 4px 16px; display: none; align-self: flex-start; font-style: italic; }
 
-        /* Form Text bar layout */
+        /* WhatsApp Bottom Input Bar */
         .input-area {
-            background: #0d1624; border-top: 1px solid #1e2d4a; padding: 12px 15px;
-            display: flex; gap: 10px; width: 100%;
+            background-color: #202c33; padding: 10px 12px;
+            display: flex; align-items: center; gap: 8px; width: 100%;
         }
+        
         input {
-            flex: 1; background: #0b111e; border: 1px solid #233554; border-radius: 25px;
-            padding: 12px 20px; color: #fff; font-size: 14px; outline: none; transition: 0.2s;
+            flex: 1; background-color: #2a3942; border: none; border-radius: 8px;
+            padding: 10px 16px; color: #fff; font-size: 15px; outline: none;
         }
-        input:focus { border-color: #e11d48; background: #0d1624; }
         
         button {
-            background: #e11d48; color: white; border: none; width: 44px; height: 44px;
+            background-color: #00a884; color: white; border: none; width: 40px; height: 40px;
             border-radius: 50%; cursor: pointer; display: flex;
-            align-items: center; justify-content: center; font-size: 18px; transition: 0.2s;
-            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3); flex-shrink: 0;
+            align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+            transition: background-color 0.2s;
         }
-        button:hover { background: #be123c; transform: scale(1.04); }
+        button:hover { background-color: #008f72; }
     </style>
 </head>
 <body>
 
-    <div class="gemini-verified-bar">
-        <div class="gemini-status"><span class="gemini-sparkle">✦ AUTOMATION</span><span>BIHAR MOVIE HUB AI</span></div>
-        <div class="menu-trigger" onclick="toggleSettingsMenu()">⚙️</div>
+    <div class="whatsapp-header">
+        <div class="chat-info">
+            <div class="profile-pic" onclick="toggleSettingsMenu()">🤖</div>
+            <div class="user-details">
+                <div class="name">Bihar Movie Hub AI</div>
+                <div class="status">online</div>
+            </div>
+        </div>
     </div>
 
     <div class="chat-container">
         
         <div class="dropdown-menu" id="settingsMenu">
-            <div class="menu-section-title">🖥️ Live System Logging</div>
+            <div class="menu-section-title">🖥️ System Logging</div>
             <div class="log-box" id="terminalLogs">
-                <div class="log-entry">[SYSTEM] Core engine synced.</div>
+                <div class="log-entry">[SYSTEM] WhatsApp layout injected.</div>
             </div>
             
-            <div class="menu-section-title">⏳ Chat Session Context</div>
-            <button class="history-btn" onclick="clearChatHistory()">🗑️ Clear Conversation History</button>
+            <div class="menu-section-title">⏳ Conversation Context</div>
+            <button class="history-btn" onclick="clearChatHistory()">Clear Chat History</button>
         </div>
 
         <div class="chat-box" id="chatBox">
-            <div class="msg bot">🚀 **Bhai, aapka naya interface perfectly compact ho gaya hai!**<br><br>Kone ke **⚙️ Gear Emoji** par touch karke aap live Logs aur Context clear kar sakte hain! Scroll bars ko bhi clean kar diya hai. Bataiye kya help chahiye?</div>
+            <div class="msg bot">👋 **Bhai, aapka chatbot ab poori tarah WhatsApp style mein badal chuka hai!**<br><br>Upar left side mein robot wale profile icon par tap karke aap **Logging Console** aur **History Reset** open kar sakte hain. Bataiye kya help chahiye?</div>
         </div>
         
-        <div class="typing-indicator" id="typing">AI is writing a response...</div>
+        <div class="typing-indicator" id="typing">typing...</div>
 
         <div class="options-wrapper">
-            <div class="opt-btn opt-img-gen" onclick="selectOption('generate image of a dynamic neon bihar cinema house poster')">🎨 Create Cinema Art</div>
+            <div class="opt-btn" onclick="selectOption('generate image of a dynamic neon bihar cinema house poster')">🎨 Create Cinema Art</div>
             <div class="opt-btn" onclick="selectOption('Bhojpuri trending films list')">🎭 Bhojpuri Superhits</div>
             <div class="opt-btn" onclick="selectOption('Top 5 South Action Masterpieces')">🔥 South Action</div>
-            <div class="opt-btn" onclick="selectOption('Top Hollywood sci fi list')">🚀 Hollywood Sci-Fi</div>
         </div>
 
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type chat or ask to 'generate image of...'" onkeypress="handleKeyPress(event)">
+            <input type="text" id="userInput" placeholder="Type a message" onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">➔</button>
         </div>
     </div>
 
     <script>
-        let conversationContext = "You are a witty friendly AI assistant for Bihar Movie Hub. Reply concisely in natural Hindi/Hinglish.";
+        let conversationContext = "You are a witty friendly AI assistant for Bihar Movie Hub. Reply concisely in natural Hindi/Hinglish like a friend on WhatsApp.";
 
         function toggleSettingsMenu() {
             const menu = document.getElementById('settingsMenu');
@@ -181,9 +182,9 @@
         }
 
         function clearChatHistory() {
-            conversationContext = "You are a witty friendly AI assistant for Bihar Movie Hub. Reply concisely in natural Hindi/Hinglish.";
-            document.getElementById('chatBox').innerHTML = `<div class="msg bot">🧹 **Chat history cleared!** Naye sire se baatein shuru kijiye bhai.</div>`;
-            addLog("System history stack cleared successfully.");
+            conversationContext = "You are a witty friendly AI assistant for Bihar Movie Hub. Reply concisely in natural Hindi/Hinglish like a friend on WhatsApp.";
+            document.getElementById('chatBox').innerHTML = `<div class="msg bot">🧹 **Chat history cleared!**</div>`;
+            addLog("Chat context cleared.");
             toggleSettingsMenu();
         }
 
@@ -208,7 +209,7 @@
 
             document.getElementById('settingsMenu').classList.remove('active');
 
-            // Append User Message
+            // Append User Message Bubble
             const userDiv = document.createElement('div');
             userDiv.className = 'msg user';
             userDiv.innerText = userText;
@@ -218,11 +219,11 @@
             chatBox.scrollTop = chatBox.scrollHeight; 
 
             typingIndicator.style.display = 'block';
-            addLog(`Outgoing request: "${userText.substring(0, 15)}..."`);
+            addLog(`Request sent: "${userText.substring(0, 15)}..."`);
 
             const lowerText = userText.toLowerCase();
             if (lowerText.includes("generate image") || lowerText.includes("photo") || lowerText.includes("image of") || lowerText.includes("picture")) {
-                addLog("Image task scheduled...");
+                addLog("Image trigger hit.");
                 
                 setTimeout(() => {
                     typingIndicator.style.display = 'none';
@@ -234,7 +235,7 @@
                     botDiv.innerHTML = `✨ Image ready hai bhai:<br><img src="${imageUrl}" class="ai-generated-img" alt="AI Output">`;
                     
                     chatBox.appendChild(botDiv);
-                    addLog("Image pipeline finished.");
+                    addLog("Image generated.");
                     chatBox.scrollTop = chatBox.scrollHeight;
                 }, 1200);
                 
@@ -257,20 +258,19 @@
                 chatBox.appendChild(botDiv);
                 
                 conversationContext += ` User: ${userText}. Bot: ${botReply}.`;
-                addLog("Text delivery synced.");
+                addLog("Text context updated.");
                 chatBox.scrollTop = chatBox.scrollHeight;
 
             } catch (error) {
                 typingIndicator.style.display = 'none';
                 const botDiv = document.createElement('div');
                 botDiv.className = 'msg bot';
-                botDiv.innerText = "Haan bhai! Kaise ho? Sab badhiya chal raha hai na? Kuch bhi pucho ya image generate karne bolo.";
+                botDiv.innerText = "Haan bhai! Kaise ho? Sab badhiya chal raha hai na?";
                 chatBox.appendChild(botDiv);
-                addLog("API Fetch fail. Local output.");
+                addLog("API Fetch failed.");
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
         }
     </script>
 </body>
 </html>
-
