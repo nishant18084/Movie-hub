@@ -6,15 +6,16 @@
     <title>BIHAR MOVIE HUB - PREMIUM AI</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
+        
+        /* Hide default scrollbars globally */
+        html, body {
             background-color: #0b111e; color: #ffffff; font-family: 'Segoe UI', Arial, sans-serif;
-            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            overflow: hidden;
+            height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center;
         }
         
         /* Premium Header */
         .gemini-verified-bar {
-            width: 100%; background: linear-gradient(90deg, #e11d48, #0f172a);
+            width: 100%; max-width: 600px; background: linear-gradient(90deg, #e11d48, #0f172a);
             border-bottom: 2px solid #f43f5e; padding: 12px 15px; display: flex;
             justify-content: space-between; align-items: center; font-size: 13px; font-weight: bold;
             position: relative; z-index: 10;
@@ -22,7 +23,7 @@
         .gemini-status { color: #fda4af; display: flex; align-items: center; gap: 6px; text-transform: uppercase; }
         .gemini-sparkle { color: #fff; background: linear-gradient(45deg, #e11d48, #3b82f6); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
         
-        /* Right Side Corner Emoji Button */
+        /* Corner Menu Button */
         .menu-trigger {
             background: rgba(255,255,255,0.1); width: 34px; height: 34px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-size: 18px;
@@ -30,47 +31,49 @@
         }
         .menu-trigger:hover { background: #e11d48; }
 
-        /* Sliding Top Dropdown Menu */
+        /* Sliding Top Dropdown Panel (Sleek Compact Size) */
         .dropdown-menu {
-            position: absolute; top: -300px; right: 15px; width: 280px;
+            position: absolute; top: -350px; right: 15px; width: 260px;
             background: #0d1624; border: 1px solid #233554; border-radius: 12px;
-            padding: 15px; box-shadow: 0px 10px 25px rgba(0,0,0,0.5);
+            padding: 12px; box-shadow: 0px 10px 25px rgba(0,0,0,0.6);
             transition: all 0.3s ease-in-out; z-index: 9; opacity: 0;
         }
-        .dropdown-menu.active { top: 60px; opacity: 1; }
+        .dropdown-menu.active { top: 55px; opacity: 1; }
         
-        .menu-section-title { font-size: 11px; color: #f43f5e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-weight: bold; }
+        .menu-section-title { font-size: 10px; color: #f43f5e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: bold; }
         
-        /* Logging Console inside menu */
+        /* Logging box inside panel */
         .log-box { 
             background: #050a12; border: 1px solid #152033; border-radius: 6px; 
-            padding: 8px; font-family: monospace; font-size: 10px; color: #8fa0dd; 
-            max-height: 90px; overflow-y: auto; margin-bottom: 12px;
+            padding: 6px; font-family: monospace; font-size: 9px; color: #8fa0dd; 
+            max-height: 75px; overflow-y: auto; margin-bottom: 10px;
         }
+        .log-box::-webkit-scrollbar { display: none; }
         .log-entry { margin-bottom: 2px; border-bottom: 1px dashed #152033; }
         
         /* History Action Button */
         .history-btn {
             background: #151f32; color: #e2e8f0; border: 1px solid #233554;
-            width: 100%; padding: 8px; text-align: center; border-radius: 6px;
-            font-size: 12px; cursor: pointer; font-weight: bold; transition: 0.2s;
+            width: 100%; padding: 7px; text-align: center; border-radius: 6px;
+            font-size: 11px; cursor: pointer; font-weight: bold; transition: 0.2s;
         }
         .history-btn:hover { background: #be123c; color: white; }
 
-        /* Main Container */
+        /* Main Chat Area (Full View Setup) */
         .chat-container {
             flex: 1; width: 100%; max-width: 600px; background: #070c14; 
             border-left: 1px solid #1e2d4a; border-right: 1px solid #1e2d4a;
             display: flex; flex-direction: column; overflow: hidden; position: relative;
         }
         
-        /* Chat Feed Box */
+        /* Feed Screen */
         .chat-box {
-            flex: 1; padding: 20px 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
+            flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
         }
+        .chat-box::-webkit-scrollbar { display: none; } /* Hide trackbar */
         
-        /* Modern Chat Bubbles Layout */
-        .msg { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+        /* Chat Bubbles Layout */
+        .msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
         .msg.user {
             background: #e11d48; color: white; align-self: flex-end;
             border-bottom-right-radius: 4px; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.2);
@@ -85,7 +88,7 @@
             border: 2px solid #e11d48; display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
         
-        /* Scrollable Dynamic Options Chips */
+        /* Scrollable Options horizontal row */
         .options-wrapper {
             padding: 10px 15px; background: #0d1624; border-top: 1px solid #1e2d4a;
             display: flex; gap: 8px; overflow-x: auto; white-space: nowrap;
@@ -100,11 +103,11 @@
         .opt-btn:hover { background: #e11d48; color: white; border-color: #e11d48; }
         .opt-img-gen { background: #1e1b4b; color: #a5b4fc; border: 1px solid #3730a3; }
 
-        .typing-indicator { color: #8fa0dd; font-size: 12px; padding: 8px 15px; display: none; align-self: flex-start; font-style: italic; }
+        .typing-indicator { color: #8fa0dd; font-size: 12px; padding: 6px 15px; display: none; align-self: flex-start; font-style: italic; }
 
-        /* Premium Input Area */
+        /* Form Text bar layout */
         .input-area {
-            background: #0d1624; border-top: 1px solid #1e2d4a; padding: 15px;
+            background: #0d1624; border-top: 1px solid #1e2d4a; padding: 12px 15px;
             display: flex; gap: 10px; width: 100%;
         }
         input {
@@ -114,12 +117,12 @@
         input:focus { border-color: #e11d48; background: #0d1624; }
         
         button {
-            background: #e11d48; color: white; border: none; width: 45px; height: 45px;
+            background: #e11d48; color: white; border: none; width: 44px; height: 44px;
             border-radius: 50%; cursor: pointer; display: flex;
             align-items: center; justify-content: center; font-size: 18px; transition: 0.2s;
-            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3);
+            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3); flex-shrink: 0;
         }
-        button:hover { background: #be123c; transform: scale(1.05); }
+        button:hover { background: #be123c; transform: scale(1.04); }
     </style>
 </head>
 <body>
@@ -142,7 +145,7 @@
         </div>
 
         <div class="chat-box" id="chatBox">
-            <div class="msg bot">🚀 **Bhai, aapka naya ultra interface ready hai!**<br><br>Kone mein diye gaye **⚙️ Emoji** par click karke aap upar se live **Logging terminal** dekh sakte hain aur **History** reset kar sakte hain! Kahiye, kya help chahiye?</div>
+            <div class="msg bot">🚀 **Bhai, aapka naya interface perfectly compact ho gaya hai!**<br><br>Kone ke **⚙️ Gear Emoji** par touch karke aap live Logs aur Context clear kar sakte hain! Scroll bars ko bhi clean kar diya hai. Bataiye kya help chahiye?</div>
         </div>
         
         <div class="typing-indicator" id="typing">AI is writing a response...</div>
@@ -163,7 +166,6 @@
     <script>
         let conversationContext = "You are a witty friendly AI assistant for Bihar Movie Hub. Reply concisely in natural Hindi/Hinglish.";
 
-        // Toggle the hidden dropdown panel
         function toggleSettingsMenu() {
             const menu = document.getElementById('settingsMenu');
             menu.classList.toggle('active');
@@ -182,7 +184,7 @@
             conversationContext = "You are a witty friendly AI assistant for Bihar Movie Hub. Reply concisely in natural Hindi/Hinglish.";
             document.getElementById('chatBox').innerHTML = `<div class="msg bot">🧹 **Chat history cleared!** Naye sire se baatein shuru kijiye bhai.</div>`;
             addLog("System history stack cleared successfully.");
-            toggleSettingsMenu(); // Close panel
+            toggleSettingsMenu();
         }
 
         function handleKeyPress(e) {
@@ -204,10 +206,9 @@
 
             if (!userText) return;
 
-            // Auto close menu if open
             document.getElementById('settingsMenu').classList.remove('active');
 
-            // 1. Append User Message
+            // Append User Message
             const userDiv = document.createElement('div');
             userDiv.className = 'msg user';
             userDiv.innerText = userText;
@@ -217,12 +218,11 @@
             chatBox.scrollTop = chatBox.scrollHeight; 
 
             typingIndicator.style.display = 'block';
-            addLog(`Outgoing request queued: "${userText.substring(0, 20)}..."`);
+            addLog(`Outgoing request: "${userText.substring(0, 15)}..."`);
 
-            // Photo generation parsing logic
             const lowerText = userText.toLowerCase();
             if (lowerText.includes("generate image") || lowerText.includes("photo") || lowerText.includes("image of") || lowerText.includes("picture")) {
-                addLog("Image pipeline detected. Generating rendering graph...");
+                addLog("Image task scheduled...");
                 
                 setTimeout(() => {
                     typingIndicator.style.display = 'none';
@@ -231,17 +231,16 @@
                     
                     const botDiv = document.createElement('div');
                     botDiv.className = 'msg bot';
-                    botDiv.innerHTML = `✨ Bhai, aapke prompt ke hisab se image ready hai:<br><img src="${imageUrl}" class="ai-generated-img" alt="AI Output">`;
+                    botDiv.innerHTML = `✨ Image ready hai bhai:<br><img src="${imageUrl}" class="ai-generated-img" alt="AI Output">`;
                     
                     chatBox.appendChild(botDiv);
-                    addLog("Image generated successfully.");
+                    addLog("Image pipeline finished.");
                     chatBox.scrollTop = chatBox.scrollHeight;
                 }, 1200);
                 
                 return;
             }
 
-            // Standard Text response logic
             const systemPrompt = `${conversationContext} User says: "${userText}".`;
             const cleanUrl = `https://text.pollinations.ai/${encodeURIComponent(systemPrompt)}?system=You are a helpful cinema chatbot.`;
 
@@ -252,26 +251,26 @@
                 const botReply = await response.text();
                 typingIndicator.style.display = 'none';
 
-                // 2. Append Bot Message
                 const botDiv = document.createElement('div');
                 botDiv.className = 'msg bot';
                 botDiv.innerText = botReply.replace(/\*\*/g, ""); 
                 chatBox.appendChild(botDiv);
                 
                 conversationContext += ` User: ${userText}. Bot: ${botReply}.`;
-                addLog("Text payload delivered to screen.");
+                addLog("Text delivery synced.");
                 chatBox.scrollTop = chatBox.scrollHeight;
 
             } catch (error) {
                 typingIndicator.style.display = 'none';
                 const botDiv = document.createElement('div');
                 botDiv.className = 'msg bot';
-                botDiv.innerText = "Haan bhai! Sab mast chal raha hai na? Kuch bhi pucho ya image generate karne bolo.";
+                botDiv.innerText = "Haan bhai! Kaise ho? Sab badhiya chal raha hai na? Kuch bhi pucho ya image generate karne bolo.";
                 chatBox.appendChild(botDiv);
-                addLog("API Error. Fallback default fired.");
+                addLog("API Fetch fail. Local output.");
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
         }
     </script>
 </body>
 </html>
+
