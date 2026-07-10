@@ -38,6 +38,7 @@
             border-bottom-left-radius: 2px; border: 1px solid #233554;
         }
         
+        /* Fixed Horizontal Options Bar */
         .options-wrapper {
             padding: 10px 15px; background: #0d1624; border-top: 1px solid #1e2d4a;
             display: flex; gap: 8px; overflow-x: auto; white-space: nowrap;
@@ -51,6 +52,14 @@
         }
         .opt-btn:hover {
             background: #e11d48; color: white; border-color: #e11d48;
+        }
+        
+        /* NEW STYLING FOR IMAGE GEN BUTTON */
+        .opt-img-gen {
+            background: #312e81; color: white; border: 1px solid #4f46e5;
+        }
+        .opt-img-gen:hover {
+            background: #4f46e5; border-color: #4f46e5;
         }
 
         .typing-indicator { color: #8fa0dd; font-size: 12px; padding: 8px 15px; display: none; align-self: flex-start; }
@@ -82,26 +91,27 @@
 
     <div class="chat-container">
         <div class="chat-box" id="chatBox">
-            <div class="msg bot">👋 Hello Bhai! Main Bihar Movie Hub ka official AI buddy hoon. Kuch bhi type karo (jaise hlo, hi ya koi film) ya niche se option chuno, main turant jawab dunga!</div>
+            <div class="msg bot">👋 Hello Bhai! Welcome to Bihar Movie Hub Chat. Niche se kisi option par click karo, main mast AI updates aur suggestions dunga!</div>
         </div>
         
         <div class="typing-indicator" id="typing">Bot typing...</div>
 
         <div class="options-wrapper">
+            <div class="opt-btn opt-img-gen" onclick="selectOption('Image Generate suggestion')">🎨 Image Generate Acche Websites</div>
             <div class="opt-btn" onclick="selectOption('Bhojpuri hit movies list')">🎭 Bhojpuri Hits</div>
             <div class="opt-btn" onclick="selectOption('Best South Action Movies')">🔥 South Action</div>
-            <div class="opt-btn" onclick="selectOption('Top 5 Web Series')">📺 Web Series</div>
+            <div class="opt-btn" onclick="selectOption('Trending Web Series')">📺 Web Series</div>
             <div class="opt-btn" onclick="selectOption('Hollywood Sci-Fi movies')">🚀 Hollywood</div>
         </div>
 
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Yahan 'hlo' ya apna sawal likhein..." onkeypress="handleKeyPress(event)">
+            <input type="text" id="userInput" placeholder="Ask for suggestions or type 'hlo'..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">➔</button>
         </div>
     </div>
 
     <script>
-        let conversationContext = "You are a friendly, cool AI expert for Bihar Movie Hub website. Talk nicely in brief Hinglish/Hindi like a friend.";
+        let conversationContext = "You are a friendly, smart movie & AI assistant for Bihar Movie Hub. Talk concisely in friendly Hinglish like a bro.";
 
         function handleKeyPress(e) {
             if (e.key === 'Enter') {
@@ -134,9 +144,8 @@
             // Show Typing Indicator
             typingIndicator.style.display = 'block';
 
-            // Fixed URL Encoding logic
-            const systemPrompt = `${conversationContext} User said: "${userText}". Reply back directly as the bot.`;
-            const cleanUrl = `https://text.pollinations.ai/${encodeURIComponent(systemPrompt)}?system=You are a friendly movie assistant.`;
+            const systemPrompt = `${conversationContext} User said: "${userText}". Provide concise info, if user asks for Image generation, guide them to top external AI websites professionally. Reply as the bot.`;
+            const cleanUrl = `https://text.pollinations.ai/${encodeURIComponent(systemPrompt)}?system=You are a very helpful assistant guiding users about movies & AI tools.`;
 
             try {
                 const response = await fetch(cleanUrl);
@@ -151,7 +160,6 @@
                 botDiv.innerText = botReply.replace(/\*\*/g, ""); 
                 chatBox.appendChild(botDiv);
                 
-                // Update short term system context memory
                 conversationContext += ` User: ${userText}. Bot: ${botReply}.`;
                 chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -159,7 +167,7 @@
                 typingIndicator.style.display = 'none';
                 const botDiv = document.createElement('div');
                 botDiv.className = 'msg bot';
-                botDiv.innerText = "Haan bhai! Kaise ho? Sab badhiya chal raha hai na, batao kya help chahiye aaj?";
+                botDiv.innerText = " Haan bhai, thoda server busy chal raha hai. Image generate karne wale option ke liye Leonardo.ai ya Bing Image Creator use kar sakte hain! Batao kya help chahiye?";
                 chatBox.appendChild(botDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
