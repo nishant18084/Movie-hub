@@ -3,74 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp AI Chat</title>
+    <title>WhatsApp AI - Fun Chat</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
-            background-color: #0b141a; color: #e9edef; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b141a; color: #e9edef; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center;
         }
         
-        /* WhatsApp Green Header */
+        /* WhatsApp Style Top Bar */
         .whatsapp-header {
-            width: 100%; max-width: 600px; background-color: #005c4b;
-            padding: 10px 16px; display: flex; justify-content: space-between;
-            align-items: center; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            width: 100%; max-width: 600px; background-color: #202c33;
+            padding: 12px 16px; display: flex; justify-content: space-between;
+            align-items: center; z-index: 10; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         
         .chat-info { display: flex; align-items: center; gap: 12px; }
         
-        /* WhatsApp Profile Style Emoji */
         .profile-pic {
-            width: 40px; height: 40px; background-color: #6a7f8c; border-radius: 50%;
+            width: 40px; height: 40px; background-color: #00a884; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-size: 22px;
-            cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
-        .user-details .name { font-size: 16px; font-weight: 500; color: #ffffff; }
-        .user-details .status { font-size: 13px; color: #8696a0; }
+        .user-details .name { font-size: 16px; font-weight: 600; color: #e9edef; }
+        .user-details .status { font-size: 12px; color: #00a884; font-weight: 500; }
 
-        /* Sliding Compact Dropdown Panel (Settings/History) */
+        /* Compact Dropdown Menu */
         .dropdown-menu {
-            position: absolute; top: -350px; right: 15px; width: 260px;
+            position: absolute; top: -350px; right: 15px; width: 250px;
             background: #233138; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
             padding: 12px; box-shadow: 0px 8px 24px rgba(0,0,0,0.5);
             transition: all 0.3s ease-in-out; z-index: 9; opacity: 0;
         }
-        .dropdown-menu.active { top: 60px; opacity: 1; }
+        .dropdown-menu.active { top: 65px; opacity: 1; }
         
-        .menu-section-title { font-size: 11px; color: #00a884; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; font-weight: bold; }
+        .menu-section-title { font-size: 10px; color: #00a884; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; font-weight: bold; }
         
         .log-box { 
             background: #111b21; border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; 
-            padding: 6px; font-family: monospace; font-size: 10px; color: #8696a0; 
+            padding: 6px; font-family: monospace; font-size: 9px; color: #8696a0; 
             max-height: 80px; overflow-y: auto; margin-bottom: 10px;
         }
         .log-box::-webkit-scrollbar { display: none; }
-        .log-entry { margin-bottom: 2px; }
         
         .history-btn {
             background: #005c4b; color: #ffffff; border: none;
             width: 100%; padding: 8px; text-align: center; border-radius: 6px;
-            font-size: 12px; cursor: pointer; font-weight: 500; transition: 0.2s;
+            font-size: 11px; cursor: pointer; font-weight: 500; transition: 0.2s;
         }
         .history-btn:hover { background-color: #007a64; }
 
-        /* Main Chat Container with WhatsApp Background Pattern Effect */
+        /* Chat Container with Wallpaper Background */
         .chat-container {
             flex: 1; width: 100%; max-width: 600px; background-color: #0b141a;
-            background-image: linear-gradient(rgba(11,20,26,0.95), rgba(11,20,26,0.95)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-image: linear-gradient(rgba(11,20,26,0.96), rgba(11,20,26,0.96)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             border-left: 1px solid #222d34; border-right: 1px solid #222d34;
             display: flex; flex-direction: column; overflow: hidden; position: relative;
         }
         
-        /* Chat Feed Screen */
-        .chat-box { flex: 1; padding: 12px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        /* Chat Feed Box */
+        .chat-box { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .chat-box::-webkit-scrollbar { display: none; }
         
         /* WhatsApp Style Chat Bubbles */
-        .msg { max-width: 75%; padding: 8px 12px; font-size: 14.5px; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.15); }
+        .msg { max-width: 75%; padding: 8px 14px; font-size: 14.5px; line-height: 1.4; word-wrap: break-word; box-shadow: 0 1px 1.5px rgba(0,0,0,0.2); }
         
         .msg.user {
             background-color: #005c4b; color: #e9edef; align-self: flex-end;
@@ -83,10 +81,10 @@
         
         .ai-generated-img {
             width: 100%; max-width: 260px; border-radius: 8px; margin-top: 6px; 
-            display: block; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            display: block; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         
-        /* Options Chips Row */
+        /* Options Row */
         .options-wrapper {
             padding: 8px 12px; background: transparent;
             display: flex; gap: 6px; overflow-x: auto; white-space: nowrap;
@@ -102,7 +100,7 @@
 
         .typing-indicator { color: #8696a0; font-size: 12px; padding: 4px 16px; display: none; align-self: flex-start; font-style: italic; }
 
-        /* WhatsApp Bottom Input Bar */
+        /* Bottom Input Field Box */
         .input-area {
             background-color: #202c33; padding: 10px 12px;
             display: flex; align-items: center; gap: 8px; width: 100%;
@@ -126,7 +124,7 @@
 
     <div class="whatsapp-header">
         <div class="chat-info">
-            <div class="profile-pic" onclick="toggleSettingsMenu()">🤖</div>
+            <div class="profile-pic" onclick="toggleSettingsMenu()">😎</div>
             <div class="user-details">
                 <div class="name">Bihar Movie Hub AI</div>
                 <div class="status">online</div>
@@ -139,7 +137,7 @@
         <div class="dropdown-menu" id="settingsMenu">
             <div class="menu-section-title">🖥️ System Logging</div>
             <div class="log-box" id="terminalLogs">
-                <div class="log-entry">[SYSTEM] WhatsApp layout injected.</div>
+                <div class="log-entry">[SYSTEM] Fun engine optimized.</div>
             </div>
             
             <div class="menu-section-title">⏳ Conversation Context</div>
@@ -147,25 +145,26 @@
         </div>
 
         <div class="chat-box" id="chatBox">
-            <div class="msg bot">👋 **Bhai, aapka chatbot ab poori tarah WhatsApp style mein badal chuka hai!**<br><br>Upar left side mein robot wale profile icon par tap karke aap **Logging Console** aur **History Reset** open kar sakte hain. Bataiye kya help chahiye?</div>
+            <div class="msg bot">Yo bhai! Aur batao kya chal raha hai? 😎<br><br>Ab badi-badi baatein band, ekdam dosto jaisi short aur mazedaar chatting hogi! Kuch poochna hai ya mast AI photo banwani hai? Bol do jaldi! 👇</div>
         </div>
         
         <div class="typing-indicator" id="typing">typing...</div>
 
         <div class="options-wrapper">
-            <div class="opt-btn" onclick="selectOption('generate image of a dynamic neon bihar cinema house poster')">🎨 Create Cinema Art</div>
-            <div class="opt-btn" onclick="selectOption('Bhojpuri trending films list')">🎭 Bhojpuri Superhits</div>
-            <div class="opt-btn" onclick="selectOption('Top 5 South Action Masterpieces')">🔥 South Action</div>
+            <div class="opt-btn" onclick="selectOption('generate image of a futuristic neon bihar cinema house poster')">🎨 Create Cinema Art</div>
+            <div class="opt-btn" onclick="selectOption('Bhojpuri superhit movie suggestions')">🎭 Bhojpuri Hits</div>
+            <div class="opt-btn" onclick="selectOption('Give me a funny Bollywood meme dialogue')">😂 Meme Dialogue</div>
         </div>
 
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type a message" onkeypress="handleKeyPress(event)">
+            <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">➔</button>
         </div>
     </div>
 
     <script>
-        let conversationContext = "You are a witty friendly AI assistant for Bihar Movie Hub. Reply concisely in natural Hindi/Hinglish like a friend on WhatsApp.";
+        // System systemPrompt forcing very short, witty responses
+        let conversationContext = "You are a very witty, casual friend chatting on WhatsApp. Keep your responses extremely short, funny, use emojis, and speak in casual Hinglish. Never give long explanations.";
 
         function toggleSettingsMenu() {
             const menu = document.getElementById('settingsMenu');
@@ -182,9 +181,8 @@
         }
 
         function clearChatHistory() {
-            conversationContext = "You are a witty friendly AI assistant for Bihar Movie Hub. Reply concisely in natural Hindi/Hinglish like a friend on WhatsApp.";
-            document.getElementById('chatBox').innerHTML = `<div class="msg bot">🧹 **Chat history cleared!**</div>`;
-            addLog("Chat context cleared.");
+            document.getElementById('chatBox').innerHTML = `<div class="msg bot">🧹 **Chat cleared!** Bol, ab kya scene hai?</div>`;
+            addLog("Context cleared.");
             toggleSettingsMenu();
         }
 
@@ -209,7 +207,7 @@
 
             document.getElementById('settingsMenu').classList.remove('active');
 
-            // Append User Message Bubble
+            // Render User Bubble
             const userDiv = document.createElement('div');
             userDiv.className = 'msg user';
             userDiv.innerText = userText;
@@ -219,11 +217,11 @@
             chatBox.scrollTop = chatBox.scrollHeight; 
 
             typingIndicator.style.display = 'block';
-            addLog(`Request sent: "${userText.substring(0, 15)}..."`);
+            addLog(`Fun request sent.`);
 
             const lowerText = userText.toLowerCase();
             if (lowerText.includes("generate image") || lowerText.includes("photo") || lowerText.includes("image of") || lowerText.includes("picture")) {
-                addLog("Image trigger hit.");
+                addLog("Image route activated.");
                 
                 setTimeout(() => {
                     typingIndicator.style.display = 'none';
@@ -232,7 +230,7 @@
                     
                     const botDiv = document.createElement('div');
                     botDiv.className = 'msg bot';
-                    botDiv.innerHTML = `✨ Image ready hai bhai:<br><img src="${imageUrl}" class="ai-generated-img" alt="AI Output">`;
+                    botDiv.innerHTML = `🔥 Lo bhai, jaisa tumne kaha waisi photo ekdam chakachak ready hai:<br><img src="${imageUrl}" class="ai-generated-img" alt="AI Generated Artwork">`;
                     
                     chatBox.appendChild(botDiv);
                     addLog("Image generated.");
@@ -242,8 +240,8 @@
                 return;
             }
 
-            const systemPrompt = `${conversationContext} User says: "${userText}".`;
-            const cleanUrl = `https://text.pollinations.ai/${encodeURIComponent(systemPrompt)}?system=You are a helpful cinema chatbot.`;
+            const systemPrompt = `${conversationContext} User says: "${userText}". Keep response under 2 sentences max, use emojis, talk like a best friend.`;
+            const cleanUrl = `https://text.pollinations.ai/${encodeURIComponent(systemPrompt)}?system=You are a funny friend on WhatsApp.`;
 
             try {
                 const response = await fetch(cleanUrl);
@@ -257,17 +255,15 @@
                 botDiv.innerText = botReply.replace(/\*\*/g, ""); 
                 chatBox.appendChild(botDiv);
                 
-                conversationContext += ` User: ${userText}. Bot: ${botReply}.`;
-                addLog("Text context updated.");
+                addLog("Text context synced.");
                 chatBox.scrollTop = chatBox.scrollHeight;
 
             } catch (error) {
                 typingIndicator.style.display = 'none';
                 const botDiv = document.createElement('div');
                 botDiv.className = 'msg bot';
-                botDiv.innerText = "Haan bhai! Kaise ho? Sab badhiya chal raha hai na?";
+                botDiv.innerText = "Arre bhai! Net thoda slow chal raha hai lagta hai, fir se bolna ek baar? 🤔";
                 chatBox.appendChild(botDiv);
-                addLog("API Fetch failed.");
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
         }
