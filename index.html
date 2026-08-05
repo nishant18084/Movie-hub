@@ -37,7 +37,6 @@
             text-align: center;
             font-size: 1.2rem;
             font-weight: 600;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -146,7 +145,7 @@ Aap mujhe bataiye:
         </div>
     </div>
 
-    <!-- Quick Suggestion Chips -->
+    <!-- Quick Suggestions Buttons -->
     <div class="suggestions">
         <div class="chip" onclick="quickSend('Doodh, Aloo, Paneer aur Tamatar se kya banayein?')">🥗 Recipe Suggestions</div>
         <div class="chip" onclick="quickSend('Fridge ka ideal temperature kitna hona chahiye?')">🌡️ Temperature Info</div>
@@ -160,7 +159,7 @@ Aap mujhe bataiye:
 </div>
 
 <script>
-    // GitHub Actions deployment ke waqt '__API_KEY__' aapke GitHub Secret (GEMINI_API_KEY) se replace ho jayega
+    // GitHub Actions Secret se ye placeholder replace ho jayega
     const API_KEY = '__API_KEY__';
 
     async function sendMessage() {
@@ -203,7 +202,7 @@ Aap mujhe bataiye:
 
     async function fetchAIResponse(userPrompt) {
         if (API_KEY === '__API_KEY__' || !API_KEY) {
-            return "API Key configure nahi hui hai. Kripya GitHub Workflow check karein.";
+            return "API Key missing hai! Kripya GitHub Workflow check karein.";
         }
 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
