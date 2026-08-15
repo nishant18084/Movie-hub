@@ -5,18 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#020617">
-  <title>Nexus Next-Gen OS</title>
+  <title>Realme UI Next-Gen App Drawer</title>
   <style>
     :root {
-      --bg: #020617;
-      --surface: #0f172a;
-      --card-bg: rgba(30, 41, 59, 0.7);
-      --border: rgba(255, 255, 255, 0.1);
+      --bg-dark: #07090e;
+      --card-glass: rgba(18, 24, 38, 0.85);
+      --border-glass: rgba(255, 255, 255, 0.12);
       --primary: #38bdf8;
-      --accent: #818cf8;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
+      --accent: #ff8c00;
+      --text: #ffffff;
+      --text-muted: #cbd5e1;
     }
 
     * {
@@ -29,7 +27,7 @@
     }
 
     body {
-      background-color: var(--bg);
+      background: #020617;
       color: var(--text);
       width: 100vw;
       height: 100vh;
@@ -38,226 +36,209 @@
       flex-direction: column;
     }
 
-    #setupWizard {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at center, #1e1b4b, #090d16, #020617);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
-      text-align: center;
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-    .hello-text {
-      font-size: 3.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #38bdf8, #818cf8, #ec4899);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: pulseHello 2s infinite ease-in-out;
-      margin-bottom: 1rem;
-    }
-
-    @keyframes pulseHello {
-      0%, 100% { transform: scale(1); opacity: 0.9; }
-      50% { transform: scale(1.08); opacity: 1; }
-    }
-
-    .setup-step {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.25rem;
-      width: 100%;
-      max-width: 380px;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .setup-step.active {
-      display: flex;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .setup-btn {
-      width: 100%;
-      padding: 1rem;
-      border-radius: 1rem;
-      background: var(--primary);
-      color: #020617;
-      font-size: 1.05rem;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
-      transition: transform 0.15s;
-    }
-
-    .setup-btn:active {
-      transform: scale(0.96);
-    }
-
-    .setup-input {
-      width: 100%;
-      padding: 1rem;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      color: #fff;
-      font-size: 1.1rem;
-      text-align: center;
-      outline: none;
-    }
-
     #osContainer {
       flex: 1;
-      display: flex;
-      flex-direction: column;
       width: 100vw;
       height: 100vh;
-      background: radial-gradient(circle at top right, #1e1b4b, #090d16, #020617);
+      background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
       position: relative;
     }
 
-    .top-notch-bar {
-      height: 48px;
-      padding: 0 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.9rem;
-      font-weight: 600;
-      z-index: 100;
-    }
-
-    .notch-icons {
-      display: flex;
-      gap: 0.6rem;
-      align-items: center;
-    }
-
-    .home-view {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 1.5rem;
-      z-index: 10;
-    }
-
-    .hero-widget {
-      background: var(--card-bg);
-      backdrop-filter: blur(25px);
-      border: 1px solid var(--border);
-      border-radius: 2rem;
-      padding: 1.5rem;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    }
-
-    .widget-clock {
-      font-size: 3rem;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -1px;
-    }
-
-    .widget-sub {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-top: 0.4rem;
-    }
-
-    .app-shelf {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.5rem 1rem;
-      margin: auto 0;
-      text-align: center;
-    }
-
-    .app-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.45rem;
-      cursor: pointer;
-    }
-
-    .app-box:active {
-      transform: scale(0.9);
-    }
-
-    .app-ico {
-      width: 64px;
-      height: 64px;
-      border-radius: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.8rem;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .app-lbl {
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
-
-    .bottom-dock {
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 0.8rem;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
-
-    .os-app-window {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 500;
-      display: flex;
-      flex-direction: column;
-      transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-    }
-
-    .os-app-window.active {
-      transform: translateY(0);
-    }
-
-    .app-window-header {
-      height: 56px;
+    .status-bar {
+      height: 42px;
       padding: 0 1.25rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #090d16;
-      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      font-weight: 700;
+      z-index: 100;
+      color: #fff;
     }
 
-    .app-window-body {
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .drawer-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.5rem 1rem;
+      z-index: 50;
+    }
+
+    .nav-pill {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 0.35rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      cursor: pointer;
+    }
+
+    .nav-pill.active {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    .app-drawer-scroll {
       flex: 1;
       overflow-y: auto;
-      padding: 1.5rem;
+      padding: 0.75rem 1.25rem 5rem 1.25rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem 0.5rem;
+      align-content: start;
+      text-align: center;
+      scrollbar-width: none;
+    }
+
+    .app-drawer-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .app-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .app-card:active {
+      transform: scale(0.88);
+    }
+
+    .app-icon-wrap {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.75rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .app-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #000;
+    }
+
+    .app-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 75px;
+    }
+
+    .az-bar {
+      position: absolute;
+      right: 4px;
+      top: 100px;
+      bottom: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.4);
+      pointer-events: none;
+      z-index: 60;
+    }
+
+    .bottom-search-container {
+      position: absolute;
+      bottom: 25px;
+      left: 1.25rem;
+      right: 1.25rem;
+      z-index: 100;
+    }
+
+    .search-input-box {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(25px);
+      border: 1px solid var(--border-glass);
+      border-radius: 25px;
+      padding: 0.65rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .search-input-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .full-app-view {
+      position: fixed;
+      inset: 0;
+      background: #090d16;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    .full-app-view.active {
+      transform: translateY(0);
+    }
+
+    .app-header {
+      height: 52px;
+      padding: 0 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-glass);
+      background: #111827;
+    }
+
+    .app-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem;
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
 
-    .bottom-gesture-bar {
-      height: 28px;
+    .home-bar-pill {
+      height: 24px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -265,287 +246,251 @@
       z-index: 600;
     }
 
-    .gesture-pill {
-      width: 140px;
-      height: 5px;
+    .pill {
+      width: 130px;
+      height: 4px;
       background: rgba(255, 255, 255, 0.5);
       border-radius: 10px;
     }
 
-    .ui-input {
-      width: 100%;
-      padding: 0.9rem 1rem;
-      background: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 0.75rem;
+    .calc-matrix {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.6rem;
+    }
+    .c-btn {
+      padding: 1.2rem;
+      font-size: 1.3rem;
+      background: #1e293b;
       color: #fff;
-      outline: none;
-      font-size: 1rem;
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      cursor: pointer;
+    }
+    .c-btn.op {
+      background: #38bdf8;
+      color: #020617;
+      font-weight: 700;
     }
 
-    .btn-act {
-      padding: 0.9rem;
-      background: var(--primary);
-      color: #020617;
-      border: none;
-      border-radius: 0.75rem;
+    #cameraStream {
+      width: 100%;
+      height: 350px;
+      background: #000;
+      border-radius: 1.25rem;
+      object-fit: cover;
+    }
+
+    .dialer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      max-width: 300px;
+      margin: auto;
+      text-align: center;
+    }
+    .d-btn {
+      padding: 1.1rem;
+      font-size: 1.5rem;
       font-weight: 700;
+      background: #1e293b;
+      border-radius: 50%;
+      color: #fff;
+      border: 1px solid var(--border-glass);
       cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <div id="setupWizard">
-    <div class="setup-step active" id="stepHello">
-      <div class="hello-text" id="helloCycle">Hello</div>
-      <p style="color: var(--text-muted); font-size: 1.1rem;">Welcome to your new Nexus Mobile OS</p>
-      <button class="setup-btn" onclick="nextStep(1)">Get Started ➔</button>
-    </div>
-
-    <div class="setup-step" id="stepName">
-      <h2 style="font-size: 1.75rem;">What is your name?</h2>
-      <p style="color: var(--text-muted);">Personalize your device owner profile.</p>
-      <input type="text" id="userNameInput" class="setup-input" placeholder="Apna naam daalein..." autocomplete="off">
-      <button class="setup-btn" onclick="nextStep(2)">Continue ➔</button>
-    </div>
-
-    <div class="setup-step" id="stepFinish">
-      <div style="font-size: 3.5rem;">✨</div>
-      <h2 style="font-size: 1.75rem;">All Set Up!</h2>
-      <p style="color: var(--text-muted);">Aapka phone ready ho chuka hai.</p>
-      <button class="setup-btn" onclick="completeSetup()">Start Using Nexus OS 🚀</button>
-    </div>
-  </div>
-
   <div id="osContainer">
-    <div class="top-notch-bar">
-      <span id="sysClock">12:00</span>
-      <div class="notch-icons">
-        <span style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.2); color: var(--primary); padding: 0.15rem 0.45rem; border-radius: 6px;">5G+</span>
-        <span>📶</span>
-        <span id="sysBattery">🔋 100%</span>
+    <div class="status-bar">
+      <span id="osClock">19:25</span>
+      <div class="status-right">
+        <span style="font-size: 0.75rem;">0.09 KB/s</span>
+        <span>VoLTE</span>
+        <span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 0.1rem 0.4rem; border-radius: 4px;">5G</span>
+        <span>🔋 100%</span>
       </div>
     </div>
 
-    <div class="home-view">
-      <div class="hero-widget">
-        <div class="widget-clock" id="heroClock">12:00</div>
-        <div class="widget-sub" id="heroDate">Saturday, Aug 15</div>
-        <div style="margin-top: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
-          <span style="color: var(--primary); font-weight: 600;" id="ownerGreeting">Hi, User! 👋</span>
-          <span style="font-size: 0.75rem; background: rgba(255, 255, 255, 0.08); padding: 0.25rem 0.6rem; border-radius: 12px;">Nexus OS 2.0</span>
-        </div>
-      </div>
-
-      <div class="app-shelf">
-        <div class="app-box" onclick="openApp('appMail')">
-          <div class="app-ico" style="background: linear-gradient(135deg, #0284c7, #2563eb);">📬</div>
-          <span class="app-lbl">Temp Mail</span>
-        </div>
-
-        <div class="app-box" onclick="openApp('appNotes')">
-          <div class="app-ico" style="background: linear-gradient(135deg, #f59e0b, #d97706);">📝</div>
-          <span class="app-lbl">Notes</span>
-        </div>
-
-        <div class="app-box" onclick="location.href='watch.html'">
-          <div class="app-ico" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">⌚</div>
-          <span class="app-lbl">Smart Watch</span>
-        </div>
-
-        <div class="app-box" onclick="openApp('appTerminal')">
-          <div class="app-ico" style="background: linear-gradient(135deg, #1e293b, #0f172a);">💻</div>
-          <span class="app-lbl">Terminal</span>
-        </div>
-
-        <div class="app-box" onclick="openApp('appSettings')">
-          <div class="app-ico" style="background: linear-gradient(135deg, #64748b, #334155);">⚙️</div>
-          <span class="app-lbl">Settings</span>
-        </div>
-      </div>
-
-      <div class="bottom-dock">
-        <div class="app-box" onclick="openApp('appMail')">
-          <div class="app-ico" style="width: 52px; height: 52px; background: linear-gradient(135deg, #0284c7, #2563eb);">📬</div>
-        </div>
-        <div class="app-box" onclick="openApp('appNotes')">
-          <div class="app-ico" style="width: 52px; height: 52px; background: linear-gradient(135deg, #f59e0b, #d97706);">📝</div>
-        </div>
-        <div class="app-box" onclick="location.href='watch.html'">
-          <div class="app-ico" style="width: 52px; height: 52px; background: linear-gradient(135deg, #ec4899, #8b5cf6);">⌚</div>
-        </div>
-      </div>
+    <div class="drawer-nav">
+      <div class="nav-pill active">All</div>
+      <div class="nav-pill">Categories</div>
     </div>
 
-    <!-- App 1: Temp Mail -->
-    <div class="os-app-window" id="appMail">
-      <div class="app-window-header">
-        <span style="font-weight: 700;">📬 Disposable Email</span>
-        <button onclick="closeApp()" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem;">✕</button>
-      </div>
-      <div class="app-window-body">
-        <input type="text" id="mailBoxAddress" class="ui-input" readonly value="Generating...">
-        <button class="btn-act" onclick="copyTempMail()">📋 Copy Address</button>
-        <button class="btn-act" style="background: #1e293b; color:#fff;" onclick="genNewAddress()">🔄 Generate New</button>
-        <div style="font-weight: 600; margin-top: 1rem;">📥 Inbox Messages:</div>
-        <div id="mailItems" style="color: var(--text-muted); font-size: 0.95rem;">No emails received.</div>
-      </div>
-      <div class="bottom-gesture-bar" onclick="closeApp()"><div class="gesture-pill"></div></div>
+    <div class="az-bar">
+      <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span><span>K</span><span>L</span><span>M</span><span>N</span><span>O</span><span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span><span>U</span><span>V</span><span>W</span><span>X</span><span>Y</span><span>Z</span>
     </div>
 
-    <!-- App 2: Notes -->
-    <div class="os-app-window" id="appNotes">
-      <div class="app-window-header">
-        <span style="font-weight: 700;">📝 Quick Notes</span>
-        <button onclick="closeApp()" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem;">✕</button>
-      </div>
-      <div class="app-window-body">
-        <textarea id="myNotes" rows="12" class="ui-input" placeholder="Type anything... Auto-saved locally."></textarea>
-        <button class="btn-act" onclick="saveMyNotes()">💾 Save Notes</button>
-      </div>
-      <div class="bottom-gesture-bar" onclick="closeApp()"><div class="gesture-pill"></div></div>
+    <div class="app-drawer-scroll" id="appGrid">
+      <div class="app-card" onclick="openWebApp('https://www.airtel.in')"><div class="app-icon-wrap" style="background: #e11d48;">🔴</div><span class="app-label">Airtel</span></div>
+      <div class="app-card" onclick="alert('Airtel Alert Service: All systems active.')"><div class="app-icon-wrap" style="background: #334155;">📟</div><span class="app-label">Airtel Alert</span></div>
+      <div class="app-card" onclick="openWebApp('https://www.amazon.in')"><div class="app-icon-wrap" style="background: #ff9900;">🛒</div><span class="app-label">Amazon</span></div>
+      <div class="app-card" onclick="openAppModal('appCalc')"><div class="app-icon-wrap" style="background: #475569;">🔢</div><span class="app-label">Calculator</span></div>
+      <div class="app-card" onclick="openCameraApp()"><div class="app-icon-wrap" style="background: #0f172a; border-color: #38bdf8;">📷</div><span class="app-label">Camera</span></div>
+      <div class="app-card" onclick="openAppModal('appWeather')"><div class="app-icon-wrap" style="background: #38bdf8;">🌤️</div><span class="app-label">Weather</span></div>
+      <div class="app-card" onclick="openAppModal('appNotes')"><div class="app-icon-wrap" style="background: #eab308;">📝</div><span class="app-label">Notes</span></div>
+      <div class="app-card" onclick="openAppModal('appDialer')"><div class="app-icon-wrap" style="background: #22c55e;">📞</div><span class="app-label">Phone</span></div>
+      <div class="app-card" onclick="openAppModal('appTempMail')"><div class="app-icon-wrap" style="background: #2563eb;">💬</div><span class="app-label">Messages</span></div>
+      <div class="app-card" onclick="openAppModal('appMusic')"><div class="app-icon-wrap" style="background: #d97706;">🎵</div><span class="app-label">Music</span></div>
+      <div class="app-card" onclick="openAppModal('appRecorder')"><div class="app-icon-wrap" style="background: #ef4444;">🎙️</div><span class="app-label">Recorder</span></div>
+      <div class="app-card" onclick="openAppModal('appSettings')"><div class="app-icon-wrap" style="background: #64748b;">⚙️</div><span class="app-label">Settings</span></div>
+      <div class="app-card" onclick="openWebApp('https://www.whatsapp.com')"><div class="app-icon-wrap" style="background: #25d366;">🟢</div><span class="app-label">WhatsApp</span></div>
+      <div class="app-card" onclick="openWebApp('https://www.youtube.com')"><div class="app-icon-wrap" style="background: #ff0000;">▶️</div><span class="app-label">YouTube</span></div>
+      <div class="app-card" onclick="openWebApp('https://www.phonepe.com')"><div class="app-icon-wrap" style="background: #5f259f;">💳</div><span class="app-label">PhonePe</span></div>
+      <div class="app-card" onclick="openWebApp('https://play.google.com')"><div class="app-icon-wrap" style="background: #ffffff; color: #0284c7;">▶️</div><span class="app-label">Play Store</span></div>
+      <div class="app-card" onclick="openWebApp('https://web.telegram.org')"><div class="app-icon-wrap" style="background: #0284c7;">✈️</div><span class="app-label">Telegram</span></div>
+      <div class="app-card" onclick="openWebApp('https://www.instagram.com')"><div class="app-icon-wrap" style="background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);">📸</div><span class="app-label">Instagram</span></div>
+      <div class="app-card" onclick="openWebApp('https://maps.google.com')"><div class="app-icon-wrap" style="background: #34a853;">🗺️</div><span class="app-label">Maps</span></div>
+      <div class="app-card" onclick="openWebApp('https://mail.google.com')"><div class="app-icon-wrap" style="background: #ea4335;">✉️</div><span class="app-label">Gmail</span></div>
     </div>
 
-    <!-- App 3: Terminal -->
-    <div class="os-app-window" id="appTerminal">
-      <div class="app-window-header">
-        <span style="font-weight: 700;">💻 Terminal Shell</span>
-        <button onclick="closeApp()" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem;">✕</button>
+    <div class="bottom-search-container">
+      <div class="search-input-box">
+        <span>🔍</span>
+        <input type="text" id="drawerSearch" placeholder="Search apps, settings & web..." oninput="filterApps(this.value)">
       </div>
-      <div class="app-window-body" style="background: #000; font-family: monospace; color: #4ade80;">
-        <div id="termLog">NexusOS Linux Shell v2.0 Ready.
-Type 'help' for commands.</div>
-        <form onsubmit="handleTermCmd(event)" style="display: flex; gap: 0.5rem; margin-top: auto;">
-          <span style="color: var(--primary);">$</span>
-          <input type="text" id="termCmdInput" style="background: transparent; border:none; color:#fff; width:100%; outline:none;" autocomplete="off">
-        </form>
-      </div>
-      <div class="bottom-gesture-bar" onclick="closeApp()"><div class="gesture-pill"></div></div>
-    </div>
-
-    <!-- App 4: Settings -->
-    <div class="os-app-window" id="appSettings">
-      <div class="app-window-header">
-        <span style="font-weight: 700;">⚙️ Device Settings</span>
-        <button onclick="closeApp()" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem;">✕</button>
-      </div>
-      <div class="app-window-body">
-        <div><strong>Device:</strong> Nexus Phone Pro (Full Screen)</div>
-        <div><strong>Owner:</strong> <span id="settingsOwner">User</span></div>
-        <div><strong>Companion Device:</strong> <a href="watch.html" style="color:var(--primary);">Open Smart Watch OS</a></div>
-        <button class="btn-act" style="background: #ef4444; color:#fff; margin-top: auto;" onclick="factoryReset()">⚠️ Restart Setup Wizard</button>
-      </div>
-      <div class="bottom-gesture-bar" onclick="closeApp()"><div class="gesture-pill"></div></div>
-    </div>
-
-    <div class="bottom-gesture-bar" onclick="closeApp()">
-      <div class="gesture-pill"></div>
     </div>
   </div>
 
-  <script>
-    const helloWords = ["Hello", "नमस्ते", "Hola", "Bonjour", "Ciao", "مرحبا", "Konnichiwa"];
-    let helloIdx = 0;
-    setInterval(() => {
-      helloIdx = (helloIdx + 1) % helloWords.length;
-      const el = document.getElementById('helloCycle');
-      if (el) el.innerText = helloWords[helloIdx];
-    }, 1600);
+  <div class="full-app-view" id="appCalc">
+    <div class="app-header">
+      <span>🔢 Calculator</span>
+      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    </div>
+    <div class="app-body">
+      <input type="text" id="calcScreen" readonly value="0" style="font-size:2.5rem; text-align:right; background:transparent; border:none; color:#fff; outline:none; padding:1rem 0;">
+      <div class="calc-matrix">
+        <button class="c-btn" onclick="pressC('C')">C</button>
+        <button class="c-btn" onclick="pressC('/')">/</button>
+        <button class="c-btn" onclick="pressC('*')">*</button>
+        <button class="c-btn op" onclick="pressC('-')">-</button>
+        <button class="c-btn" onclick="pressC('7')">7</button>
+        <button class="c-btn" onclick="pressC('8')">8</button>
+        <button class="c-btn" onclick="pressC('9')">9</button>
+        <button class="c-btn op" onclick="pressC('+')">+</button>
+        <button class="c-btn" onclick="pressC('4')">4</button>
+        <button class="c-btn" onclick="pressC('5')">5</button>
+        <button class="c-btn" onclick="pressC('6')">6</button>
+        <button class="c-btn op" onclick="evalC()">=</button>
+        <button class="c-btn" onclick="pressC('1')">1</button>
+        <button class="c-btn" onclick="pressC('2')">2</button>
+        <button class="c-btn" onclick="pressC('3')">3</button>
+        <button class="c-btn" onclick="pressC('0')">0</button>
+      </div>
+    </div>
+    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
+  </div>
 
-    function nextStep(current) {
-      if (current === 1) {
-        document.getElementById('stepHello').classList.remove('active');
-        document.getElementById('stepName').classList.add('active');
-      } else if (current === 2) {
-        const nameVal = document.getElementById('userNameInput').value.trim() || 'User';
-        localStorage.setItem('nexus_user_name', nameVal);
-        document.getElementById('stepName').classList.remove('active');
-        document.getElementById('stepFinish').classList.add('active');
-      }
-    }
+  <div class="full-app-view" id="appCamera">
+    <div class="app-header">
+      <span>📷 Camera</span>
+      <button onclick="stopCameraApp()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    </div>
+    <div class="app-body" style="align-items: center; justify-content: space-around;">
+      <video id="cameraStream" autoplay playsinline></video>
+      <button onclick="alert('Photo Captured to Gallery!')" style="width:70px; height:70px; border-radius:50%; border:4px solid #fff; background:transparent;"></button>
+    </div>
+    <div class="home-bar-pill" onclick="stopCameraApp()"><div class="pill"></div></div>
+  </div>
 
-    function completeSetup() {
-      localStorage.setItem('nexus_setup_done', 'true');
-      const wizard = document.getElementById('setupWizard');
-      wizard.style.opacity = '0';
-      wizard.style.transform = 'scale(1.08)';
-      setTimeout(() => {
-        wizard.style.display = 'none';
-      }, 600);
-      loadUserData();
-    }
+  <div class="full-app-view" id="appDialer">
+    <div class="app-header">
+      <span>📞 Phone Dialer</span>
+      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    </div>
+    <div class="app-body">
+      <input type="text" id="dialerDisplay" readonly style="font-size:2rem; text-align:center; background:transparent; border:none; color:#38bdf8; padding:1rem 0;">
+      <div class="dialer-grid">
+        <button class="d-btn" onclick="dial('1')">1</button>
+        <button class="d-btn" onclick="dial('2')">2</button>
+        <button class="d-btn" onclick="dial('3')">3</button>
+        <button class="d-btn" onclick="dial('4')">4</button>
+        <button class="d-btn" onclick="dial('5')">5</button>
+        <button class="d-btn" onclick="dial('6')">6</button>
+        <button class="d-btn" onclick="dial('7')">7</button>
+        <button class="d-btn" onclick="dial('8')">8</button>
+        <button class="d-btn" onclick="dial('9')">9</button>
+        <button class="d-btn" onclick="dial('*')">*</button>
+        <button class="d-btn" onclick="dial('0')">0</button>
+        <button class="d-btn" onclick="dial('#')">#</button>
+      </div>
+      <div style="display:flex; justify-content:center; gap:1rem; margin-top:1rem;">
+        <button onclick="callNum()" style="padding:1rem 2.5rem; background:#22c55e; color:#fff; border:none; border-radius:30px; font-weight:700;">Call 📞</button>
+        <button onclick="document.getElementById('dialerDisplay').value=''" style="padding:1rem 1.5rem; background:#334155; color:#fff; border:none; border-radius:30px;">Clear</button>
+      </div>
+    </div>
+    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
+  </div>
 
-    function factoryReset() {
-      localStorage.clear();
-      location.reload();
-    }
+  <div class="full-app-view" id="appWeather">
+    <div class="app-header">
+      <span>🌤️ Weather Live</span>
+      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    </div>
+    <div class="app-body" style="text-align:center; justify-content:center;">
+      <div style="font-size: 5rem;">☀️</div>
+      <h1 style="font-size:3.5rem;">32°C</h1>
+      <p style="color:var(--text-muted); font-size:1.2rem;">Partly Cloudy • Humidity 65%</p>
+    </div>
+    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
+  </div>
 
-    function loadUserData() {
-      const name = localStorage.getItem('nexus_user_name') || 'User';
-      document.getElementById('ownerGreeting').innerText = `Hi, ${name}! 👋`;
-      document.getElementById('settingsOwner').innerText = name;
-    }
+  <div class="full-app-view" id="appNotes">
+    <div class="app-header">
+      <span>📝 Realme Notes</span>
+      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    </div>
+    <div class="app-body">
+      <textarea id="realmeNotesBox" rows="14" style="width:100%; background:#1e293b; color:#fff; border:1px solid var(--border-glass); border-radius:1rem; padding:1rem; font-size:1.1rem; outline:none;" placeholder="Start writing..."></textarea>
+      <button onclick="saveRealmeNote()" style="padding:1rem; background:#38bdf8; border:none; border-radius:1rem; font-weight:700; color:#020617;">Save Notes</button>
+    </div>
+    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
+  </div>
 
-    function tick() {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      const timeStr = `${h}:${m}`;
+  <div class="full-app-view" id="appTempMail">
+    <div class="app-header">
+      <span>💬 Messages / Disposable Mail</span>
+      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    </div>
+    <div class="app-body">
+      <input type="text" id="tMailInput" readonly style="width:100%; padding:1rem; background:#1e293b; border:1px solid var(--border-glass); border-radius:0.75rem; color:#38bdf8; font-weight:700;">
+      <button onclick="navigator.clipboard.writeText(document.getElementById('tMailInput').value); alert('Copied!');" style="padding:0.9rem; background:#38bdf8; color:#020617; border:none; border-radius:0.75rem; font-weight:700;">Copy Email</button>
+    </div>
+    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
+  </div>
 
-      document.getElementById('sysClock').innerText = timeStr;
-      document.getElementById('heroClock').innerText = timeStr;
+  <div class="full-app-view" id="appMusic">
+    <div class="app-header">
+      <span>🎵 Music Player</span>
+      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    </div>
+    <div class="app-body" style="text-align:center; justify-content:center;">
+      <div style="width:180px; height:180px; border-radius:50%; background:linear-gradient(45deg, #ff8c00, #e11d48); margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:4rem; box-shadow:0 0 30px rgba(255,140,0,0.5);">🎶</div>
+      <h2 style="margin-top:1.5rem;">Cyber Beat Track</h2>
+      <button onclick="toggleMusic(this)" style="margin-top:1.5rem; padding:1rem 2.5rem; background:#38bdf8; color:#020617; border:none; border-radius:30px; font-weight:700;">Play / Pause</button>
+    </div>
+    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
+  </div>
 
-      const opts = { weekday: 'long', month: 'short', day: 'numeric' };
-      document.getElementById('heroDate').innerText = now.toLocaleDateString('en-US', opts);
-    }
-    setInterval(tick, 1000);
-    tick();
+  <div class="full-app-view" id="appRecorder">
+    <div class="app-header">
+      <span>🎙️ Voice Recorder</span>
+      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    </div>
+    <div class="app-body" style="text-align:center; justify-content:center;">
+      <div id="recTimer" style="font-size:3rem; font-weight:700; color:#ef4444;">00:00</div>
+      <button id="recBtn" onclick="toggleRecord()" style="margin-top:2rem; width:80px; height:80px; border-radius:50%; background:#ef4444; border:none; color:#fff; font-size:1.8rem;">●</button>
+    </div>
+    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
+  </div>
 
-    let openWindowId = null;
-    function openApp(id) {
-      openWindowId = id;
-      document.getElementById(id).classList.add('active');
-    }
-
-    function closeApp() {
-      if (openWindowId) {
-        document.getElementById(openWindowId).classList.remove('active');
-        openWindowId = null;
-      }
-    }
-
-    let currentLogin = 'user_' + Math.random().toString(36).substring(2, 8);
-    document.getElementById('mailBoxAddress').value = `${currentLogin}@1secmail.com`;
-    function genNewAddress() {
-      currentLogin = 'user_' + Math.random().toString(36).substring(2, 8);
-      document.getElementById('mailBoxAddress').value = `${currentLogin}@1secmail.com`;
-    }
-    function copyTempMail() {
-      navigator.clipboard.writeText(document.getElementById('mailBoxAddress').value);
-      alert('Email copied!');
-    }
-
-    document.getElementById('myNotes').value = localStorage.getItem('nexus_notes_data') || '';
-    function saveMyNotes() {
-      localStorage.setItem('nexus_notes_data', document.getElementById('myNotes').value);
-      alert('Notes Saved!');
-    }
-
-    function handleTermCmd(e) {
-      e.preventDefault();
-      const inp = document.getElementById('termCmdInput');
-      const log = document.getElementById('termLog');
-      log.innerText += `\n$ ${inp.value}\nCommand executed successfully.`;
-      inp.value = '';
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('nexus_setup_done') === 'true') {
-        document.getElementById('setupWizard').style.display = 'none';
-        loadUserData();
-      }
-    });
-  </script>
-</body>
-</html>
+  <div class="full-app-view" id="appSettings">
+    <div class="app-header">
+      <span>⚙️ Settings</span>
+      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    </div>
+    <div class="app-body">
+      <div style="padding:1rem; background:#1e293b; border-radius:1rem;">
+        <div><strong>Device Name:</strong> r
