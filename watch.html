@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Smart Watch OS</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #030712;
+      color: #f8fafc;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .watch-case {
+      width: 340px;
+      height: 340px;
+      background: radial-gradient(circle, #1e293b, #090d16);
+      border-radius: 50%;
+      border: 8px solid #334155;
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.25), inset 0 0 15px rgba(0,0,0,0.8);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen-view {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+    }
+
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.85);
+    }
+
+    .watch-time {
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(180deg, #ffffff, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
+    .watch-date {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .metrics-row {
+      display: flex;
+      gap: 1.25rem;
+      margin-top: 1.2rem;
+    }
+
+    .metric-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 0.3rem 0.6rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-swipe {
+      margin-top: 1.2rem;
+      background: #38bdf8;
+      color: #030712;
+      font-weight: 700;
+      font-size: 0.75rem;
+      border: none;
+      padding: 0.4rem 0.9rem;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+      padding: 1.5rem;
+    }
+
+    .app-btn {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      width: 85px;
+      height: 85px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .app-btn:active {
+      transform: scale(0.92);
+      background: #38bdf8;
+      color: #030712;
+    }
+
+    .app-btn span {
+      font-size: 1.5rem;
+    }
+
+    .mini-app {
+      background: #090d16;
+      width: 100%;
+      height: 100%;
+      padding: 2.5rem 1.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .app-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 0.5rem;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 15px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="watch-case">
+    <!-- Screen 1: Watch Face -->
+    <div class="screen-view" id="faceView">
+      <div class="watch-time" id="watchClock">10:09</div>
+      <div class="watch-date" id="watchDate">SAT, AUG 15</div>
+
+      <div class="metrics-row">
+        <div class="metric-badge" style="color: #ef4444;">❤️ <span id="heartRate">76</span></div>
+        <div class="metric-badge" style="color: #22c55e;">⚡ <span id="stepsCount">4,820</span></div>
+      </div>
+
+      <button class="btn-swipe" onclick="showApps()">Apps Menu ➔</button>
+    </div>
+
+    <!-- Screen 2: App Launcher Grid -->
+    <div class="screen-view hidden" id="appsView">
+      <button class="back-btn" onclick="showFace()">◀ Watch Face</button>
+      <div class="app-grid">
+        <div class="app-btn" onclick="openMiniApp('heart')"><span>❤️</span>Heart</div>
+        <div class="app-btn" onclick="openMiniApp('timer')"><span>⏱️</span>Timer</div>
+        <div class="app-btn" onclick="openMiniApp('weather')"><span>☀️</span>Weather</div>
+        <div class="app-btn" onclick="location.href='index.html'"><span>📱</span>Phone</div>
+      </div>
+    </div>
+
+    <!-- Screen 3: Mini App Container -->
+    <div class="screen-view hidden" id="miniAppView">
+      <button class="back-btn" onclick="showApps()">◀ Apps</button>
+      <div class="mini-app">
+        <div class="app-title" id="miniTitle">App Title</div>
+        <div id="miniBody" style="font-size: 1.1rem; font-weight: 600;">Content</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateWatchTime() {
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('watchClock').innerText = `${hrs}:${mins}`;
+
+      const options = { weekday: 'short', month: 'short', day: 'numeric' };
+      document.getElementById('watchDate').innerText = now.toLocaleDateString('en-US', options).toUpperCase();
+    }
+    setInterval(updateWatchTime, 1000);
+    updateWatchTime();
+
+    setInterval(() => {
+      const hr = 72 + Math.floor(Math.random() * 8);
+      document.getElementById('heartRate').innerText = hr;
+    }, 3000);
+
+    function showFace() {
+      document.getElementById('faceView').classList.remove('hidden');
+      document.getElementById('appsView').classList.add('hidden');
+      document.getElementById('miniAppView').classList.add('hidden');
+    }
+
+    function showApps() {
+      document.getElementById('faceView').classList.add('hidden');
+      document.getElementById('appsView').classList.remove('hidden');
+      document.getElementById('miniAppView').classList.add('hidden');
+    }
+
+    function openMiniApp(type) {
+      document.getElementById('appsView').classList.add('hidden');
+      document.getElementById('miniAppView').classList.remove('hidden');
+
+      const title = document.getElementById('miniTitle');
+      const body = document.getElementById('miniBody');
+
+      if (type === 'heart') {
+        title.innerText = 'Heart Rate Monitor';
+        body.innerHTML = '<span style="font-size:2rem; color:#ef4444;">76 BPM</span><br><small style="color:#94a3b8;">Normal Resting</small>';
+      } else if (type === 'timer') {
+        title.innerText = 'Stopwatch';
+        body.innerHTML = '<span style="font-size:1.8rem; color:#38bdf8;">00:45.8</span><br><button style="margin-top:0.5rem; padding:0.3rem 0.8rem; border-radius:10px; border:none; background:#22c55e; font-weight:700;">Start</button>';
+      } else if (type === 'weather') {
+        title.innerText = 'Local Weather';
+        body.innerHTML = '<span style="font-size:2rem;">☀️ 29°C</span><br><small style="color:#94a3b8;">Sunny & Clear</small>';
+      }
+    }
+  </script>
+</body>
+</html>
