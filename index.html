@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Realme UI Next-Gen App Drawer</title>
+  <title>Nexus OS - Next Gen Mobile</title>
   <style>
     :root {
-      --bg-dark: #07090e;
-      --card-glass: rgba(18, 24, 38, 0.85);
-      --border-glass: rgba(255, 255, 255, 0.12);
+      --bg: #050811;
+      --card-glass: rgba(18, 26, 43, 0.75);
+      --card-border: rgba(255, 255, 255, 0.12);
       --primary: #38bdf8;
-      --accent: #ff8c00;
+      --accent: #ffcc00;
       --text: #ffffff;
-      --text-muted: #cbd5e1;
+      --text-muted: #94a3b8;
     }
 
     * {
@@ -27,27 +27,27 @@
     }
 
     body {
-      background: #020617;
+      background: #000;
       color: var(--text);
       width: 100vw;
       height: 100vh;
       overflow: hidden;
       display: flex;
-      flex-direction: column;
     }
 
-    #osContainer {
-      flex: 1;
+    #osViewport {
       width: 100vw;
       height: 100vh;
-      background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat;
+      background: radial-gradient(circle at top right, #1e1b4b, #0f172a, #020617);
+      position: relative;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      position: relative;
     }
 
+    /* TOP STATUS BAR */
     .status-bar {
-      height: 42px;
+      height: 44px;
       padding: 0 1.25rem;
       display: flex;
       justify-content: space-between;
@@ -55,146 +55,81 @@
       font-size: 0.85rem;
       font-weight: 700;
       z-index: 100;
-      color: #fff;
+      cursor: pointer;
     }
 
-    .status-right {
+    .status-icons {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .drawer-nav {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.5rem 1rem;
-      z-index: 50;
+    .badge-net {
+      background: #22c55e;
+      color: #000;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 800;
     }
 
-    .nav-pill {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      padding: 0.35rem 1.2rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #cbd5e1;
-      cursor: pointer;
-    }
-
-    .nav-pill.active {
-      background: #ffffff;
-      color: #000000;
-    }
-
-    .app-drawer-scroll {
+    /* HOME SCREEN MAIN VIEW */
+    .home-screen {
       flex: 1;
-      overflow-y: auto;
-      padding: 0.75rem 1.25rem 5rem 1.25rem;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.25rem 0.5rem;
-      align-content: start;
-      text-align: center;
-      scrollbar-width: none;
-    }
-
-    .app-drawer-scroll::-webkit-scrollbar {
-      display: none;
-    }
-
-    .app-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-      cursor: pointer;
-      transition: transform 0.15s ease;
-    }
-
-    .app-card:active {
-      transform: scale(0.88);
-    }
-
-    .app-icon-wrap {
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.75rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-      position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .app-badge {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      background: #ef4444;
-      color: #fff;
-      font-size: 0.65rem;
-      font-weight: 700;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #000;
-    }
-
-    .app-label {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 75px;
-    }
-
-    .az-bar {
-      position: absolute;
-      right: 4px;
-      top: 100px;
-      bottom: 80px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      font-size: 0.55rem;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.4);
-      pointer-events: none;
-      z-index: 60;
+      padding: 0.5rem 1.25rem 5.5rem 1.25rem;
+      position: relative;
     }
 
-    .bottom-search-container {
-      position: absolute;
-      bottom: 25px;
-      left: 1.25rem;
-      right: 1.25rem;
-      z-index: 100;
-    }
-
-    .search-input-box {
-      background: rgba(30, 41, 59, 0.85);
+    /* BRAND LOGO & CLOCK WIDGET */
+    .header-widget {
+      background: var(--card-glass);
       backdrop-filter: blur(25px);
-      border: 1px solid var(--border-glass);
-      border-radius: 25px;
-      padding: 0.65rem 1.25rem;
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .brand-logo-text {
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #ffcc00, #ff8c00, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .clock-big {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    /* SEARCH PILL */
+    .search-pill {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 30px;
+      padding: 0.65rem 1.2rem;
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      margin: 1rem 0;
+      cursor: pointer;
     }
 
-    .search-input-box input {
+    .search-pill input {
       flex: 1;
       background: transparent;
       border: none;
@@ -203,10 +138,121 @@
       outline: none;
     }
 
-    .full-app-view {
+    /* APP DRAWER GRID */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem 0.5rem;
+      text-align: center;
+    }
+
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .app-item:active { transform: scale(0.88); }
+
+    .app-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.7rem;
+      background: #1e293b;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      border: 1px solid var(--card-border);
+    }
+
+    .app-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 72px;
+    }
+
+    /* FLOATING BOTTOM DOCK */
+    .floating-dock {
+      position: absolute;
+      bottom: 20px;
+      left: 1.25rem;
+      right: 1.25rem;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(30px);
+      border: 1px solid var(--card-border);
+      border-radius: 32px;
+      padding: 0.65rem 1rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 90;
+    }
+
+    /* PULL DOWN CONTROL CENTER */
+    #controlCenter {
       position: fixed;
       inset: 0;
-      background: #090d16;
+      background: rgba(8, 12, 22, 0.85);
+      backdrop-filter: blur(40px);
+      z-index: 1000;
+      padding: 1.5rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      transform: translateY(-100%);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    #controlCenter.active {
+      transform: translateY(0);
+    }
+
+    .cc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem 0.5rem;
+      text-align: center;
+    }
+
+    .cc-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin: 0 auto 0.3rem auto;
+      cursor: pointer;
+    }
+
+    .cc-btn.on {
+      background: #007aff;
+      color: #fff;
+    }
+
+    /* APP RUNTIME WINDOWS */
+    .app-window {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
       z-index: 500;
       display: flex;
       flex-direction: column;
@@ -214,21 +260,22 @@
       transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
     }
 
-    .full-app-view.active {
+    .app-window.active {
       transform: translateY(0);
     }
 
-    .app-header {
+    .window-header {
       height: 52px;
       padding: 0 1.25rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-glass);
       background: #111827;
+      border-bottom: 1px solid var(--card-border);
+      font-weight: 700;
     }
 
-    .app-body {
+    .window-body {
       flex: 1;
       overflow-y: auto;
       padding: 1.25rem;
@@ -237,7 +284,7 @@
       gap: 1rem;
     }
 
-    .home-bar-pill {
+    .bottom-home-bar {
       height: 24px;
       display: flex;
       justify-content: center;
@@ -246,251 +293,214 @@
       z-index: 600;
     }
 
-    .pill {
+    .home-pill {
       width: 130px;
       height: 4px;
       background: rgba(255, 255, 255, 0.5);
       border-radius: 10px;
     }
-
-    .calc-matrix {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.6rem;
-    }
-    .c-btn {
-      padding: 1.2rem;
-      font-size: 1.3rem;
-      background: #1e293b;
-      color: #fff;
-      border: 1px solid var(--border-glass);
-      border-radius: 16px;
-      cursor: pointer;
-    }
-    .c-btn.op {
-      background: #38bdf8;
-      color: #020617;
-      font-weight: 700;
-    }
-
-    #cameraStream {
-      width: 100%;
-      height: 350px;
-      background: #000;
-      border-radius: 1.25rem;
-      object-fit: cover;
-    }
-
-    .dialer-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      max-width: 300px;
-      margin: auto;
-      text-align: center;
-    }
-    .d-btn {
-      padding: 1.1rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: #1e293b;
-      border-radius: 50%;
-      color: #fff;
-      border: 1px solid var(--border-glass);
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
 
-  <div id="osContainer">
-    <div class="status-bar">
-      <span id="osClock">19:25</span>
-      <div class="status-right">
-        <span style="font-size: 0.75rem;">0.09 KB/s</span>
+  <div id="osViewport">
+    
+    <!-- Top System Status Bar -->
+    <div class="status-bar" onclick="openCC()">
+      <span id="topClock">19:34</span>
+      <div class="status-icons">
+        <span style="font-size:0.75rem;">0.85 KB/s</span>
         <span>VoLTE</span>
-        <span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 0.1rem 0.4rem; border-radius: 4px;">5G</span>
+        <span class="badge-net">5G</span>
         <span>🔋 100%</span>
       </div>
     </div>
 
-    <div class="drawer-nav">
-      <div class="nav-pill active">All</div>
-      <div class="nav-pill">Categories</div>
+    <!-- Main Home UI -->
+    <div class="home-screen">
+      
+      <div>
+        <!-- Brand Logo & Clock Widget -->
+        <div class="header-widget">
+          <div>
+            <div class="clock-big" id="homeClock">19:34</div>
+            <div style="color:var(--text-muted); font-size:0.9rem;" id="homeDate">Saturday, Aug 15</div>
+          </div>
+          <div class="brand-logo-text">
+            ⚡ NEXUS OS
+          </div>
+        </div>
+
+        <!-- Global Search Bar -->
+        <div class="search-pill">
+          <span>🔍</span>
+          <input type="text" id="appFilter" placeholder="Search system, apps, tools..." oninput="filterDrawer(this.value)">
+        </div>
+      </div>
+
+      <!-- Complete App Grid -->
+      <div class="app-grid" id="mainGrid">
+        <div class="app-item" onclick="openApp('appDialer')">
+          <div class="app-icon" style="background:#22c55e;">📞</div>
+          <span class="app-label">Phone</span>
+        </div>
+
+        <div class="app-item" onclick="openApp('appTempMail')">
+          <div class="app-icon" style="background:#0284c7;">💬</div>
+          <span class="app-label">Messages</span>
+        </div>
+
+        <div class="app-item" onclick="openApp('appCamera')">
+          <div class="app-icon" style="background:#0f172a; border-color:#38bdf8;">📷</div>
+          <span class="app-label">Camera</span>
+        </div>
+
+        <div class="app-item" onclick="openApp('appCalc')">
+          <div class="app-icon" style="background:#334155;">🔢</div>
+          <span class="app-label">Calculator</span>
+        </div>
+
+        <div class="app-item" onclick="openApp('appNotes')">
+          <div class="app-icon" style="background:#eab308;">📝</div>
+          <span class="app-label">Notes</span>
+        </div>
+
+        <div class="app-item" onclick="openApp('appWeather')">
+          <div class="app-icon" style="background:#38bdf8;">🌤️</div>
+          <span class="app-label">Weather</span>
+        </div>
+
+        <div class="app-item" onclick="openWeb('https://www.youtube.com')">
+          <div class="app-icon" style="background:#ff0000;">▶️</div>
+          <span class="app-label">YouTube</span>
+        </div>
+
+        <div class="app-item" onclick="openWeb('https://www.whatsapp.com')">
+          <div class="app-icon" style="background:#25d366;">🟢</div>
+          <span class="app-label">WhatsApp</span>
+        </div>
+
+        <div class="app-item" onclick="openWeb('https://www.phonepe.com')">
+          <div class="app-icon" style="background:#5f259f;">💳</div>
+          <span class="app-label">PhonePe</span>
+        </div>
+
+        <div class="app-item" onclick="openWeb('https://play.google.com')">
+          <div class="app-icon" style="background:#fff; color:#0284c7;">🛍️</div>
+          <span class="app-label">Play Store</span>
+        </div>
+
+        <div class="app-item" onclick="openApp('appTerminal')">
+          <div class="app-icon" style="background:#000;">💻</div>
+          <span class="app-label">Terminal</span>
+        </div>
+
+        <div class="app-item" onclick="openApp('appSettings')">
+          <div class="app-icon" style="background:#64748b;">⚙️</div>
+          <span class="app-label">Settings</span>
+        </div>
+      </div>
+
+      <div></div>
     </div>
 
-    <div class="az-bar">
-      <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span><span>K</span><span>L</span><span>M</span><span>N</span><span>O</span><span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span><span>U</span><span>V</span><span>W</span><span>X</span><span>Y</span><span>Z</span>
+    <!-- Floating Dock -->
+    <div class="floating-dock">
+      <div class="app-item" onclick="openApp('appDialer')"><div class="app-icon" style="background:#22c55e;">📞</div></div>
+      <div class="app-item" onclick="openApp('appTempMail')"><div class="app-icon" style="background:#0284c7;">💬</div></div>
+      <div class="app-item" onclick="openWeb('https://www.google.com')"><div class="app-icon" style="background:#fff; color:#000;">🌐</div></div>
+      <div class="app-item" onclick="openApp('appCamera')"><div class="app-icon" style="background:#0f172a; border-color:#38bdf8;">📷</div></div>
     </div>
 
-    <div class="app-drawer-scroll" id="appGrid">
-      <div class="app-card" onclick="openWebApp('https://www.airtel.in')"><div class="app-icon-wrap" style="background: #e11d48;">🔴</div><span class="app-label">Airtel</span></div>
-      <div class="app-card" onclick="alert('Airtel Alert Service: All systems active.')"><div class="app-icon-wrap" style="background: #334155;">📟</div><span class="app-label">Airtel Alert</span></div>
-      <div class="app-card" onclick="openWebApp('https://www.amazon.in')"><div class="app-icon-wrap" style="background: #ff9900;">🛒</div><span class="app-label">Amazon</span></div>
-      <div class="app-card" onclick="openAppModal('appCalc')"><div class="app-icon-wrap" style="background: #475569;">🔢</div><span class="app-label">Calculator</span></div>
-      <div class="app-card" onclick="openCameraApp()"><div class="app-icon-wrap" style="background: #0f172a; border-color: #38bdf8;">📷</div><span class="app-label">Camera</span></div>
-      <div class="app-card" onclick="openAppModal('appWeather')"><div class="app-icon-wrap" style="background: #38bdf8;">🌤️</div><span class="app-label">Weather</span></div>
-      <div class="app-card" onclick="openAppModal('appNotes')"><div class="app-icon-wrap" style="background: #eab308;">📝</div><span class="app-label">Notes</span></div>
-      <div class="app-card" onclick="openAppModal('appDialer')"><div class="app-icon-wrap" style="background: #22c55e;">📞</div><span class="app-label">Phone</span></div>
-      <div class="app-card" onclick="openAppModal('appTempMail')"><div class="app-icon-wrap" style="background: #2563eb;">💬</div><span class="app-label">Messages</span></div>
-      <div class="app-card" onclick="openAppModal('appMusic')"><div class="app-icon-wrap" style="background: #d97706;">🎵</div><span class="app-label">Music</span></div>
-      <div class="app-card" onclick="openAppModal('appRecorder')"><div class="app-icon-wrap" style="background: #ef4444;">🎙️</div><span class="app-label">Recorder</span></div>
-      <div class="app-card" onclick="openAppModal('appSettings')"><div class="app-icon-wrap" style="background: #64748b;">⚙️</div><span class="app-label">Settings</span></div>
-      <div class="app-card" onclick="openWebApp('https://www.whatsapp.com')"><div class="app-icon-wrap" style="background: #25d366;">🟢</div><span class="app-label">WhatsApp</span></div>
-      <div class="app-card" onclick="openWebApp('https://www.youtube.com')"><div class="app-icon-wrap" style="background: #ff0000;">▶️</div><span class="app-label">YouTube</span></div>
-      <div class="app-card" onclick="openWebApp('https://www.phonepe.com')"><div class="app-icon-wrap" style="background: #5f259f;">💳</div><span class="app-label">PhonePe</span></div>
-      <div class="app-card" onclick="openWebApp('https://play.google.com')"><div class="app-icon-wrap" style="background: #ffffff; color: #0284c7;">▶️</div><span class="app-label">Play Store</span></div>
-      <div class="app-card" onclick="openWebApp('https://web.telegram.org')"><div class="app-icon-wrap" style="background: #0284c7;">✈️</div><span class="app-label">Telegram</span></div>
-      <div class="app-card" onclick="openWebApp('https://www.instagram.com')"><div class="app-icon-wrap" style="background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);">📸</div><span class="app-label">Instagram</span></div>
-      <div class="app-card" onclick="openWebApp('https://maps.google.com')"><div class="app-icon-wrap" style="background: #34a853;">🗺️</div><span class="app-label">Maps</span></div>
-      <div class="app-card" onclick="openWebApp('https://mail.google.com')"><div class="app-icon-wrap" style="background: #ea4335;">✉️</div><span class="app-label">Gmail</span></div>
+    <!-- PULL-DOWN CONTROL CENTER -->
+    <div id="controlCenter">
+      <div class="cc-header">
+        <div>
+          <div style="font-size:2.2rem; font-weight:800;" id="ccClock">19:34</div>
+          <small style="color:var(--text-muted);">Realme UI Quick Settings</small>
+        </div>
+        <button onclick="closeCC()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+      </div>
+
+      <div class="cc-grid">
+        <div><div class="cc-btn on" onclick="this.classList.toggle('on')">📶</div><span style="font-size:0.75rem;">Wi-Fi</span></div>
+        <div><div class="cc-btn on" onclick="this.classList.toggle('on')">ᛒ</div><span style="font-size:0.75rem;">Bluetooth</span></div>
+        <div><div class="cc-btn" onclick="this.classList.toggle('on')">🔦</div><span style="font-size:0.75rem;">Torch</span></div>
+        <div><div class="cc-btn on" onclick="this.classList.toggle('on')">📍</div><span style="font-size:0.75rem;">Location</span></div>
+        <div><div class="cc-btn" onclick="this.classList.toggle('on')">✈️</div><span style="font-size:0.75rem;">Flight</span></div>
+        <div><div class="cc-btn on" onclick="this.classList.toggle('on')">🌓</div><span style="font-size:0.75rem;">Dark</span></div>
+        <div><div class="cc-btn" onclick="this.classList.toggle('on')">🔄</div><span style="font-size:0.75rem;">Rotate</span></div>
+        <div><div class="cc-btn" onclick="location.href='watch.html'">⌚</div><span style="font-size:0.75rem;">Watch</span></div>
+      </div>
+
+      <div class="bottom-home-bar" onclick="closeCC()"><div class="home-pill"></div></div>
     </div>
 
-    <div class="bottom-search-container">
-      <div class="search-input-box">
-        <span>🔍</span>
-        <input type="text" id="drawerSearch" placeholder="Search apps, settings & web..." oninput="filterApps(this.value)">
+  </div>
+
+  <!-- APP 1: DIALER -->
+  <div class="app-window" id="appDialer">
+    <div class="window-header"><span>📞 Phone Dialer</span><button onclick="closeApp('appDialer')" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button></div>
+    <div class="window-body">
+      <input type="text" id="dialNum" readonly style="width:100%; font-size:2.2rem; text-align:center; background:transparent; border:none; color:#38bdf8; padding:1rem 0;">
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; max-width:280px; margin:auto;">
+        <button onclick="dialNum.value+='1'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">1</button>
+        <button onclick="dialNum.value+='2'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">2</button>
+        <button onclick="dialNum.value+='3'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">3</button>
+        <button onclick="dialNum.value+='4'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">4</button>
+        <button onclick="dialNum.value+='5'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">5</button>
+        <button onclick="dialNum.value+='6'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">6</button>
+        <button onclick="dialNum.value+='7'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">7</button>
+        <button onclick="dialNum.value+='8'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">8</button>
+        <button onclick="dialNum.value+='9'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">9</button>
+        <button onclick="dialNum.value+='*'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">*</button>
+        <button onclick="dialNum.value+='0'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">0</button>
+        <button onclick="dialNum.value+='#'" style="padding:1.2rem; border-radius:50%; background:#1e293b; color:#fff; font-size:1.4rem; border:none;">#</button>
+      </div>
+      <div style="display:flex; justify-content:center; gap:1rem; margin-top:1.5rem;">
+        <button onclick="if(dialNum.value) location.href='tel:'+dialNum.value" style="padding:1rem 2.5rem; background:#22c55e; color:#fff; border:none; border-radius:30px; font-weight:700;">Call 📞</button>
+        <button onclick="dialNum.value=''" style="padding:1rem 1.5rem; background:#334155; color:#fff; border:none; border-radius:30px;">Clear</button>
       </div>
     </div>
+    <div class="bottom-home-bar" onclick="closeApp('appDialer')"><div class="home-pill"></div></div>
   </div>
 
-  <div class="full-app-view" id="appCalc">
-    <div class="app-header">
-      <span>🔢 Calculator</span>
-      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+  <!-- APP 2: TEMP MAIL -->
+  <div class="app-window" id="appTempMail">
+    <div class="window-header"><span>💬 Messages / Temp Mail</span><button onclick="closeApp('appTempMail')" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button></div>
+    <div class="window-body">
+      <input type="text" id="mailAddress" readonly style="width:100%; padding:1rem; background:#1e293b; border:1px solid var(--card-border); border-radius:12px; color:#38bdf8; font-weight:700;">
+      <button onclick="navigator.clipboard.writeText(mailAddress.value); alert('Copied!');" style="padding:0.9rem; background:#0284c7; color:#fff; border:none; border-radius:12px; font-weight:700;">Copy Email</button>
+      <div style="font-weight:700; margin-top:1rem;">📥 Inbox Ready</div>
     </div>
-    <div class="app-body">
-      <input type="text" id="calcScreen" readonly value="0" style="font-size:2.5rem; text-align:right; background:transparent; border:none; color:#fff; outline:none; padding:1rem 0;">
-      <div class="calc-matrix">
-        <button class="c-btn" onclick="pressC('C')">C</button>
-        <button class="c-btn" onclick="pressC('/')">/</button>
-        <button class="c-btn" onclick="pressC('*')">*</button>
-        <button class="c-btn op" onclick="pressC('-')">-</button>
-        <button class="c-btn" onclick="pressC('7')">7</button>
-        <button class="c-btn" onclick="pressC('8')">8</button>
-        <button class="c-btn" onclick="pressC('9')">9</button>
-        <button class="c-btn op" onclick="pressC('+')">+</button>
-        <button class="c-btn" onclick="pressC('4')">4</button>
-        <button class="c-btn" onclick="pressC('5')">5</button>
-        <button class="c-btn" onclick="pressC('6')">6</button>
-        <button class="c-btn op" onclick="evalC()">=</button>
-        <button class="c-btn" onclick="pressC('1')">1</button>
-        <button class="c-btn" onclick="pressC('2')">2</button>
-        <button class="c-btn" onclick="pressC('3')">3</button>
-        <button class="c-btn" onclick="pressC('0')">0</button>
-      </div>
-    </div>
-    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
+    <div class="bottom-home-bar" onclick="closeApp('appTempMail')"><div class="home-pill"></div></div>
   </div>
 
-  <div class="full-app-view" id="appCamera">
-    <div class="app-header">
-      <span>📷 Camera</span>
-      <button onclick="stopCameraApp()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+  <!-- APP 3: CAMERA -->
+  <div class="app-window" id="appCamera">
+    <div class="window-header"><span>📷 Camera</span><button onclick="stopCam()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button></div>
+    <div class="window-body" style="align-items:center; justify-content:space-around;">
+      <video id="liveStream" autoplay playsinline style="width:100%; height:360px; border-radius:20px; object-fit:cover; background:#000;"></video>
+      <button onclick="alert('Photo Captured!')" style="width:75px; height:75px; border-radius:50%; border:4px solid #fff; background:transparent;"></button>
     </div>
-    <div class="app-body" style="align-items: center; justify-content: space-around;">
-      <video id="cameraStream" autoplay playsinline></video>
-      <button onclick="alert('Photo Captured to Gallery!')" style="width:70px; height:70px; border-radius:50%; border:4px solid #fff; background:transparent;"></button>
-    </div>
-    <div class="home-bar-pill" onclick="stopCameraApp()"><div class="pill"></div></div>
+    <div class="bottom-home-bar" onclick="stopCam()"><div class="home-pill"></div></div>
   </div>
 
-  <div class="full-app-view" id="appDialer">
-    <div class="app-header">
-      <span>📞 Phone Dialer</span>
-      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
-    </div>
-    <div class="app-body">
-      <input type="text" id="dialerDisplay" readonly style="font-size:2rem; text-align:center; background:transparent; border:none; color:#38bdf8; padding:1rem 0;">
-      <div class="dialer-grid">
-        <button class="d-btn" onclick="dial('1')">1</button>
-        <button class="d-btn" onclick="dial('2')">2</button>
-        <button class="d-btn" onclick="dial('3')">3</button>
-        <button class="d-btn" onclick="dial('4')">4</button>
-        <button class="d-btn" onclick="dial('5')">5</button>
-        <button class="d-btn" onclick="dial('6')">6</button>
-        <button class="d-btn" onclick="dial('7')">7</button>
-        <button class="d-btn" onclick="dial('8')">8</button>
-        <button class="d-btn" onclick="dial('9')">9</button>
-        <button class="d-btn" onclick="dial('*')">*</button>
-        <button class="d-btn" onclick="dial('0')">0</button>
-        <button class="d-btn" onclick="dial('#')">#</button>
-      </div>
-      <div style="display:flex; justify-content:center; gap:1rem; margin-top:1rem;">
-        <button onclick="callNum()" style="padding:1rem 2.5rem; background:#22c55e; color:#fff; border:none; border-radius:30px; font-weight:700;">Call 📞</button>
-        <button onclick="document.getElementById('dialerDisplay').value=''" style="padding:1rem 1.5rem; background:#334155; color:#fff; border:none; border-radius:30px;">Clear</button>
-      </div>
-    </div>
-    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
-  </div>
-
-  <div class="full-app-view" id="appWeather">
-    <div class="app-header">
-      <span>🌤️ Weather Live</span>
-      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
-    </div>
-    <div class="app-body" style="text-align:center; justify-content:center;">
-      <div style="font-size: 5rem;">☀️</div>
-      <h1 style="font-size:3.5rem;">32°C</h1>
-      <p style="color:var(--text-muted); font-size:1.2rem;">Partly Cloudy • Humidity 65%</p>
-    </div>
-    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
-  </div>
-
-  <div class="full-app-view" id="appNotes">
-    <div class="app-header">
-      <span>📝 Realme Notes</span>
-      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
-    </div>
-    <div class="app-body">
-      <textarea id="realmeNotesBox" rows="14" style="width:100%; background:#1e293b; color:#fff; border:1px solid var(--border-glass); border-radius:1rem; padding:1rem; font-size:1.1rem; outline:none;" placeholder="Start writing..."></textarea>
-      <button onclick="saveRealmeNote()" style="padding:1rem; background:#38bdf8; border:none; border-radius:1rem; font-weight:700; color:#020617;">Save Notes</button>
-    </div>
-    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
-  </div>
-
-  <div class="full-app-view" id="appTempMail">
-    <div class="app-header">
-      <span>💬 Messages / Disposable Mail</span>
-      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
-    </div>
-    <div class="app-body">
-      <input type="text" id="tMailInput" readonly style="width:100%; padding:1rem; background:#1e293b; border:1px solid var(--border-glass); border-radius:0.75rem; color:#38bdf8; font-weight:700;">
-      <button onclick="navigator.clipboard.writeText(document.getElementById('tMailInput').value); alert('Copied!');" style="padding:0.9rem; background:#38bdf8; color:#020617; border:none; border-radius:0.75rem; font-weight:700;">Copy Email</button>
-    </div>
-    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
-  </div>
-
-  <div class="full-app-view" id="appMusic">
-    <div class="app-header">
-      <span>🎵 Music Player</span>
-      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
-    </div>
-    <div class="app-body" style="text-align:center; justify-content:center;">
-      <div style="width:180px; height:180px; border-radius:50%; background:linear-gradient(45deg, #ff8c00, #e11d48); margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:4rem; box-shadow:0 0 30px rgba(255,140,0,0.5);">🎶</div>
-      <h2 style="margin-top:1.5rem;">Cyber Beat Track</h2>
-      <button onclick="toggleMusic(this)" style="margin-top:1.5rem; padding:1rem 2.5rem; background:#38bdf8; color:#020617; border:none; border-radius:30px; font-weight:700;">Play / Pause</button>
-    </div>
-    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
-  </div>
-
-  <div class="full-app-view" id="appRecorder">
-    <div class="app-header">
-      <span>🎙️ Voice Recorder</span>
-      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
-    </div>
-    <div class="app-body" style="text-align:center; justify-content:center;">
-      <div id="recTimer" style="font-size:3rem; font-weight:700; color:#ef4444;">00:00</div>
-      <button id="recBtn" onclick="toggleRecord()" style="margin-top:2rem; width:80px; height:80px; border-radius:50%; background:#ef4444; border:none; color:#fff; font-size:1.8rem;">●</button>
-    </div>
-    <div class="home-bar-pill" onclick="closeAppModal()"><div class="pill"></div></div>
-  </div>
-
-  <div class="full-app-view" id="appSettings">
-    <div class="app-header">
-      <span>⚙️ Settings</span>
-      <button onclick="closeAppModal()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
-    </div>
-    <div class="app-body">
-      <div style="padding:1rem; background:#1e293b; border-radius:1rem;">
-        <div><strong>Device Name:</strong> r
+  <!-- APP 4: CALCULATOR -->
+  <div class="app-window" id="appCalc">
+    <div class="window-header"><span>🔢 Calculator</span><button onclick="closeApp('appCalc')" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button></div>
+    <div class="window-body">
+      <input type="text" id="calcRes" readonly value="0" style="font-size:2.5rem; text-align:right; background:transparent; border:none; color:#fff; padding:1rem 0;">
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.6rem;">
+        <button onclick="calcPress('C')" style="padding:1.2rem; background:#1e293b; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">C</button>
+        <button onclick="calcPress('/')" style="padding:1.2rem; background:#1e293b; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">/</button>
+        <button onclick="calcPress('*')" style="padding:1.2rem; background:#1e293b; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">*</button>
+        <button onclick="calcPress('-')" style="padding:1.2rem; background:#007aff; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">-</button>
+        <button onclick="calcPress('7')" style="padding:1.2rem; background:#1e293b; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">7</button>
+        <button onclick="calcPress('8')" style="padding:1.2rem; background:#1e293b; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">8</button>
+        <button onclick="calcPress('9')" style="padding:1.2rem; background:#1e293b; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">9</button>
+        <button onclick="calcPress('+')" style="padding:1.2rem; background:#007aff; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">+</button>
+        <button onclick="calcPress('4')" style="padding:1.2rem; background:#1e293b; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">4</button>
+        <button onclick="calcPress('5')" style="padding:1.2rem; background:#1e293b; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">5</button>
+        <button onclick="calcPress('6')" style="padding:1.2rem; background:#1e293b; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">6</button>
+        <button onclick="calcEval()" style="padding:1.2rem; background:#007aff; color:#fff; border:none; border-radius:14px; font-size:1.3rem;">=</
