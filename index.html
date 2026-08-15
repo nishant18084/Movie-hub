@@ -1,58 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus OS</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Nexus OS</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Boot Screen (Hello Animation) -->
-    <div id="boot-screen">
-        <svg class="hello-svg" viewBox="0 0 300 120">
-            <text x="50%" y="65%" text-anchor="middle" class="hello-text">hello</text>
-        </svg>
+  <!-- 1. Boot Screen (Hello Animation) -->
+  <div id="boot-screen">
+    <svg class="hello-svg" viewBox="0 0 300 120">
+      <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">
+        hello
+      </text>
+    </svg>
+  </div>
+
+  <!-- 2. Main OS Screen -->
+  <main id="main-os">
+    <!-- Status Bar -->
+    <header class="status-bar">
+      <span id="live-status-time">--:--</span>
+      <div class="status-icons">
+        <span class="fs-btn" onclick="toggleFullScreen()">⛶</span>
+        <span>VoLTE 5G</span>
+        <span>100%</span>
+      </div>
+    </header>
+
+    <!-- Home Widgets -->
+    <section class="time-card">
+      <div>
+        <h1 id="live-clock">--:--</h1>
+        <p id="live-date">Loading...</p>
+      </div>
+      <span class="os-badge">⚡ NEXUS OS</span>
+    </section>
+
+    <!-- Search Input -->
+    <div class="search-wrap">
+      <input type="text" id="app-search" class="search-box" placeholder="Search system, apps, tools..." oninput="filterApps()">
     </div>
 
-    <!-- Home Screen -->
-    <div id="main-os">
-        <div class="os-container">
-            <div class="status-bar">
-                <span id="live-status-time">--:--</span>
-                <span>5G • 100%</span>
-            </div>
-            <div class="time-card">
-                <div>
-                    <h1 id="live-clock">--:--</h1>
-                    <p id="live-date">Loading...</p>
-                </div>
-            </div>
-            
-            <div class="grid">
-                <div class="app-item" onclick="openApp('app-weather')">
-                    <div class="icon" style="background:#38bdf8;">☀️</div>
-                    <span class="label">Weather</span>
-                </div>
-                <div class="app-item" onclick="openApp('app-notes')">
-                    <div class="icon" style="background:#eab308;">📝</div>
-                    <span class="label">Notes</span>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Home App Grid -->
+    <section class="grid" id="home-grid">
+      <div class="app-item" onclick="openApp('phone')">
+        <div class="icon bg-green">📞</div>
+        <span class="label">Phone</span>
+      </div>
+      <div class="app-item" onclick="openApp('messages')">
+        <div class="icon bg-blue">💬</div>
+        <span class="label">Messages</span>
+      </div>
+      <div class="app-item" onclick="openApp('calc')">
+        <div class="icon bg-slate">🔢</div>
+        <span class="label">Calculator</span>
+      </div>
+      <div class="app-item" onclick="openApp('notes')">
+        <div class="icon bg-yellow">📝</div>
+        <span class="label">Notes</span>
+      </div>
+      <div class="app-item" onclick="openApp('weather')">
+        <div class="icon bg-sky">☀️</div>
+        <span class="label">Weather</span>
+      </div>
+      <div class="app-item" onclick="openApp('watch')">
+        <div class="icon bg-rose">⏱️</div>
+        <span class="label">Watch</span>
+      </div>
+      <div class="app-item" onclick="openApp('settings')">
+        <div class="icon bg-zinc">⚙️</div>
+        <span class="label">Settings</span>
+      </div>
+    </section>
 
-    <!-- App Windows System (Hidden by default) -->
-    <div id="app-window" class="app-hidden">
-        <div class="window-header">
-            <button onclick="closeApp()">Back</button>
-            <span id="window-title">App Name</span>
-        </div>
-        <div class="window-content" id="window-content">
-            <!-- App Content will inject here -->
-        </div>
+    <!-- Bottom Dock / Drawer Handle -->
+    <div class="dock-handle" onclick="toggleDrawer()">
+      <div class="bar"></div>
+      <span>Swipe up for App Drawer</span>
     </div>
+  </main>
 
-    <script src="script.js"></script>
+  <!-- 3. Slide-up App Drawer -->
+  <section id="app-drawer" class="drawer-hidden">
+    <div class="drawer-header">
+      <div class="bar" onclick="toggleDrawer()"></div>
+      <h3>All Applications</h3>
+    </div>
+    <div class="grid" id="drawer-grid">
+      <div class="app-item" onclick="openApp('phone'); toggleDrawer();">
+        <div class="icon bg-green">📞</div>
+        <span class="label">Phone</span>
+      </div>
+      <div class="app-item" onclick="openApp('messages'); toggleDrawer();">
+        <div class="icon bg-blue">💬</div>
+        <span class="label">Messages</span>
+      </div>
+      <div class="app-item" onclick="openApp('calc'); toggleDrawer();">
+        <div class="icon bg-slate">🔢</div>
+        <span class="label">Calculator</span>
+      </div>
+      <div class="app-item" onclick="openApp('notes'); toggleDrawer();">
+        <div class="icon bg-yellow">📝</div>
+        <span class="label">Notes</span>
+      </div>
+      <div class="app-item" onclick="openApp('weather'); toggleDrawer();">
+        <div class="icon bg-sky">☀️</div>
+        <span class="label">Weather</span>
+      </div>
+      <div class="app-item" onclick="openApp('watch'); toggleDrawer();">
+        <div class="icon bg-rose">⏱️</div>
+        <span class="label">Watch</span>
+      </div>
+      <div class="app-item" onclick="openApp('settings'); toggleDrawer();">
+        <div class="icon bg-zinc">⚙️</div>
+        <span class="label">Settings</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Global App Window System -->
+  <section id="app-window" class="window-hidden">
+    <div class="window-header">
+      <button class="back-btn" onclick="closeApp()">‹ Back</button>
+      <h3 id="window-title">App</h3>
+      <div style="width: 50px;"></div>
+    </div>
+    <div class="window-content" id="window-content"></div>
+  </section>
+
+  <script src="script.js"></script>
 </body>
 </html>
