@@ -1,0 +1,9 @@
+{
+  "name": "Nexus OS",
+  "short_name": "NexusOS",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#070a12",
+  "theme_color": "#070a12"
+}
