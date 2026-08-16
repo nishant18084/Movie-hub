@@ -1,4 +1,4 @@
-ko<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -8,14 +8,14 @@ ko<!DOCTYPE html>
 </head>
 <body>
 
-  <!-- Boot Hello Animation -->
+  <!-- Boot Screen -->
   <div id="boot-screen">
     <svg class="hello-svg" viewBox="0 0 300 120">
       <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">hello</text>
     </svg>
   </div>
 
-  <!-- Main Home Screen -->
+  <!-- Main OS Screen -->
   <main id="main-os">
     <header class="status-bar">
       <span id="live-status-time">--:--</span>
@@ -40,6 +40,10 @@ ko<!DOCTYPE html>
       <div class="app-item" onclick="openApp('camera')">
         <div class="icon bg-slate">📷</div>
         <span class="label">Camera</span>
+      </div>
+      <div class="app-item" onclick="openApp('photos')">
+        <div class="icon bg-purple">🖼️</div>
+        <span class="label">Photos</span>
       </div>
       <div class="app-item" onclick="openApp('calc')">
         <div class="icon bg-blue">🔢</div>
