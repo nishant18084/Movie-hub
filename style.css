@@ -1,7 +1,6 @@
 :root {
   --bg-gradient: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #090d16 60%, #030712 100%);
   --glass: rgba(255, 255, 255, 0.08);
-  --glass-hover: rgba(255, 255, 255, 0.14);
   --border: rgba(255, 255, 255, 0.12);
   --accent: #38bdf8;
   --yellow: #f59e0b;
@@ -47,15 +46,11 @@ html, body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 18px;
+  gap: 16px;
   margin-top: 10px;
 }
 
-.widget-container {
-  display: flex;
-  gap: 12px;
-}
+.widget-container { display: flex; gap: 12px; }
 
 .clock-card {
   flex: 2;
@@ -67,7 +62,7 @@ html, body {
   padding: 18px 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
-.clock-card h1 { font-size: 42px; line-height: 1; font-weight: 700; letter-spacing: -1px; }
+.clock-card h1 { font-size: 40px; line-height: 1; font-weight: 700; }
 .clock-card p { font-size: 13px; color: var(--text-sub); margin-top: 6px; }
 
 .weather-chip {
@@ -80,13 +75,13 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
 }
 .weather-icon { font-size: 24px; }
 .weather-chip b { font-size: 16px; display: block; }
 .weather-chip small { color: #22c55e; font-weight: 600; font-size: 11px; }
 
-/* Material You Squircle Icons */
+/* Squircle App Icons */
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -125,7 +120,7 @@ html, body {
   pointer-events: none;
 }
 
-/* Material Colors */
+/* Material Gradients */
 .mat-purple { background: linear-gradient(135deg, #a855f7, #6b21a8); }
 .mat-blue { background: linear-gradient(135deg, #0284c7, #0369a1); }
 .mat-yellow { background: linear-gradient(135deg, #f59e0b, #d97706); }
@@ -219,6 +214,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin: auto;
   cursor: pointer;
 }
 
@@ -249,7 +245,7 @@ html, body {
 }
 .modal-body { flex: 1; overflow-y: auto; padding: 18px; position: relative; }
 
-/* Modern System Cards */
+/* System Cards */
 .card {
   background: var(--glass);
   border: 1px solid var(--border);
@@ -262,12 +258,13 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 13px 0;
   border-bottom: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
 }
 .card-item:last-child { border-bottom: none; }
 
-/* Android 15 Calculator */
+/* Calculator */
 .calc-screen {
   background: rgba(255, 255, 255, 0.04);
   padding: 24px 16px;
@@ -290,3 +287,39 @@ html, body {
 }
 .calc-btn.op { background: var(--yellow); color: #000; }
 .calc-btn.action { background: #334155; }
+
+/* Power Menu Overlay */
+#power-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(25px);
+  z-index: 10000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+.power-card {
+  width: 85%;
+  max-width: 320px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 26px;
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.p-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.p-restart { background: #38bdf8; color: #000; }
+.p-off { background: #ef4444; color: #fff; }
+.p-cancel { background: #334155; color: #fff; }
