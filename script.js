@@ -1,3 +1,10 @@
+// Auto/Tap Fullscreen Trigger
+function launchFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+}
+
 // 1. Clock Engine
 function renderTime() {
   const d = new Date();
@@ -334,5 +341,4 @@ function resetSw() {
   const b = document.getElementById('sw-btn');
   if (d) d.innerText = '00:00.00';
   if (b) { b.innerText = 'Start'; b.style.background = '#22c55e'; }
-             }
-    
+}
