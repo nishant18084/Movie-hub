@@ -1,4 +1,4 @@
-// Android 15 Live Clock
+// Android 15 Clock Engine
 function updateClock() {
   const d = new Date();
   const h = String(d.getHours()).padStart(2, '0');
@@ -28,7 +28,7 @@ let mediaRecorder = null;
 let audioChunks = [];
 let activeRecentApps = ['drivers', 'files', 'calc', 'notes'];
 
-// Recents Manager
+// Recents & Navigation Management
 function toggleRecents() {
   const recents = document.getElementById('recents-screen');
   const container = document.getElementById('recents-cards');
@@ -42,7 +42,7 @@ function toggleRecents() {
   document.getElementById('app-modal').style.display = 'none';
   container.innerHTML = '';
   if (activeRecentApps.length === 0) {
-    container.innerHTML = '<p style="color:#64748b; margin:auto;">No background apps in memory</p>';
+    container.innerHTML = '<p style="color:#64748b; margin:auto;">No background tasks</p>';
   } else {
     activeRecentApps.forEach((appName) => {
       container.innerHTML += `
@@ -51,12 +51,11 @@ function toggleRecents() {
             <span style="font-size:20px;">⚡</span>
             <b style="color:#fff; text-transform:uppercase; font-size:14px;">${appName}</b>
           </div>
-          <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:13px;">App is suspended in background</div>
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:13px;">Running in RAM</div>
         </div>
       `;
     });
   }
-
   recents.style.display = 'flex';
 }
 
@@ -81,6 +80,39 @@ function navHome() {
   closeApp();
 }
 
+// Power Management
+function showPowerMenu() {
+  document.getElementById('power-overlay').style.display = 'flex';
+}
+function hidePowerMenu() {
+  document.getElementById('power-overlay').style.display = 'none';
+}
+function restartDevice() {
+  hidePowerMenu();
+  document.body.style.opacity = '0';
+  setTimeout(() => window.location.reload(), 500);
+}
+function powerOffDevice() {
+  hidePowerMenu();
+  document.body.innerHTML = `
+    <div style="height:100vh; background:#000; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#334155;">
+      <h2 style="font-size:22px; font-weight:600; margin-bottom:12px;">Nexus OS is Powered Off</h2>
+      <button onclick="window.location.reload()" style="background:#38bdf8; border:none; padding:10px 24px; border-radius:30px; font-weight:bold; color:#000; cursor:pointer;">Press Power Button (Turn On)</button>
+    </div>
+  `;
+}
+
+// Fullscreen API Controller
+function toggleFullscreenMode() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+  openApp('settings');
+}
+
+// Application Launcher
 function openApp(name) {
   const modal = document.getElementById('app-modal');
   const hdr = document.getElementById('modal-hdr');
@@ -94,7 +126,7 @@ function openApp(name) {
   modal.style.display = 'flex';
   title.innerText = name.toUpperCase();
 
-  // 1. Realme Camera Engine
+  // 1. Live Camera
   if (name === 'camera') {
     hdr.style.display = 'none';
     body.style.padding = '0';
@@ -126,23 +158,56 @@ function openApp(name) {
   body.style.padding = '18px';
 
   switch(name) {
+    // 2. Settings (Power & Fullscreen integrated)
+    case 'settings':
+      const isFull = !!document.fullscreenElement;
+      body.innerHTML = `
+        <div class="card">
+          <div class="card-item" onclick="toggleFullscreenMode()">
+            <div>
+              <b>Full Screen Display</b>
+              <p style="font-size:12px; color:#94a3b8;">Immersive app view</p>
+            </div>
+            <span style="color:#38bdf8; font-weight:bold;">${isFull ? 'ON' : 'OFF'} ›</span>
+          </div>
+          <div class="card-item" onclick="showPowerMenu()">
+            <div>
+              <b style="color:#ef4444;">Power & Restart Options</b>
+              <p style="font-size:12px; color:#94a3b8;">Shutdown, reboot kernel</p>
+            </div>
+            <span style="color:#ef4444; font-weight:bold;">Menu ›</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-item"><span>Device Model</span><b style="color:#38bdf8;">Nexus Alpha</b></div>
+          <div class="card-item"><span>Android Version</span><b style="color:#22c55e;">Android 15 (Realme UI 6.0)</b></div>
+          <div class="card-item"><span>Processor</span><b>MediaTek Dimensity 7400</b></div>
+          <div class="card-item"><span>RAM</span><b>8.00 GB LPDDR5X</b></div>
+          <div class="card-item"><span>Storage</span><b>128 GB UFS 4.0</b></div>
+        </div>
+      `;
+      break;
+
+    // 3. Photos
     case 'photos':
       const savedPhoto = localStorage.getItem('nexus_last_photo');
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:16px;">
-          <h3 style="font-size:15px; color:#94a3b8;">Gallery Album</h3>
+          <h3 style="font-size:15px; color:#94a3b8;">Gallery Albums</h3>
           <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
             ${savedPhoto ? `
               <div style="position:relative; aspect-ratio:1; border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,0.2);">
                 <img src="${savedPhoto}" style="width:100%; height:100%; object-fit:cover;">
               </div>
-            ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos in storage.<br>Open Camera to capture!</p>'}
+            ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos clicked yet.<br>Open Camera to capture!</p>'}
           </div>
           ${savedPhoto ? `<button onclick="localStorage.removeItem('nexus_last_photo'); openApp('photos')" class="calc-btn action" style="padding:12px; font-size:13px; border-radius:16px;">Clear Gallery</button>` : ''}
         </div>
       `;
       break;
 
+    // 4. Calculator
     case 'calc':
       calcBuffer = '';
       body.innerHTML = `
@@ -170,6 +235,7 @@ function openApp(name) {
       `;
       break;
 
+    // 5. Notes
     case 'notes':
       const savedNotes = localStorage.getItem('nexus_notes') || '';
       body.innerHTML = `
@@ -180,6 +246,7 @@ function openApp(name) {
       `;
       break;
 
+    // 6. Music
     case 'music':
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 0; gap:18px;">
@@ -200,6 +267,7 @@ function openApp(name) {
       `;
       break;
 
+    // 7. Voice Recorder
     case 'recorder':
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:60vh; gap:24px; text-align:center;">
@@ -211,6 +279,7 @@ function openApp(name) {
       `;
       break;
 
+    // 8. Files
     case 'files':
       body.innerHTML = `
         <div class="card">
@@ -232,11 +301,12 @@ function openApp(name) {
       `;
       break;
 
+    // 9. Hardware Drivers
     case 'drivers':
       body.innerHTML = `
         <div class="card">
-          <h4 style="color:#38bdf8;">Hardware Driver Interfaces</h4>
-          <p style="font-size:12px; color:#94a3b8; margin-top:2px;">Real-time hardware kernel active</p>
+          <h4 style="color:#38bdf8;">Hardware Interfaces</h4>
+          <p style="font-size:12px; color:#94a3b8; margin-top:2px;">Real-time kernel bridges</p>
         </div>
         <div class="card">
           <div class="card-item"><span>📷 Camera Sensor</span><b style="color:#22c55e;">Sony IMX890 (Online)</b></div>
@@ -248,18 +318,7 @@ function openApp(name) {
       `;
       break;
 
-    case 'settings':
-      body.innerHTML = `
-        <div class="card">
-          <div class="card-item"><span>Device Model</span><b style="color:#38bdf8;">Nexus Alpha (Realme UI 6.0)</b></div>
-          <div class="card-item"><span>Android Version</span><b style="color:#22c55e;">Android 15 / 16 Preview</b></div>
-          <div class="card-item"><span>Processor</span><b>MediaTek Dimensity 7400</b></div>
-          <div class="card-item"><span>RAM</span><b>8.00 GB LPDDR5X</b></div>
-          <div class="card-item"><span>Storage</span><b>128 GB UFS 4.0</b></div>
-        </div>
-      `;
-      break;
-
+    // 10. Weather
     case 'weather':
       body.innerHTML = `
         <div style="text-align:center; padding:30px 0;">
@@ -274,6 +333,7 @@ function openApp(name) {
       `;
       break;
 
+    // 11. Phone Dialer
     case 'dialer':
       dialPadStr = '';
       body.innerHTML = `
@@ -298,6 +358,7 @@ function openApp(name) {
       `;
       break;
 
+    // 12. Browser
     case 'browser':
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:16px;">
@@ -328,6 +389,7 @@ function closeApp() {
   }
 }
 
+// Camera Helper Functions
 function startCamera() {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({
@@ -335,61 +397,4 @@ function startCamera() {
     })
     .then(stream => {
       mediaStream = stream;
-      const v = document.getElementById('cam-feed-view');
-      if (v) {
-        v.srcObject = stream;
-        v.onloadedmetadata = () => v.play().catch(() => {});
-      }
-    })
-    .catch(() => alert('Allow Camera Access in browser permissions.'));
-  }
-}
-
-function flipCam() {
-  currentFacing = (currentFacing === 'environment') ? 'user' : 'environment';
-  if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-  startCamera();
-}
-
-function takeCamSnap() {
-  const v = document.getElementById('cam-feed-view');
-  const c = document.getElementById('cam-canvas-snap');
-  const t = document.getElementById('cam-thumb');
-  if (v && c) {
-    c.width = v.videoWidth || 640;
-    c.height = v.videoHeight || 480;
-    const ctx = c.getContext('2d');
-    if (currentFacing === 'user') { ctx.translate(c.width, 0); ctx.scale(-1, 1); }
-    ctx.drawImage(v, 0, 0, c.width, c.height);
-    const data = c.toDataURL('image/png');
-    localStorage.setItem('nexus_last_photo', data);
-    if (t) t.src = data;
-  }
-}
-
-function calcKey(k) {
-  const v = document.getElementById('calc-view');
-  if (k === 'C') { calcBuffer = ''; v.innerText = '0'; }
-  else if (k === 'DEL') { calcBuffer = calcBuffer.slice(0, -1); v.innerText = calcBuffer || '0'; }
-  else if (k === '=') { try { calcBuffer = String(eval(calcBuffer)); v.innerText = calcBuffer; } catch(e) { v.innerText = 'Error'; calcBuffer = ''; } }
-  else { calcBuffer += k; v.innerText = calcBuffer; }
-}
-
-function dialDigit(d) { dialPadStr += d; document.getElementById('dial-number').innerText = dialPadStr; }
-function dialClear() { dialPadStr = dialPadStr.slice(0, -1); document.getElementById('dial-number').innerText = dialPadStr; }
-
-function toggleMusic() {
-  const btn = document.getElementById('music-play-btn');
-  isMusicPlaying = !isMusicPlaying;
-  btn.innerText = isMusicPlaying ? '⏸' : '▶';
-}
-
-async function toggleRecording() {
-  const btn = document.getElementById('mic-btn');
-  const status = document.getElementById('rec-status-text');
-  if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      audioChunks = [];
-      mediaR
+      const v = document.getElementById('cam-feed
