@@ -4,67 +4,352 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Nexus OS</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --bg: #070a12;
+      --surface: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #38bdf8;
+      --yellow: #f59e0b;
+      --text: #ffffff;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Swipeable OS Container */
+    #os-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      width: 100vw;
+      height: calc(100dvh - 120px);
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    #os-container::-webkit-scrollbar { display: none; }
+
+    .page {
+      flex: 0 0 100vw;
+      width: 100vw;
+      scroll-snap-align: start;
+      padding: 14px 16px 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .time-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .time-card h1 { font-size: 38px; line-height: 1; font-weight: 600; }
+    .time-card p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .os-badge { color: var(--yellow); font-weight: 700; font-size: 13px; }
+
+    .search-box {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 11px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-box::placeholder { color: #64748b; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px 10px;
+    }
+
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      transition: transform 0.1s ease;
+      pointer-events: none;
+    }
+    .app-item:active .icon { transform: scale(0.88); }
+    .label { font-size: 11px; color: #cbd5e1; margin-top: 5px; text-align: center; pointer-events: none; }
+
+    /* Colors */
+    .bg-green { background: #22c55e; }
+    .bg-blue { background: #0284c7; }
+    .bg-slate { background: #475569; }
+    .bg-yellow { background: #eab308; }
+    .bg-sky { background: #38bdf8; }
+    .bg-rose { background: #e11d48; }
+    .bg-zinc { background: #52525b; }
+    .bg-purple { background: #a855f7; }
+    .bg-pink { background: #ec4899; }
+    .bg-cyan { background: #06b6d4; }
+    .bg-red { background: #ef4444; }
+    .bg-amber { background: #f59e0b; }
+    .bg-indigo { background: #6366f1; }
+    .bg-emerald { background: #10b981; }
+    .bg-teal { background: #14b8a6; }
+
+    /* Dock */
+    .dock {
+      position: fixed;
+      bottom: 46px;
+      left: 16px;
+      right: 16px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 22px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 50;
+    }
+
+    /* 3-Button Navigation Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 44px;
+      background: #000;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 250;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .nav-btn {
+      font-size: 16px;
+      color: #94a3b8;
+      padding: 8px 30px;
+      cursor: pointer;
+    }
+    .nav-btn:active { color: #fff; transform: scale(0.85); }
+
+    /* Gesture Bar */
+    .gesture-bar-wrap {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 22px;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 250;
+      cursor: pointer;
+    }
+    .gesture-pill {
+      width: 120px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 4px;
+    }
+
+    /* App Window Modal */
+    #app-window {
+      position: fixed;
+      inset: 0;
+      bottom: 44px;
+      background: #080c16;
+      z-index: 200;
+      display: none;
+      flex-direction: column;
+    }
+
+    .window-header {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .window-content { flex: 1; overflow-y: auto; padding: 18px; position: relative; }
+
+    /* Camera Interface */
+    .cam-wrapper {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+    .cam-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      z-index: 10;
+      background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+    }
+    .cam-top-btn { background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+    .cam-viewfinder { position: relative; flex: 1; width: 100%; background: #000; overflow: hidden; }
+    .cam-viewfinder video { width: 100%; height: 100%; object-fit: cover; }
+    .cam-side-controls { position: absolute; right: 18px; bottom: 80px; display: flex; flex-direction: column; gap: 16px; z-index: 10; }
+    .cam-circle-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; cursor: pointer; }
+    .cam-zoom-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; background: rgba(0,0,0,0.4); border-radius: 20px; padding: 3px; gap: 4px; z-index: 10; }
+    .cam-zoom-btn { width: 32px; height: 32px; border-radius: 50%; background: transparent; border: none; color: #94a3b8; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .cam-zoom-btn.active { background: rgba(255,255,255,0.2); color: var(--yellow); }
+    .cam-mode-slider { display: flex; justify-content: center; align-items: center; gap: 22px; padding: 10px 0; background: #000; overflow-x: auto; font-size: 13px; font-weight: 600; }
+    .cam-mode-item { color: #94a3b8; cursor: pointer; white-space: nowrap; }
+    .cam-mode-item.active { color: var(--yellow); }
+    .cam-bottom-controls { display: flex; justify-content: space-around; align-items: center; padding: 14px 20px 24px 20px; background: #000; }
+    .cam-thumb-box { width: 52px; height: 52px; border-radius: 14px; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); background: #1e293b; cursor: pointer; }
+    .cam-shutter-ring { width: 72px; height: 72px; border-radius: 50%; border: 4px solid #fff; background: transparent; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .cam-shutter-fill { width: 100%; height: 100%; background: #fff; border-radius: 50%; }
+    .cam-flip-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 22px; cursor: pointer; }
+
+    /* Camera More Panel */
+    .cam-more-panel { position: absolute; inset: 0; background: #000; z-index: 20; display: none; flex-direction: column; padding: 20px; }
+    .more-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 16px; margin-top: 30px; }
+    .more-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+    .more-icon-box { width: 52px; height: 52px; border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; }
+    .more-label { font-size: 11px; font-weight: 600; color: #e2e8f0; text-align: center; }
+
+    /* Cards & Standard Lists */
+    .settings-container { display: flex; flex-direction: column; gap: 12px; }
+    .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+    .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; }
+    .settings-item:last-child { border-bottom: none; }
+    .item-left { display: flex; align-items: center; gap: 12px; }
+    .s-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #fff; }
+    .s-title { font-size: 14px; color: #f1f5f9; font-weight: 500; }
+    .item-right { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+
+    /* Recents Modal */
+    #recents-modal { position: fixed; inset: 0; bottom: 44px; background: rgba(7, 10, 18, 0.95); backdrop-filter: blur(25px); z-index: 210; display: none; flex-direction: column; padding: 24px 18px; }
+    .recents-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .clear-task-btn { background: #ef4444; border: none; padding: 6px 14px; color: #fff; border-radius: 10px; font-weight: 600; cursor: pointer; }
+    .task-list { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 20px; }
+    .task-card { flex: 0 0 220px; height: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
+
+    /* Calculator & Dialer */
+    .calc-screen { background: rgba(255, 255, 255, 0.05); padding: 20px 14px; border-radius: 14px; font-size: 32px; text-align: right; margin-bottom: 16px; min-height: 70px; }
+    .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .calc-btn { padding: 14px 0; border-radius: 12px; border: none; background: #1e293b; color: #fff; font-size: 18px; font-weight: 600; cursor: pointer; }
+    .calc-btn.op { background: #f59e0b; color: #000; }
+    .calc-btn.action { background: #475569; }
+    .dialer-screen { font-size: 28px; font-weight: 600; text-align: center; min-height: 40px; margin-bottom: 14px; }
+    .dial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 280px; margin: 0 auto; }
+    .dial-btn { height: 58px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: #fff; font-size: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+  </style>
 </head>
 <body>
 
-  <!-- Swipeable OS Root Layout -->
+  <!-- OS Root Viewport -->
   <div id="os-container">
-    <!-- Page 1: Main System Apps -->
+    <!-- Page 1: Main Apps -->
     <section class="page">
       <header class="status-bar">
-        <span id="live-status-time">16:25</span>
+        <span id="live-status-time">--:--</span>
         <span>VoLTE 5G • 100%</span>
       </header>
 
       <section class="time-card">
         <div>
-          <h1 id="live-clock">16:25</h1>
-          <p id="live-date">Sunday, Aug 16</p>
+          <h1 id="live-clock">--:--</h1>
+          <p id="live-date">--</p>
         </div>
         <span class="os-badge">⚡ NEXUS</span>
       </section>
 
-      <input type="text" id="app-search" class="search-box" placeholder="Search system, apps, drivers..." oninput="filterApps()">
+      <input type="text" id="app-search" class="search-box" placeholder="Search apps, drivers..." oninput="filterApps()">
 
       <div class="grid" id="home-grid">
-        <div class="app-item" onclick="openApp('photos')"><div class="icon bg-purple">🖼️</div><span class="label">Photos</span></div>
-        <div class="app-item" onclick="openApp('calc')"><div class="icon bg-blue">🔢</div><span class="label">Calculator</span></div>
-        <div class="app-item" onclick="openApp('notes')"><div class="icon bg-yellow">📝</div><span class="label">Notes</span></div>
-        <div class="app-item" onclick="openApp('weather')"><div class="icon bg-sky">☀️</div><span class="label">Weather</span></div>
-        <div class="app-item" onclick="openApp('music')"><div class="icon bg-pink">🎵</div><span class="label">Music</span></div>
-        <div class="app-item" onclick="openApp('recorder')"><div class="icon bg-red">🎙️</div><span class="label">Recorder</span></div>
-        <div class="app-item" onclick="openApp('files')"><div class="icon bg-amber">📁</div><span class="label">Files</span></div>
-        <div class="app-item" onclick="openApp('drivers')"><div class="icon bg-cyan">🎛️</div><span class="label">Drivers</span></div>
+        <div class="app-item" role="button" onclick="openApp('photos')"><div class="icon bg-purple">🖼️</div><span class="label">Photos</span></div>
+        <div class="app-item" role="button" onclick="openApp('calc')"><div class="icon bg-blue">🔢</div><span class="label">Calculator</span></div>
+        <div class="app-item" role="button" onclick="openApp('notes')"><div class="icon bg-yellow">📝</div><span class="label">Notes</span></div>
+        <div class="app-item" role="button" onclick="openApp('weather')"><div class="icon bg-sky">☀️</div><span class="label">Weather</span></div>
+        <div class="app-item" role="button" onclick="openApp('music')"><div class="icon bg-pink">🎵</div><span class="label">Music</span></div>
+        <div class="app-item" role="button" onclick="openApp('recorder')"><div class="icon bg-red">🎙️</div><span class="label">Recorder</span></div>
+        <div class="app-item" role="button" onclick="openApp('files')"><div class="icon bg-amber">📁</div><span class="label">Files</span></div>
+        <div class="app-item" role="button" onclick="openApp('drivers')"><div class="icon bg-cyan">🎛️</div><span class="label">Drivers</span></div>
       </div>
     </section>
 
     <!-- Page 2: Tools & Games -->
     <section class="page">
       <header class="status-bar">
-        <span>More Tools & Sensors</span>
+        <span>Tools & Sensors</span>
         <span>Page 2/2</span>
       </header>
 
       <div class="grid" style="margin-top: 10px;">
-        <div class="app-item" onclick="openApp('game')"><div class="icon bg-emerald">🎮</div><span class="label">Games</span></div>
-        <div class="app-item" onclick="openApp('paint')"><div class="icon bg-indigo">🎨</div><span class="label">Paint</span></div>
-        <div class="app-item" onclick="openApp('compass')"><div class="icon bg-teal">🧭</div><span class="label">Compass</span></div>
-        <div class="app-item" onclick="openApp('watch')"><div class="icon bg-rose">⏱️</div><span class="label">Watch</span></div>
-        <div class="app-item" onclick="openApp('messages')"><div class="icon bg-blue">💬</div><span class="label">Messages</span></div>
+        <div class="app-item" role="button" onclick="openApp('game')"><div class="icon bg-emerald">🎮</div><span class="label">Games</span></div>
+        <div class="app-item" role="button" onclick="openApp('paint')"><div class="icon bg-indigo">🎨</div><span class="label">Paint</span></div>
+        <div class="app-item" role="button" onclick="openApp('compass')"><div class="icon bg-teal">🧭</div><span class="label">Compass</span></div>
+        <div class="app-item" role="button" onclick="openApp('watch')"><div class="icon bg-rose">⏱️</div><span class="label">Watch</span></div>
+        <div class="app-item" role="button" onclick="openApp('messages')"><div class="icon bg-blue">💬</div><span class="label">Messages</span></div>
       </div>
     </section>
   </div>
 
   <!-- Persistent Dock -->
   <nav class="dock" id="main-dock">
-    <div class="app-item" onclick="openApp('dialer')"><div class="icon bg-green">📞</div></div>
-    <div class="app-item" onclick="openApp('browser')"><div class="icon bg-cyan">🌐</div></div>
-    <div class="app-item" onclick="openApp('camera')"><div class="icon bg-slate">📷</div></div>
-    <div class="app-item" onclick="openApp('settings')"><div class="icon bg-zinc">⚙️</div></div>
+    <div class="app-item" role="button" onclick="openApp('dialer')"><div class="icon bg-green">📞</div></div>
+    <div class="app-item" role="button" onclick="openApp('browser')"><div class="icon bg-cyan">🌐</div></div>
+    <div class="app-item" role="button" onclick="openApp('camera')"><div class="icon bg-slate">📷</div></div>
+    <div class="app-item" role="button" onclick="openApp('settings')"><div class="icon bg-zinc">⚙️</div></div>
   </nav>
 
-  <!-- Navigation Bar: 3-Buttons Mode -->
+  <!-- 3-Button Navigation Bar -->
   <footer class="nav-bar" id="nav-buttons-bar">
     <div class="nav-btn" onclick="navRecents()">⏹</div>
     <div class="nav-btn" onclick="navHome()">⚪</div>
@@ -76,7 +361,7 @@
     <div class="gesture-pill"></div>
   </div>
 
-  <!-- Modal Application Screen -->
+  <!-- App Window Modal -->
   <section id="app-window">
     <div class="window-header" id="win-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
@@ -95,7 +380,7 @@
     <div class="task-list" id="task-list"></div>
   </section>
 
-  <!-- Self-Contained JavaScript Engine -->
+  <!-- Runtime Engine Script -->
   <script>
     function syncTime() {
       const d = new Date();
@@ -123,7 +408,6 @@
     let isPlaying = false;
     let board = Array(9).fill(null), gameActive = true;
     let paintCtx, isDrawing = false, paintColor = '#38bdf8';
-
     let activeTasks = [];
     let navMode = 'buttons';
     let navLayout = 'right_back';
@@ -131,7 +415,6 @@
       navMode = localStorage.getItem('nexus_nav_mode') || 'buttons';
       navLayout = localStorage.getItem('nexus_nav_layout') || 'right_back';
     } catch(e) {}
-
     let currentCamMode = 'PHOTO';
     let currentZoom = 1;
 
@@ -166,18 +449,18 @@
       if (mode === 'gestures') {
         if (btnBar) btnBar.style.display = 'none';
         if (gestBar) gestBar.style.display = 'flex';
-        if (dock) dock.style.bottom = '26px';
-        if (appWin) appWin.style.bottom = '24px';
-        if (recents) recents.style.bottom = '24px';
-        if (osRoot) osRoot.style.height = 'calc(100dvh - 105px)';
+        if (dock) dock.style.bottom = '24px';
+        if (appWin) appWin.style.bottom = '22px';
+        if (recents) recents.style.bottom = '22px';
+        if (osRoot) osRoot.style.height = 'calc(100dvh - 95px)';
       } else {
         renderNavButtons();
         if (btnBar) btnBar.style.display = 'flex';
         if (gestBar) gestBar.style.display = 'none';
-        if (dock) dock.style.bottom = '50px';
+        if (dock) dock.style.bottom = '46px';
         if (appWin) appWin.style.bottom = '44px';
         if (recents) recents.style.bottom = '44px';
-        if (osRoot) osRoot.style.height = 'calc(100dvh - 130px)';
+        if (osRoot) osRoot.style.height = 'calc(100dvh - 120px)';
       }
     }
 
@@ -199,194 +482,4 @@
     }
 
     function navHome() {
-      const recents = document.getElementById('recents-modal');
-      const win = document.getElementById('app-window');
-      if (recents) recents.style.display = 'none';
-      if (win) closeApp();
-      const container = document.getElementById('os-container');
-      if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
-    }
-
-    function navRecents() {
-      const recents = document.getElementById('recents-modal');
-      const list = document.getElementById('task-list');
-      if (!recents || !list) return;
-
-      if (recents.style.display === 'flex') {
-        recents.style.display = 'none';
-        return;
-      }
-
-      list.innerHTML = '';
-      if (activeTasks.length === 0) {
-        list.innerHTML = '<p style="color:#64748b; padding:40px 0;">No active background apps.</p>';
-      } else {
-        activeTasks.forEach((app, idx) => {
-          list.innerHTML += `
-            <div class="task-card" onclick="openApp('${app}'); document.getElementById('recents-modal').style.display='none';">
-              <h4>${app.toUpperCase()}</h4>
-              <p style="color:#94a3b8; font-size:12px;">Active in background</p>
-              <button class="clear-task-btn" style="background:#334155;" onclick="event.stopPropagation(); removeTask(${idx})">Close</button>
-            </div>
-          `;
-        });
-      }
-      recents.style.display = 'flex';
-    }
-
-    function removeTask(idx) {
-      activeTasks.splice(idx, 1);
-      navRecents();
-    }
-
-    function clearAllTasks() {
-      activeTasks = [];
-      navRecents();
-      closeApp();
-    }
-
-    function filterApps() {
-      const q = document.getElementById('app-search').value.toLowerCase();
-      document.querySelectorAll('#home-grid .app-item').forEach(item => {
-        const label = item.querySelector('.label').innerText.toLowerCase();
-        item.style.display = label.includes(q) ? 'flex' : 'none';
-      });
-    }
-
-    function openApp(appName) {
-      const win = document.getElementById('app-window');
-      const winHdr = document.getElementById('win-hdr');
-      const title = document.getElementById('window-title');
-      const content = document.getElementById('window-content');
-      if (!win || !title || !content) return;
-
-      if (!activeTasks.includes(appName)) {
-        activeTasks.push(appName);
-      }
-
-      win.style.display = 'flex';
-
-      if (appName === 'camera') {
-        winHdr.style.display = 'none';
-        content.style.padding = '0';
-        let lastThumb = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="%23334155"><rect width="52" height="52"/></svg>';
-        try { lastThumb = localStorage.getItem('nexus_last_photo') || lastThumb; } catch(e) {}
-
-        content.innerHTML = `
-          <div class="cam-wrapper">
-            <div class="cam-top-bar">
-              <button class="cam-top-btn" onclick="toggleFlash(this)">⚡</button>
-              <button class="cam-top-btn" onclick="alert('HDR: Auto Active')">HDR</button>
-              <button class="cam-top-btn" onclick="alert('Google Lens Scanner...')">⛶</button>
-              <button class="cam-top-btn" onclick="closeApp()">✕</button>
-            </div>
-
-            <div class="cam-viewfinder">
-              <video id="cam-feed" autoplay playsinline muted></video>
-              <div id="cam-flash-effect" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.12s;"></div>
-
-              <div class="cam-side-controls">
-                <div class="cam-circle-icon" onclick="toggleCamFilter()">🔘</div>
-                <div class="cam-circle-icon" onclick="alert('Beauty Mode Active')">✨</div>
-              </div>
-
-              <div class="cam-zoom-bar">
-                <button class="cam-zoom-btn active" id="z1-btn" onclick="setZoom(1)">1x</button>
-                <button class="cam-zoom-btn" id="z2-btn" onclick="setZoom(2)">2</button>
-              </div>
-            </div>
-
-            <div class="cam-more-panel" id="cam-more-screen">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="font-size:16px;">More Modes</h3>
-                <button onclick="setCamMode('PHOTO')" style="background:transparent; border:none; color:var(--yellow); font-size:18px; cursor:pointer;">✕</button>
-              </div>
-              <div class="more-grid">
-                <div class="more-item" onclick="selectMoreMode('PRO')"><div class="more-icon-box">PRO</div><span class="more-label">PRO</span></div>
-                <div class="more-item" onclick="selectMoreMode('PANO')"><div class="more-icon-box">🖼️</div><span class="more-label">PANO</span></div>
-                <div class="more-item" onclick="selectMoreMode('HI-RES')"><div class="more-icon-box">⊞</div><span class="more-label">HI-RES</span></div>
-                <div class="more-item" onclick="selectMoreMode('FILM')"><div class="more-icon-box">🎬</div><span class="more-label">FILM</span></div>
-                <div class="more-item" onclick="selectMoreMode('SLO-MO')"><div class="more-icon-box">⏳</div><span class="more-label">SLO-MO</span></div>
-                <div class="more-item" onclick="selectMoreMode('TIME-LAPSE')"><div class="more-icon-box">⏱️</div><span class="more-label">TIME-LAPSE</span></div>
-                <div class="more-item" onclick="selectMoreMode('DUAL-VIEW')"><div class="more-icon-box">📱</div><span class="more-label">DUAL-VIEW</span></div>
-                <div class="more-item" onclick="selectMoreMode('UNDERWATER')"><div class="more-icon-box">🌊</div><span class="more-label">UNDERWATER</span></div>
-                <div class="more-item" onclick="selectMoreMode('SCANNER')"><div class="more-icon-box">📄</div><span class="more-label">TEXT SCANNER</span></div>
-                <div class="more-item" onclick="selectMoreMode('TILT-SHIFT')"><div class="more-icon-box">🔄</div><span class="more-label">TILT-SHIFT</span></div>
-              </div>
-            </div>
-
-            <div class="cam-mode-slider">
-              <span class="cam-mode-item" onclick="setCamMode('STREET')">STREET</span>
-              <span class="cam-mode-item" onclick="setCamMode('VIDEO')">VIDEO</span>
-              <span class="cam-mode-item active" id="mode-photo" onclick="setCamMode('PHOTO')">PHOTO</span>
-              <span class="cam-mode-item" onclick="setCamMode('PORTRAIT')">PORTRAIT</span>
-              <span class="cam-mode-item" onclick="setCamMode('MORE')">MORE</span>
-            </div>
-
-            <div class="cam-bottom-controls">
-              <img id="cam-thumb" onclick="openApp('photos')" class="cam-thumb-box" src="${lastThumb}">
-              <button onclick="takePhoto()" class="cam-shutter-ring">
-                <div class="cam-shutter-fill"></div>
-              </button>
-              <button onclick="flipCamera()" class="cam-flip-btn">🔄</button>
-            </div>
-          </div>
-          <canvas id="cam-canvas" style="display:none;"></canvas>
-        `;
-        startCameraFeed();
-        return;
-      }
-
-      winHdr.style.display = 'flex';
-      content.style.padding = '18px';
-
-      switch(appName) {
-        case 'drivers':
-          title.innerText = "Device Drivers & Sensors";
-          content.innerHTML = `
-            <div class="settings-container">
-              <div class="settings-card" style="padding:16px;">
-                <h4 style="font-size:15px; font-weight:600; color:#38bdf8; margin-bottom:4px;">Hardware Driver Status</h4>
-                <p style="color:#94a3b8; font-size:12px;">Real-time hardware interfaces connected to Nexus Kernel</p>
-              </div>
-
-              <div class="settings-card">
-                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#0284c7;">📷</div><span class="s-title">Camera Sensor Driver</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">Active (v2.4)</span></div>
-                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#ec4899;">🎙️</div><span class="s-title">Audio I/O Driver</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">Active (48kHz)</span></div>
-                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#14b8a6;">🧭</div><span class="s-title">Gyroscope & Motion Driver</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">Online</span></div>
-                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#eab308;">⚡</div><span class="s-title">GPU Acceleration</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">120Hz Native</span></div>
-                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#22c55e;">📶</div><span class="s-title">5G Modem Baseband</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">Connected</span></div>
-              </div>
-              <button onclick="alert('Driver diagnostics passed: All hardware functioning normally.')" class="calc-btn action" style="width:100%; margin-top:10px;">Run Diagnostics</button>
-            </div>
-          `;
-          break;
-
-        case 'files':
-          title.innerText = "Files";
-          content.innerHTML = `
-            <div class="settings-container">
-              <div class="settings-card" style="padding:16px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                  <h4 style="font-size:15px; font-weight:600;">Internal Storage</h4>
-                  <span style="font-size:12px; color:#38bdf8;">42 GB / 128 GB</span>
-                </div>
-                <div style="width:100%; height:8px; background:#1e293b; border-radius:4px; overflow:hidden; margin-bottom:12px;">
-                  <div style="width:33%; height:100%; background:linear-gradient(90deg, #38bdf8, #22c55e);"></div>
-                </div>
-                <p style="color:#94a3b8; font-size:12px;">86 GB Free Space Available</p>
-              </div>
-
-              <div class="settings-card">
-                <div class="settings-item" onclick="openFileCategory('Documents')"><div class="item-left"><div class="s-icon" style="background:#0284c7;">📄</div><span class="s-title">Documents</span></div><span class="item-right">24 files ›</span></div>
-                <div class="settings-item" onclick="openApp('photos')"><div class="item-left"><div class="s-icon" style="background:#a855f7;">🖼️</div><span class="s-title">Images & Gallery</span></div><span class="item-right">186 photos ›</span></div>
-                <div class="settings-item" onclick="openFileCategory('Downloads')"><div class="item-left"><div class="s-icon" style="background:#22c55e;">⬇️</div><span class="s-title">Downloads</span></div><span class="item-right">12 files ›</span></div>
-                <div class="settings-item" onclick="openFileCategory('Audio')"><div class="item-left"><div class="s-icon" style="background:#ec4899;">🎵</div><span class="s-title">Audio & Recordings</span></div><span class="item-right">8 tracks ›</span></div>
-                <div class="settings-item" onclick="openFileCategory('APKs')"><div class="item-left"><div class="s-icon" style="background:#f59e0b;">📦</div><span class="s-title">Packages (APK)</span></div><span class="item-right">3 files ›</span></div>
-              </div>
-            </div>
-          `;
-          break;
-
-        case 'settings':
-          title.i
+      const recents 
