@@ -15,7 +15,7 @@
     </svg>
   </div>
 
-  <!-- Swipeable OS Container -->
+  <!-- Swipeable OS Root -->
   <div id="os-container">
     <!-- Page 1: Main Apps -->
     <section class="page">
@@ -29,7 +29,7 @@
           <h1 id="live-clock">--:--</h1>
           <p id="live-date">--</p>
         </div>
-        <span class="os-badge">⚡ NEXUS</span>
+        <span class="os-badge">⚡ hello</span>
       </section>
 
       <input type="text" id="app-search" class="search-box" placeholder="Search system, apps, tools..." oninput="filterApps()">
@@ -46,7 +46,7 @@
       </div>
     </section>
 
-    <!-- Page 2: Games & Tools -->
+    <!-- Page 2: Tools & Games -->
     <section class="page">
       <header class="status-bar">
         <span>More Apps</span>
@@ -63,19 +63,24 @@
   </div>
 
   <!-- Persistent Dock -->
-  <nav class="dock">
+  <nav class="dock" id="main-dock">
     <div class="app-item" onclick="openApp('dialer')"><div class="icon bg-green">📞</div></div>
     <div class="app-item" onclick="openApp('browser')"><div class="icon bg-cyan">🌐</div></div>
     <div class="app-item" onclick="openApp('camera')"><div class="icon bg-slate">📷</div></div>
     <div class="app-item" onclick="openApp('settings')"><div class="icon bg-zinc">⚙️</div></div>
   </nav>
 
-  <!-- Navigation Bar (Back, Home, Recents) -->
-  <footer class="nav-bar">
-    <div class="nav-btn" onclick="navBack()">◀</div>
+  <!-- Navigation Bar: 3 Buttons Mode -->
+  <footer class="nav-bar" id="nav-buttons-bar">
+    <div class="nav-btn" onclick="navBack()">⏹</div>
     <div class="nav-btn" onclick="navHome()">⚪</div>
-    <div class="nav-btn" onclick="navRecents()">⏹</div>
+    <div class="nav-btn" onclick="navRecents()">◀</div>
   </footer>
+
+  <!-- Gesture Bar Mode (Alternative) -->
+  <div class="gesture-bar-wrap" id="nav-gesture-bar" onclick="navHome()">
+    <div class="gesture-pill"></div>
+  </div>
 
   <!-- Modal Application Screen -->
   <section id="app-window">
@@ -87,7 +92,7 @@
     <div class="window-content" id="window-content"></div>
   </section>
 
-  <!-- Recents / Multi-Tasking Screen -->
+  <!-- Recents / Multi-Tasking Modal -->
   <section id="recents-modal">
     <div class="recents-header">
       <h3>Active Tasks</h3>
