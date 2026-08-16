@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- Boot Sequence -->
+  <!-- Boot Animation -->
   <div id="boot-screen">
     <svg class="hello-svg" viewBox="0 0 300 120">
       <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">Nexus</text>
@@ -70,8 +70,12 @@
     <div class="app-item" onclick="openApp('settings')"><div class="icon bg-zinc">⚙️</div></div>
   </nav>
 
-  <!-- Navigation Bar -->
-  <footer class="nav-bar" id="nav-buttons-bar"></footer>
+  <!-- Navigation Bar: 3 Buttons -->
+  <footer class="nav-bar" id="nav-buttons-bar">
+    <div class="nav-btn" onclick="navRecents()">⏹</div>
+    <div class="nav-btn" onclick="navHome()">⚪</div>
+    <div class="nav-btn" onclick="navBack()">◀</div>
+  </footer>
 
   <!-- Gesture Bar -->
   <div class="gesture-bar-wrap" id="nav-gesture-bar" onclick="navHome()">
@@ -97,6 +101,28 @@
     <div class="task-list" id="task-list"></div>
   </section>
 
+  <!-- Inline Fail-Safe Clock Init -->
+  <script>
+    (function() {
+      function syncTime() {
+        const d = new Date();
+        const h = String(d.getHours()).padStart(2, '0');
+        const m = String(d.getMinutes()).padStart(2, '0');
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const t = h + ':' + m;
+        const dt = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
+        const s = document.getElementById('live-status-time');
+        const c = document.getElementById('live-clock');
+        const dateEl = document.getElementById('live-date');
+        if (s) s.innerText = t;
+        if (c) c.innerText = t;
+        if (dateEl) dateEl.innerText = dt;
+      }
+      syncTime();
+      setInterval(syncTime, 1000);
+    })();
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
