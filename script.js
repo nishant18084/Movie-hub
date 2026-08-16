@@ -1,3 +1,24 @@
+// 1. Clock Engine
+function syncTime() {
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const t = h + ':' + m;
+  const dt = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
+
+  const s = document.getElementById('live-status-time');
+  const c = document.getElementById('live-clock');
+  const dateEl = document.getElementById('live-date');
+
+  if (s) s.innerText = t;
+  if (c) c.innerText = t;
+  if (dateEl) dateEl.innerText = dt;
+}
+syncTime();
+setInterval(syncTime, 1000);
+
 let mediaStream = null;
 let currentFacingMode = "environment";
 let calcBuffer = '';
@@ -7,20 +28,17 @@ let isPlaying = false;
 let board = Array(9).fill(null), gameActive = true;
 let paintCtx, isDrawing = false, paintColor = '#38bdf8';
 
-// Active Task Stack
+// Navigation & Tasks
 let activeTasks = [];
 let navMode = localStorage.getItem('nexus_nav_mode') || 'buttons';
 let navLayout = localStorage.getItem('nexus_nav_layout') || 'right_back';
-
-// Camera States
 let currentCamMode = 'PHOTO';
 let currentZoom = 1;
 
-// 1. Navigation Setup
+// 2. Navigation Mode Renderer
 function renderNavButtons() {
   const btnBar = document.getElementById('nav-buttons-bar');
   if (!btnBar) return;
-
   if (navLayout === 'right_back') {
     btnBar.innerHTML = `
       <div class="nav-btn" onclick="navRecents()">⏹</div>
@@ -39,7 +57,6 @@ function renderNavButtons() {
 function applyNavMode(mode) {
   navMode = mode;
   localStorage.setItem('nexus_nav_mode', mode);
-
   const btnBar = document.getElementById('nav-buttons-bar');
   const gestBar = document.getElementById('nav-gesture-bar');
   const dock = document.getElementById('main-dock');
@@ -70,10 +87,8 @@ function setNavLayout(layout) {
   localStorage.setItem('nexus_nav_layout', layout);
   renderNavButtons();
 }
-
 applyNavMode(navMode);
 
-// 2. Navigation Actions
 function navBack() {
   const recents = document.getElementById('recents-modal');
   const win = document.getElementById('app-window');
@@ -139,7 +154,7 @@ function filterApps() {
   });
 }
 
-// 3. App Router
+// 3. App Opener & Routers
 function openApp(appName) {
   const win = document.getElementById('app-window');
   const winHdr = document.getElementById('win-hdr');
@@ -153,6 +168,7 @@ function openApp(appName) {
 
   win.style.display = 'flex';
 
+  // Camera Custom Fullscreen Interface
   if (appName === 'camera') {
     winHdr.style.display = 'none';
     content.style.padding = '0';
@@ -226,13 +242,49 @@ function openApp(appName) {
   content.style.padding = '18px';
 
   switch(appName) {
+    case 'drivers':
+      title.innerText = "Device Drivers & Sensors";
+      content.innerHTML = `
+        <div class="settings-container">
+          <div class="settings-card" style="padding:16px;">
+            <h4 style="font-size:15px; font-weight:600; color:#38bdf8; margin-bottom:4px;">Hardware Driver Status</h4>
+            <p style="color:#94a3b8; font-size:12px;">Real-time hardware interfaces connected to Nexus Kernel</p>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-item">
+              <div class="item-left"><div class="s-icon" style="background:#0284c7;">📷</div><span class="s-title">Camera Sensor Driver</span></div>
+              <span class="item-right" style="color:#22c55e; font-weight:bold;">Active (v2.4)</span>
+            </div>
+            <div class="settings-item">
+              <div class="item-left"><div class="s-icon" style="background:#ec4899;">🎙️</div><span class="s-title">Audio I/O Driver</span></div>
+              <span class="item-right" style="color:#22c55e; font-weight:bold;">Active (48kHz)</span>
+            </div>
+            <div class="settings-item">
+              <div class="item-left"><div class="s-icon" style="background:#14b8a6;">🧭</div><span class="s-title">Gyroscope & Motion Driver</span></div>
+              <span class="item-right" style="color:#22c55e; font-weight:bold;">Online</span>
+            </div>
+            <div class="settings-item">
+              <div class="item-left"><div class="s-icon" style="background:#eab308;">⚡</div><span class="s-title">GPU Display Acceleration</span></div>
+              <span class="item-right" style="color:#22c55e; font-weight:bold;">120Hz Native</span>
+            </div>
+            <div class="settings-item">
+              <div class="item-left"><div class="s-icon" style="background:#22c55e;">📶</div><span class="s-title">5G Modem Baseband</span></div>
+              <span class="item-right" style="color:#22c55e; font-weight:bold;">Connected</span>
+            </div>
+          </div>
+          <button onclick="alert('Driver diagnostics passed: All hardware functioning normally.')" class="calc-btn action" style="width:100%; margin-top:10px;">Run Driver Diagnostics</button>
+        </div>
+      `;
+      break;
+
     case 'files':
       title.innerText = "Files";
       content.innerHTML = `
         <div class="settings-container">
           <div class="settings-card" style="padding:16px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <h4 style="font-size:15px; font-weight:600;">Device Storage</h4>
+              <h4 style="font-size:15px; font-weight:600;">Internal Storage</h4>
               <span style="font-size:12px; color:#38bdf8;">42 GB / 128 GB</span>
             </div>
             <div style="width:100%; height:8px; background:#1e293b; border-radius:4px; overflow:hidden; margin-bottom:12px;">
@@ -274,7 +326,7 @@ function openApp(appName) {
               <div class="item-left"><div class="s-icon" style="background:#f59e0b;">✈️</div><span class="s-title">Aeroplane mode</span></div>
               <label class="switch"><input type="checkbox"><span class="slider"></span></label>
             </div>
-            <div class="settings-item" onclick="alert('Wi-Fi is scanning...')"><div class="item-left"><div class="s-icon" style="background:#0284c7;">📶</div><span class="s-title">Wi-Fi</span></div><span class="item-right">Off ›</span></div>
+            <div class="settings-item" onclick="alert('Wi-Fi scanning...')"><div class="item-left"><div class="s-icon" style="background:#0284c7;">📶</div><span class="s-title">Wi-Fi</span></div><span class="item-right">Off ›</span></div>
             <div class="settings-item" onclick="alert('Bluetooth scanning...')"><div class="item-left"><div class="s-icon" style="background:#2563eb;">ᛒ</div><span class="s-title">Bluetooth</span></div><span class="item-right">Off ›</span></div>
           </div>
 
@@ -347,55 +399,4 @@ function openApp(appName) {
           <button class="calc-btn op" onclick="calcAction('+')">+</button>
           <button class="calc-btn" onclick="calcAction('1')">1</button>
           <button class="calc-btn" onclick="calcAction('2')">2</button>
-          <button class="calc-btn" onclick="calcAction('3')">3</button>
-          <button class="calc-btn op" onclick="calcAction('=')">=</button>
-          <button class="calc-btn" style="grid-column: span 2;" onclick="calcAction('0')">0</button>
-          <button class="calc-btn" onclick="calcAction('.')">.</button>
-        </div>
-      `;
-      break;
-
-    case 'notes':
-      title.innerText = "Quick Notes";
-      const saved = localStorage.getItem('nexus_notes') || '';
-      content.innerHTML = `
-        <textarea oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:70vh; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:14px; color:#fff; font-size:16px; outline:none; resize:none;" placeholder="Start typing...">${saved}</textarea>
-      `;
-      break;
-
-    case 'paint':
-      title.innerText = "Paint";
-      content.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:10px; height:100%;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; gap:8px;">
-              <button onclick="setPaintColor('#38bdf8')" style="width:28px; height:28px; border-radius:50%; background:#38bdf8; border:none;"></button>
-              <button onclick="setPaintColor('#22c55e')" style="width:28px; height:28px; border-radius:50%; background:#22c55e; border:none;"></button>
-              <button onclick="setPaintColor('#ef4444')" style="width:28px; height:28px; border-radius:50%; background:#ef4444; border:none;"></button>
-              <button onclick="setPaintColor('#ffffff')" style="width:28px; height:28px; border-radius:50%; background:#ffffff; border:none;"></button>
-            </div>
-            <button onclick="clearCanvas()" class="calc-btn action" style="padding:6px 12px; font-size:12px;">Clear</button>
-          </div>
-          <canvas id="paint-canvas" style="width:100%; height:62vh; background:#111827; border-radius:18px; border:1px solid rgba(255,255,255,0.1); touch-action:none;"></canvas>
-        </div>
-      `;
-      setTimeout(initDrawingCanvas, 100);
-      break;
-
-    case 'game':
-      title.innerText = "Tic-Tac-Toe";
-      content.innerHTML = `
-        <div style="display:flex; flex-direction:column; align-items:center; gap:20px; padding:20px 0;">
-          <h3 id="game-status" style="font-size:16px; color:#38bdf8;">Your Turn (X)</h3>
-          <div id="ttt-board" style="display:grid; grid-template-columns:repeat(3, 80px); gap:8px;">
-            ${[0,1,2,3,4,5,6,7,8].map(i => `<button onclick="makeMove(${i})" id="cell-${i}" style="width:80px; height:80px; border-radius:14px; background:#1e293b; border:1px solid rgba(255,255,255,0.1); color:#fff; font-size:28px; font-weight:700; cursor:pointer;"></button>`).join('')}
-          </div>
-          <button onclick="resetGame()" class="calc-btn action" style="padding:10px 24px; font-size:14px;">Restart</button>
-        </div>
-      `;
-      resetGameVars();
-      break;
-
-    case 'music':
-      title.innerText = "Music";
-      content.innerHTML =
+          <button class="calc-btn" onclick="calcAction('3')">3</but
