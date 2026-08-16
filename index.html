@@ -5,17 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Nexus OS</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Direct safety styling taaki transition smooth rahe */
+    #boot-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .boot-fadeout {
+      opacity: 0 !important;
+      transform: scale(1.05);
+      pointer-events: none !important;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Boot Screen -->
-  <div id="boot-screen">
+  <!-- 1. Boot Screen (Hello Animation) -->
+  <div id="boot-screen" onclick="forceBoot()">
     <svg class="hello-svg" viewBox="0 0 300 120">
-      <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">hello</text>
+      <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">
+        hello
+      </text>
     </svg>
   </div>
 
-  <!-- Notification & Control Center Shade (Pull Down) -->
+  <!-- 2. Notification & Control Center Shade -->
   <div id="control-center" class="shade-hidden">
     <div class="shade-header">
       <span id="shade-time">--:--</span>
@@ -53,9 +73,9 @@
     </div>
   </div>
 
-  <!-- Main OS Screen -->
+  <!-- 3. Main OS Screen -->
   <main id="main-os">
-    <!-- Status Bar (Tap to open Control Center) -->
+    <!-- Status Bar -->
     <header class="status-bar" onclick="toggleControlCenter()">
       <span id="live-status-time">--:--</span>
       <div class="status-icons">
@@ -118,7 +138,7 @@
     </div>
   </main>
 
-  <!-- Slide-up App Drawer -->
+  <!-- 4. Slide-up App Drawer -->
   <section id="app-drawer" class="drawer-hidden">
     <div class="drawer-header">
       <div class="bar" onclick="toggleDrawer()"></div>
@@ -156,7 +176,7 @@
     </div>
   </section>
 
-  <!-- App Window Modal -->
+  <!-- 5. App Window Modal -->
   <section id="app-window" class="window-hidden">
     <div class="window-header">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
@@ -165,6 +185,19 @@
     </div>
     <div class="window-content" id="window-content"></div>
   </section>
+
+  <!-- Fail-Safe Auto Boot Script -->
+  <script>
+    function forceBoot() {
+      const boot = document.getElementById('boot-screen');
+      const os = document.getElementById('main-os');
+      if (boot) boot.classList.add('boot-fadeout');
+      if (os) os.classList.add('os-visible');
+      setTimeout(() => { if (boot) boot.remove(); }, 800);
+    }
+    // 2.2 seconds me automatic transition ho jayega
+    setTimeout(forceBoot, 2200);
+  </script>
 
   <script src="script.js"></script>
 </body>
