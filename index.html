@@ -8,33 +8,33 @@
 </head>
 <body>
 
-  <!-- Android 15 Quick Status Bar -->
+  <!-- Top System Status Header -->
   <header class="status-bar">
     <span id="top-time" class="time-badge">--:--</span>
     <div class="status-icons">
       <span>5G</span>
-      <span class="signal-bars">📶</span>
+      <span>📶</span>
       <span>100% 🔋</span>
     </div>
   </header>
 
-  <!-- Modern Dynamic Widgets Area -->
+  <!-- Modern Widgets & Home Screen -->
   <main class="home-screen">
     <section class="widget-container">
       <div class="clock-card">
         <h1 id="main-clock">--:--</h1>
         <p id="main-date">--</p>
       </div>
-      <div class="weather-chip">
+      <div class="weather-chip" onclick="openApp('weather')">
         <span class="weather-icon">⛅</span>
         <div>
           <b>29°C</b>
-          <small>AQI 42</small>
+          <small>AQI 42 • Clear</small>
         </div>
       </div>
     </section>
 
-    <!-- Modern App Grid (Material You Rounded Squares) -->
+    <!-- Main System 8-App Grid -->
     <section class="grid" id="home-grid">
       <button class="app-btn" onclick="openApp('photos')">
         <div class="icon-box mat-purple">🖼️</div>
@@ -71,7 +71,7 @@
     </section>
   </main>
 
-  <!-- Floating Glass Dock -->
+  <!-- Persistent Glass Dock -->
   <nav class="dock">
     <button class="app-btn" onclick="openApp('dialer')"><div class="icon-box mat-green">📞</div></button>
     <button class="app-btn" onclick="openApp('browser')"><div class="icon-box mat-sky">🌐</div></button>
@@ -79,18 +79,16 @@
     <button class="app-btn" onclick="openApp('settings')"><div class="icon-box mat-zinc">⚙️</div></button>
   </nav>
 
-  <!-- Modern Navigation Bar -->
+  <!-- 3-Button Navigation Bar (Recents | Home | Back) -->
   <footer class="nav-bar">
     <div class="nav-btn" onclick="toggleRecents()">⏹</div>
     <div class="nav-btn" onclick="navHome()">⚪</div>
     <div class="nav-btn" onclick="navBack()">◀</div>
   </footer>
 
-  <!-- Android 15 Recents Multitasking Screen -->
+  <!-- Real Multi-Tasking Recents Screen -->
   <section id="recents-screen">
-    <div class="recents-header">
-      <span>Active Tasks</span>
-    </div>
+    <div class="recents-header">Active Tasks</div>
     <div class="recents-cards-container" id="recents-cards"></div>
     <div class="recents-bottom-bar">
       <button class="close-all-btn" onclick="clearAllRecents()">
@@ -99,7 +97,7 @@
     </div>
   </section>
 
-  <!-- Fullscreen Modern App Modal -->
+  <!-- Full Software Application Modal -->
   <section id="app-modal">
     <div class="modal-hdr" id="modal-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
@@ -108,6 +106,16 @@
     </div>
     <div class="modal-body" id="modal-body"></div>
   </section>
+
+  <!-- Native Power Options Overlay -->
+  <div id="power-overlay">
+    <div class="power-card">
+      <h3 style="font-size:18px; margin-bottom:14px;">Power Options</h3>
+      <button class="p-btn p-restart" onclick="restartDevice()">🔄 Restart</button>
+      <button class="p-btn p-off" onclick="powerOffDevice()">⚡ Power Off</button>
+      <button class="p-btn p-cancel" onclick="hidePowerMenu()">Cancel</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
