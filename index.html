@@ -22,7 +22,7 @@
       color: #fff;
     }
 
-    /* 1. HELLO BOOT ANIMATION (PURE CSS AUTO-HIDE) */
+    /* 1. HELLO BOOT ANIMATION */
     #boot-screen {
       position: fixed;
       inset: 0;
@@ -31,11 +31,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      animation: hideBoot 0.6s ease 2.2s forwards;
+      animation: hideBoot 0.5s ease 2.0s forwards;
       pointer-events: none;
     }
 
-    .hello-svg { width: 280px; max-width: 80vw; }
+    .hello-svg { width: 260px; max-width: 80vw; }
     .hello-text {
       font-family: 'Brush Script MT', 'Segoe Script', cursive, sans-serif;
       font-size: 85px;
@@ -45,7 +45,7 @@
       stroke-dasharray: 600;
       stroke-dashoffset: 600;
       stroke-linecap: round;
-      animation: writeHello 2.0s ease-in-out forwards;
+      animation: writeHello 1.8s ease-in-out forwards;
       filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.7));
     }
 
@@ -56,11 +56,10 @@
     }
 
     @keyframes hideBoot {
-      0% { opacity: 1; transform: scale(1); visibility: visible; }
-      100% { opacity: 0; transform: scale(1.05); visibility: hidden; }
+      to { opacity: 0; visibility: hidden; }
     }
 
-    /* 2. MAIN OS CONTAINER */
+    /* 2. MAIN OS SCREEN */
     #main-os {
       width: 100%;
       height: 100dvh;
@@ -79,7 +78,6 @@
       font-size: 13px;
       color: #94a3b8;
       padding-top: 4px;
-      cursor: pointer;
     }
 
     .time-card {
@@ -144,18 +142,16 @@
     .bg-rose { background: #e11d48; }
     .bg-zinc { background: #52525b; }
 
-    /* 3. APP WINDOW SYSTEM */
+    /* 3. APP MODAL WINDOW */
     #app-window {
       position: fixed;
       inset: 0;
       background: #080c16;
       z-index: 200;
-      display: flex;
+      display: none;
       flex-direction: column;
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    #app-window.window-active { transform: translateY(0); }
+    #app-window.window-active { display: flex !important; }
 
     .window-header {
       padding: 16px 20px;
@@ -230,7 +226,7 @@
     <section class="time-card">
       <div>
         <h1 id="live-clock">--:--</h1>
-        <p id="live-date">Loading...</p>
+        <p id="live-date">Sunday, Aug 16</p>
       </div>
       <span class="os-badge">⚡ NEXUS OS</span>
     </section>
@@ -279,7 +275,7 @@
     <div class="window-content" id="window-content"></div>
   </section>
 
-  <!-- Complete Inlined Working Engine -->
+  <!-- Direct Runtime Logic -->
   <script>
     let mediaStream = null;
     let currentFacingMode = "environment";
@@ -287,18 +283,22 @@
     let dialPadStr = '';
     let swTimer = null, swElapsed = 0, isSwRunning = false;
 
-    // Clock
+    // Instant clock execution
     function updateClock() {
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
       const dateStr = now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
       
-      document.getElementById('live-status-time').innerText = timeStr;
-      document.getElementById('live-clock').innerText = timeStr;
-      document.getElementById('live-date').innerText = dateStr;
+      const st = document.getElementById('live-status-time');
+      const lc = document.getElementById('live-clock');
+      const ld = document.getElementById('live-date');
+
+      if (st) st.innerText = timeStr;
+      if (lc) lc.innerText = timeStr;
+      if (ld) ld.innerText = dateStr;
     }
-    setInterval(updateClock, 1000);
     updateClock();
+    setInterval(updateClock, 1000);
 
     function filterApps() {
       const q = document.getElementById('app-search').value.toLowerCase();
@@ -308,11 +308,13 @@
       });
     }
 
-    // App Open Handler
+    // App Open System
     function openApp(appName) {
       const win = document.getElementById('app-window');
       const title = document.getElementById('window-title');
       const content = document.getElementById('window-content');
+      if (!win || !title || !content) return;
+
       win.classList.add('window-active');
 
       switch(appName) {
@@ -320,36 +322,51 @@
           title.innerText = "Settings";
           content.innerHTML = `
             <div class="settings-container">
+              <!-- Group 1: Connectivity -->
               <div class="settings-card">
                 <div class="settings-item">
                   <div class="item-left"><div class="s-icon" style="background:#f59e0b;">✈️</div><span class="s-title">Aeroplane mode</span></div>
                   <label class="switch"><input type="checkbox"><span class="slider"></span></label>
                 </div>
-                <div class="settings-item" onclick="alert('Wi-Fi is ready')">
+                <div class="settings-item" onclick="alert('Wi-Fi is scanning...')">
                   <div class="item-left"><div class="s-icon" style="background:#0284c7;">📶</div><span class="s-title">Wi-Fi</span></div>
                   <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
                 </div>
-                <div class="settings-item" onclick="alert('Bluetooth scanning...')">
+                <div class="settings-item" onclick="alert('Bluetooth is scanning...')">
                   <div class="item-left"><div class="s-icon" style="background:#2563eb;">ᛒ</div><span class="s-title">Bluetooth</span></div>
                   <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
                 </div>
-                <div class="settings-item" onclick="alert('Mobile Network 5G')">
+                <div class="settings-item" onclick="alert('SIM 5G Active')">
                   <div class="item-left"><div class="s-icon" style="background:#16a34a;">⇅</div><span class="s-title">Mobile network</span></div>
                   <div class="item-right"><span class="arrow">›</span></div>
                 </div>
               </div>
 
+              <!-- Group 2: Personalisation & Display -->
               <div class="settings-card">
-                <div class="settings-item" onclick="alert('Display Settings')">
-                  <div class="item-left"><div class="s-icon" style="background:#eab308;">☀️</div><span class="s-title">Display & brightness</span></div>
+                <div class="settings-item" onclick="alert('Wallpapers & Style')">
+                  <div class="item-left"><div class="s-icon" style="background:#ea580c;">🎨</div><span class="s-title">Home screen, Lock screen & style</span></div>
                   <div class="item-right"><span class="arrow">›</span></div>
                 </div>
-                <div class="settings-item" onclick="alert('Sound & Vibration')">
-                  <div class="item-left"><div class="s-icon" style="background:#22c55e;">🔔</div><span class="s-title">Sound & vibration</span></div>
+                <div class="settings-item" onclick="alert('Display: Dark Mode Active')">
+                  <div class="item-left"><div class="s-icon" style="background:#eab308;">☀️</div><span class="s-title">Display & brightness</span></div>
                   <div class="item-right"><span class="arrow">›</span></div>
                 </div>
               </div>
 
+              <!-- Group 3: Sound & Notifications -->
+              <div class="settings-card">
+                <div class="settings-item" onclick="alert('Volume: 100%')">
+                  <div class="item-left"><div class="s-icon" style="background:#22c55e;">🔔</div><span class="s-title">Sound & vibration</span></div>
+                  <div class="item-right"><span class="arrow">›</span></div>
+                </div>
+                <div class="settings-item" onclick="alert('Notifications Active')">
+                  <div class="item-left"><div class="s-icon" style="background:#0284c7;">💬</div><span class="s-title">Notifications & Quick Settings</span></div>
+                  <div class="item-right"><span class="arrow">›</span></div>
+                </div>
+              </div>
+
+              <!-- Group 4: Device Info -->
               <div class="settings-card">
                 <div class="settings-item" onclick="openAboutDevice()">
                   <div class="item-left"><div class="s-icon" style="background:#16a34a;">📱</div><span class="s-title">About device</span></div>
@@ -436,19 +453,4 @@
 
         case 'notes':
           title.innerText = "Quick Notes";
-          const saved = localStorage.getItem('nexus_notes') || '';
-          content.innerHTML = `
-            <textarea oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:70vh; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:14px; color:#fff; font-size:16px; outline:none; resize:none;" placeholder="Start typing...">${saved}</textarea>
-          `;
-          break;
-
-        case 'weather':
-          title.innerText = "Weather";
-          content.innerHTML = `
-            <div style="text-align:center; padding:30px 0;">
-              <h2 style="font-size:36px; margin-bottom:4px;">29°C</h2>
-              <p style="color:#38bdf8; font-size:18px;">Partly Cloudy</p>
-              <p style="color:#94a3b8; margin-top:8px;">Humidity: 65% • Wind: 12 km/h</p>
-            </div>
-          `;
-        
+          const
