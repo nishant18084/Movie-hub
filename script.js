@@ -23,12 +23,9 @@ let calcBuffer = '';
 let dialPadStr = '';
 let mediaStream = null;
 let currentFacing = 'environment';
-let activeFilterIdx = 0;
-const camFilters = ['none', 'grayscale(100%)', 'sepia(80%)', 'contrast(150%)', 'hue-rotate(90deg)'];
 let isMusicPlaying = false;
 let mediaRecorder = null;
 let audioChunks = [];
-let navMode = 'buttons';
 
 function openApp(name) {
   const modal = document.getElementById('app-modal');
@@ -39,7 +36,7 @@ function openApp(name) {
   modal.style.display = 'flex';
   title.innerText = name.toUpperCase();
 
-  // 1. Camera Engine
+  // 1. Live Camera
   if (name === 'camera') {
     hdr.style.display = 'none';
     body.style.padding = '0';
@@ -57,37 +54,13 @@ function openApp(name) {
         <div class="cam-video-container">
           <video id="cam-video-feed" autoplay playsinline muted></video>
           <div id="cam-flash-fx" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.12s;"></div>
-
-          <div class="cam-floating-controls">
-            <div class="cam-round-icon" onclick="switchFilter()">🔘</div>
-            <div class="cam-round-icon" onclick="alert('Beauty Retouch 50%')">✨</div>
-          </div>
-
-          <div class="cam-zoom-badge">1x</div>
-        </div>
-
-        <div class="cam-more-screen" id="cam-more-panel">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="font-size:16px;">More Modes</h3>
-            <button onclick="setCameraMode('PHOTO')" style="background:transparent; border:none; color:var(--yellow); font-size:18px; cursor:pointer;">✕</button>
-          </div>
-          <div class="more-grid-items">
-            <div class="more-btn-item" onclick="selectMore('PRO')"><div class="more-icon-wrap">PRO</div><span class="more-text">PRO</span></div>
-            <div class="more-btn-item" onclick="selectMore('PANO')"><div class="more-icon-wrap">🖼️</div><span class="more-text">PANO</span></div>
-            <div class="more-btn-item" onclick="selectMore('HI-RES')"><div class="more-icon-wrap">⊞</div><span class="more-text">HI-RES</span></div>
-            <div class="more-btn-item" onclick="selectMore('FILM')"><div class="more-icon-wrap">🎬</div><span class="more-text">FILM</span></div>
-            <div class="more-btn-item" onclick="selectMore('SLO-MO')"><div class="more-icon-wrap">⏳</div><span class="more-text">SLO-MO</span></div>
-            <div class="more-btn-item" onclick="selectMore('TIME-LAPSE')"><div class="more-icon-wrap">⏱️</div><span class="more-text">TIME-LAPSE</span></div>
-            <div class="more-btn-item" onclick="selectMore('SCANNER')"><div class="more-icon-wrap">📄</div><span class="more-text">TEXT SCANNER</span></div>
-          </div>
         </div>
 
         <div class="cam-modes">
-          <span class="cam-mode-label" onclick="setCameraMode('STREET')">STREET</span>
-          <span class="cam-mode-label" onclick="setCameraMode('VIDEO')">VIDEO</span>
-          <span class="cam-mode-label active" id="mode-photo-label" onclick="setCameraMode('PHOTO')">PHOTO</span>
-          <span class="cam-mode-label" onclick="setCameraMode('PORTRAIT')">PORTRAIT</span>
-          <span class="cam-mode-label" onclick="setCameraMode('MORE')">MORE</span>
+          <span class="cam-mode-label" onclick="alert('Street mode ready')">STREET</span>
+          <span class="cam-mode-label" onclick="alert('Video mode ready')">VIDEO</span>
+          <span class="cam-mode-label active">PHOTO</span>
+          <span class="cam-mode-label" onclick="alert('Portrait depth on')">PORTRAIT</span>
         </div>
 
         <div class="cam-shutter-bar">
@@ -113,15 +86,15 @@ function openApp(name) {
       const savedPhoto = localStorage.getItem('nexus_last_photo');
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:16px;">
-          <h3 style="font-size:15px; color:#94a3b8;">Camera Gallery & Captures</h3>
-          <div id="photos-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+          <h3 style="font-size:15px; color:#94a3b8;">Captured Gallery Album</h3>
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
             ${savedPhoto ? `
               <div style="position:relative; aspect-ratio:1; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,0.2);">
-                <img src="${savedPhoto}" style="width:100%; height:100%; object-fit:cover;" onclick="viewFullPhoto('${savedPhoto}')">
+                <img src="${savedPhoto}" style="width:100%; height:100%; object-fit:cover;">
               </div>
-            ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos clicked yet.<br>Open Camera to capture!</p>'}
+            ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos clicked yet.<br>Open Camera to capture photos!</p>'}
           </div>
-          ${savedPhoto ? `<button onclick="localStorage.removeItem('nexus_last_photo'); openApp('photos')" class="calc-btn action" style="padding:10px; font-size:13px;">Clear Gallery</button>` : ''}
+          ${savedPhoto ? `<button onclick="localStorage.removeItem('nexus_last_photo'); openApp('photos')" class="calc-btn action" style="padding:10px; font-size:13px;">Delete Stored Photos</button>` : ''}
         </div>
       `;
       break;
@@ -159,7 +132,7 @@ function openApp(name) {
       const savedNotes = localStorage.getItem('nexus_notes') || '';
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:10px;">
-          <textarea id="note-input" oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:62vh; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:14px; color:#fff; font-size:16px; resize:none;" placeholder="Start writing notes...">${savedNotes}</textarea>
+          <textarea id="note-input" oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:60vh; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:14px; color:#fff; font-size:16px; resize:none;" placeholder="Write your notes here...">${savedNotes}</textarea>
           <button onclick="localStorage.removeItem('nexus_notes'); document.getElementById('note-input').value='';" class="calc-btn action" style="padding:10px; font-size:13px;">Clear Notes</button>
         </div>
       `;
@@ -169,7 +142,7 @@ function openApp(name) {
     case 'music':
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 0; gap:18px;">
-          <div id="vinyl-disc" style="width:180px; height:180px; border-radius:50%; background:radial-gradient(circle, #334155 20%, #0f172a 70%); border:4px solid #ec4899; display:flex; align-items:center; justify-content:center; font-size:48px; box-shadow:0 8px 25px rgba(236,72,153,0.3); transition:transform 1s linear;">
+          <div id="vinyl-disc" style="width:180px; height:180px; border-radius:50%; background:radial-gradient(circle, #334155 20%, #0f172a 70%); border:4px solid #ec4899; display:flex; align-items:center; justify-content:center; font-size:48px; box-shadow:0 8px 25px rgba(236,72,153,0.3);">
             🎵
           </div>
           <div>
@@ -209,14 +182,13 @@ function openApp(name) {
           <div style="width:100%; height:6px; background:#222; border-radius:3px; margin:10px 0; overflow:hidden;">
             <div style="width:33%; height:100%; background:linear-gradient(90deg, #38bdf8, #22c55e);"></div>
           </div>
-          <p style="color:#94a3b8; font-size:12px;">86 GB Available</p>
+          <p style="color:#94a3b8; font-size:12px;">86 GB Free Space</p>
         </div>
         <div class="card">
-          <div class="card-item" onclick="openFileCategory('Documents')"><span>📄 Documents (PDF, TXT)</span><span style="color:#94a3b8;">24 files ›</span></div>
+          <div class="card-item" onclick="alert('Opening Documents Folder')"><span>📄 Documents (PDF, DOCX)</span><span style="color:#94a3b8;">24 files ›</span></div>
           <div class="card-item" onclick="openApp('photos')"><span>🖼️ Images & Camera</span><span style="color:#94a3b8;">186 photos ›</span></div>
-          <div class="card-item" onclick="openFileCategory('Downloads')"><span>⬇️ Downloads</span><span style="color:#94a3b8;">12 files ›</span></div>
-          <div class="card-item" onclick="openFileCategory('Audio')"><span>🎵 Audio & Recordings</span><span style="color:#94a3b8;">8 tracks ›</span></div>
-          <div class="card-item" onclick="openFileCategory('APKs')"><span>📦 Packages (APK)</span><span style="color:#94a3b8;">3 files ›</span></div>
+          <div class="card-item" onclick="alert('Opening Downloads Folder')"><span>⬇️ Downloads</span><span style="color:#94a3b8;">12 files ›</span></div>
+          <div class="card-item" onclick="alert('Opening Audio Recordings')"><span>🎵 Audio Tracks</span><span style="color:#94a3b8;">8 tracks ›</span></div>
         </div>
       `;
       break;
@@ -226,7 +198,7 @@ function openApp(name) {
       body.innerHTML = `
         <div class="card">
           <h4 style="color:#38bdf8;">Hardware Driver Bridges</h4>
-          <p style="font-size:12px; color:#94a3b8; margin-top:2px;">Real-time peripheral kernel interfaces</p>
+          <p style="font-size:12px; color:#94a3b8; margin-top:2px;">Real-time hardware interfaces connected</p>
         </div>
         <div class="card">
           <div class="card-item"><span>📷 Camera Sensor Driver</span><b style="color:#22c55e;">Online (v2.4)</b></div>
@@ -235,7 +207,7 @@ function openApp(name) {
           <div class="card-item"><span>⚡ GPU Acceleration</span><b style="color:#22c55e;">120Hz Native</b></div>
           <div class="card-item"><span>📶 5G Modem Baseband</span><b style="color:#22c55e;">Connected</b></div>
         </div>
-        <button onclick="alert('Driver diagnostics: All hardware drivers are running perfectly.')" class="calc-btn action" style="width:100%; padding:10px; font-size:13px;">Run Hardware Diagnostic</button>
+        <button onclick="alert('Diagnostics Passed: All peripheral drivers active.')" class="calc-btn action" style="width:100%; padding:10px; font-size:13px;">Run Hardware Diagnostic</button>
       `;
       break;
 
@@ -304,24 +276,14 @@ function openApp(name) {
     case 'settings':
       body.innerHTML = `
         <div class="card">
-          <div class="card-item" onclick="toggleNavLayoutSetting()">
-            <span>System Navigation</span>
-            <b style="color:#38bdf8;">${navMode === 'buttons' ? '3-Button Bar' : 'Full Gestures'} ›</b>
-          </div>
-          <div class="card-item" onclick="alert('Wi-Fi scanning...')">
-            <span>Wi-Fi Network</span>
-            <span style="color:#94a3b8;">Off ›</span>
-          </div>
-          <div class="card-item" onclick="alert('Bluetooth ready')">
-            <span>Bluetooth</span>
-            <span style="color:#94a3b8;">Off ›</span>
-          </div>
-        </div>
-        <div class="card">
           <div class="card-item"><span>Device Name</span><b style="color:#38bdf8;">Nexus Alpha</b></div>
           <div class="card-item"><span>Processor</span><b>MediaTek Dimensity 7400</b></div>
           <div class="card-item"><span>RAM</span><b>8.00 GB</b></div>
           <div class="card-item"><span>Storage</span><b>128 GB</b></div>
+        </div>
+        <div class="card">
+          <div class="card-item" onclick="alert('Wi-Fi scanning...')"><span>Wi-Fi Network</span><span style="color:#94a3b8;">Off ›</span></div>
+          <div class="card-item" onclick="alert('Bluetooth ready')"><span>Bluetooth</span><span style="color:#94a3b8;">Off ›</span></div>
         </div>
       `;
       break;
@@ -336,7 +298,11 @@ function closeApp() {
   }
 }
 
-// Camera Helper Functions
+function showRecents() {
+  alert('Recents: All apps are actively preserved in memory.');
+}
+
+// Camera Helper
 function startCameraStream() {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({
@@ -350,7 +316,7 @@ function startCameraStream() {
         v.onloadedmetadata = () => v.play().catch(() => {});
       }
     })
-    .catch(() => alert('Allow Camera Access in browser settings.'));
+    .catch(() => alert('Allow Camera Access in browser permissions.'));
   }
 }
 
@@ -360,30 +326,71 @@ function toggleFacing() {
   startCameraStream();
 }
 
-function switchFilter() {
-  activeFilterIdx = (activeFilterIdx + 1) % camFilters.length;
-  const v = document.getElementById('cam-video-feed');
-  if (v) v.style.filter = camFilters[activeFilterIdx];
-}
-
-function setCameraMode(mode) {
-  const morePanel = document.getElementById('cam-more-panel');
-  document.querySelectorAll('.cam-mode-label').forEach(el => {
-    el.classList.toggle('active', el.innerText === mode);
-  });
-  if (mode === 'MORE') {
-    if (morePanel) morePanel.style.display = 'flex';
-  } else {
-    if (morePanel) morePanel.style.display = 'none';
-  }
-}
-
-function selectMore(m) {
-  alert(`Mode: ${m}`);
-  setCameraMode('PHOTO');
-}
-
 function capturePhoto() {
   const v = document.getElementById('cam-video-feed');
   const c = document.getElementById('cam-capture-canvas');
-  con
+  const t = document.getElementById('cam-gallery-thumb');
+  const f = document.getElementById('cam-flash-fx');
+  if (v && c) {
+    if (f) { f.style.opacity = '0.9'; setTimeout(() => f.style.opacity = '0', 120); }
+    c.width = v.videoWidth || 640;
+    c.height = v.videoHeight || 480;
+    const ctx = c.getContext('2d');
+    if (currentFacing === 'user') { ctx.translate(c.width, 0); ctx.scale(-1, 1); }
+    ctx.drawImage(v, 0, 0, c.width, c.height);
+    const data = c.toDataURL('image/png');
+    localStorage.setItem('nexus_last_photo', data);
+    if (t) t.src = data;
+  }
+}
+
+// Utilities
+function calcKey(k) {
+  const v = document.getElementById('calc-view');
+  if (k === 'C') { calcBuffer = ''; v.innerText = '0'; }
+  else if (k === 'DEL') { calcBuffer = calcBuffer.slice(0, -1); v.innerText = calcBuffer || '0'; }
+  else if (k === '=') { try { calcBuffer = String(eval(calcBuffer)); v.innerText = calcBuffer; } catch(e) { v.innerText = 'Error'; calcBuffer = ''; } }
+  else { calcBuffer += k; v.innerText = calcBuffer; }
+}
+
+function dialDigit(d) { dialPadStr += d; document.getElementById('dial-number').innerText = dialPadStr; }
+function dialClear() { dialPadStr = dialPadStr.slice(0, -1); document.getElementById('dial-number').innerText = dialPadStr; }
+
+function toggleMusic() {
+  const btn = document.getElementById('music-play-btn');
+  isMusicPlaying = !isMusicPlaying;
+  btn.innerText = isMusicPlaying ? '⏸' : '▶';
+}
+
+async function toggleRecording() {
+  const btn = document.getElementById('mic-btn');
+  const status = document.getElementById('rec-status-text');
+  if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunks, { type: 'audio/mp3' });
+        const pb = document.getElementById('recorded-audio');
+        pb.src = URL.createObjectURL(blob);
+        pb.style.display = 'block';
+      };
+      mediaRecorder.start();
+      btn.innerText = '⏹';
+      status.innerText = 'Recording audio live...';
+    } catch(e) { alert('Microphone permission required.'); }
+  } else {
+    mediaRecorder.stop();
+    btn.innerText = '🎙️';
+    status.innerText = 'Recording saved!';
+  }
+}
+
+function launchSearch() {
+  const query = document.getElementById('web-search-query').value;
+  if (query) {
+    window.open(query.startsWith('http') ? query : `https://google.com/search?q=${query}`, '_blank');
+  }
+}
