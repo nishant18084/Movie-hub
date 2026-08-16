@@ -178,7 +178,7 @@ html, body {
   transition: bottom 0.2s ease;
 }
 
-/* Mode 1: 3-Buttons Navigation Bar */
+/* Navigation Bar */
 .nav-bar {
   position: fixed;
   bottom: 0;
@@ -195,7 +195,7 @@ html, body {
 .nav-btn {
   font-size: 16px;
   color: #94a3b8;
-  padding: 8px 24px;
+  padding: 8px 28px;
   cursor: pointer;
 }
 .nav-btn:active {
@@ -203,7 +203,7 @@ html, body {
   transform: scale(0.85);
 }
 
-/* Mode 2: Gesture Navigation Bar */
+/* Gesture Bar */
 .gesture-bar-wrap {
   position: fixed;
   bottom: 0;
@@ -297,4 +297,3 @@ input:checked + .slider:before { transform: translateX(20px); }
 .dialer-screen { font-size: 28px; font-weight: 600; text-align: center; min-height: 40px; margin-bottom: 14px; }
 .dial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 280px; margin: 0 auto; }
 .dial-btn { height: 58px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: #fff; font-size: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-  
