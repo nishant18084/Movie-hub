@@ -8,9 +8,9 @@
 </head>
 <body>
 
-  <!-- Top System Status Header -->
+  <!-- Status Bar -->
   <header class="status-bar">
-    <span id="top-time" class="time-badge">--:--</span>
+    <span id="top-time">--:--</span>
     <div class="status-icons">
       <span>5G</span>
       <span>📶</span>
@@ -18,7 +18,7 @@
     </div>
   </header>
 
-  <!-- Modern Widgets & Home Screen -->
+  <!-- Widgets & Apps Screen -->
   <main class="home-screen">
     <section class="widget-container">
       <div class="clock-card">
@@ -34,44 +34,20 @@
       </div>
     </section>
 
-    <!-- Main System 8-App Grid -->
-    <section class="grid" id="home-grid">
-      <button class="app-btn" onclick="openApp('photos')">
-        <div class="icon-box mat-purple">🖼️</div>
-        <span class="label">Photos</span>
-      </button>
-      <button class="app-btn" onclick="openApp('calc')">
-        <div class="icon-box mat-blue">🔢</div>
-        <span class="label">Calculator</span>
-      </button>
-      <button class="app-btn" onclick="openApp('notes')">
-        <div class="icon-box mat-yellow">📝</div>
-        <span class="label">Notes</span>
-      </button>
-      <button class="app-btn" onclick="openApp('weather')">
-        <div class="icon-box mat-sky">☀️</div>
-        <span class="label">Weather</span>
-      </button>
-      <button class="app-btn" onclick="openApp('music')">
-        <div class="icon-box mat-pink">🎵</div>
-        <span class="label">Music</span>
-      </button>
-      <button class="app-btn" onclick="openApp('recorder')">
-        <div class="icon-box mat-red">🎙️</div>
-        <span class="label">Recorder</span>
-      </button>
-      <button class="app-btn" onclick="openApp('files')">
-        <div class="icon-box mat-amber">📁</div>
-        <span class="label">Files</span>
-      </button>
-      <button class="app-btn" onclick="openApp('drivers')">
-        <div class="icon-box mat-cyan">🎛️</div>
-        <span class="label">Hardware</span>
-      </button>
+    <!-- App Grid -->
+    <section class="grid">
+      <button class="app-btn" onclick="openApp('photos')"><div class="icon-box mat-purple">🖼️</div><span class="label">Photos</span></button>
+      <button class="app-btn" onclick="openApp('calc')"><div class="icon-box mat-blue">🔢</div><span class="label">Calculator</span></button>
+      <button class="app-btn" onclick="openApp('notes')"><div class="icon-box mat-yellow">📝</div><span class="label">Notes</span></button>
+      <button class="app-btn" onclick="openApp('weather')"><div class="icon-box mat-sky">☀️</div><span class="label">Weather</span></button>
+      <button class="app-btn" onclick="openApp('music')"><div class="icon-box mat-pink">🎵</div><span class="label">Music</span></button>
+      <button class="app-btn" onclick="openApp('recorder')"><div class="icon-box mat-red">🎙️</div><span class="label">Recorder</span></button>
+      <button class="app-btn" onclick="openApp('files')"><div class="icon-box mat-amber">📁</div><span class="label">Files</span></button>
+      <button class="app-btn" onclick="openApp('drivers')"><div class="icon-box mat-cyan">🎛️</div><span class="label">Hardware</span></button>
     </section>
   </main>
 
-  <!-- Persistent Glass Dock -->
+  <!-- Bottom Dock -->
   <nav class="dock">
     <button class="app-btn" onclick="openApp('dialer')"><div class="icon-box mat-green">📞</div></button>
     <button class="app-btn" onclick="openApp('browser')"><div class="icon-box mat-sky">🌐</div></button>
@@ -79,25 +55,14 @@
     <button class="app-btn" onclick="openApp('settings')"><div class="icon-box mat-zinc">⚙️</div></button>
   </nav>
 
-  <!-- 3-Button Navigation Bar (Recents | Home | Back) -->
+  <!-- Navigation Bar -->
   <footer class="nav-bar">
-    <div class="nav-btn" onclick="toggleRecents()">⏹</div>
-    <div class="nav-btn" onclick="navHome()">⚪</div>
-    <div class="nav-btn" onclick="navBack()">◀</div>
+    <div class="nav-btn" onclick="openApp('drivers')">⏹</div>
+    <div class="nav-btn" onclick="closeApp()">⚪</div>
+    <div class="nav-btn" onclick="closeApp()">◀</div>
   </footer>
 
-  <!-- Real Multi-Tasking Recents Screen -->
-  <section id="recents-screen">
-    <div class="recents-header">Active Tasks</div>
-    <div class="recents-cards-container" id="recents-cards"></div>
-    <div class="recents-bottom-bar">
-      <button class="close-all-btn" onclick="clearAllRecents()">
-        <span>✕</span> Close all
-      </button>
-    </div>
-  </section>
-
-  <!-- Full Software Application Modal -->
+  <!-- App Window Modal -->
   <section id="app-modal">
     <div class="modal-hdr" id="modal-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
@@ -107,10 +72,10 @@
     <div class="modal-body" id="modal-body"></div>
   </section>
 
-  <!-- Native Power Options Overlay -->
+  <!-- Power Menu Overlay -->
   <div id="power-overlay">
     <div class="power-card">
-      <h3 style="font-size:18px; margin-bottom:14px;">Power Options</h3>
+      <h3 style="font-size:18px; margin-bottom:4px;">Power Options</h3>
       <button class="p-btn p-restart" onclick="restartDevice()">🔄 Restart</button>
       <button class="p-btn p-off" onclick="powerOffDevice()">⚡ Power Off</button>
       <button class="p-btn p-cancel" onclick="hidePowerMenu()">Cancel</button>
