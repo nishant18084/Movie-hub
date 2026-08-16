@@ -32,8 +32,30 @@ let paintCtx, isDrawing = false, paintColor = '#38bdf8';
 // Active Task Stack
 let activeTasks = [];
 let navMode = localStorage.getItem('nexus_nav_mode') || 'buttons'; // 'buttons' | 'gestures'
+let navLayout = localStorage.getItem('nexus_nav_layout') || 'right_back'; // 'right_back' | 'left_back'
 
-// 2. Navigation Switcher Function
+// 2. Navigation Renderer & Switcher
+function renderNavButtons() {
+  const btnBar = document.getElementById('nav-buttons-bar');
+  if (!btnBar) return;
+
+  if (navLayout === 'right_back') {
+    // Realme / Samsung standard: Recents on Left, Home Center, Back on Right
+    btnBar.innerHTML = `
+      <div class="nav-btn" onclick="navRecents()">⏹</div>
+      <div class="nav-btn" onclick="navHome()">⚪</div>
+      <div class="nav-btn" onclick="navBack()">◀</div>
+    `;
+  } else {
+    // Standard Google: Back on Left, Home Center, Recents on Right
+    btnBar.innerHTML = `
+      <div class="nav-btn" onclick="navBack()">◀</div>
+      <div class="nav-btn" onclick="navHome()">⚪</div>
+      <div class="nav-btn" onclick="navRecents()">⏹</div>
+    `;
+  }
+}
+
 function applyNavMode(mode) {
   navMode = mode;
   localStorage.setItem('nexus_nav_mode', mode);
@@ -53,6 +75,7 @@ function applyNavMode(mode) {
     if (recents) recents.style.bottom = '24px';
     if (osRoot) osRoot.style.height = 'calc(100dvh - 105px)';
   } else {
+    renderNavButtons();
     if (btnBar) btnBar.style.display = 'flex';
     if (gestBar) gestBar.style.display = 'none';
     if (dock) dock.style.bottom = '50px';
@@ -61,6 +84,13 @@ function applyNavMode(mode) {
     if (osRoot) osRoot.style.height = 'calc(100dvh - 130px)';
   }
 }
+
+function setNavLayout(layout) {
+  navLayout = layout;
+  localStorage.setItem('nexus_nav_layout', layout);
+  renderNavButtons();
+}
+
 setTimeout(() => applyNavMode(navMode), 50);
 
 // Search Filter
@@ -72,7 +102,7 @@ function filterApps() {
   });
 }
 
-// Navigation Triggers
+// Navigation Actions
 function navBack() {
   const recents = document.getElementById('recents-modal');
   const win = document.getElementById('app-window');
@@ -196,7 +226,7 @@ function openApp(appName) {
                 <div class="s-icon" style="background:#6366f1;">🧭</div>
                 <div>
                   <div class="s-title">System Navigation</div>
-                  <div style="font-size:11px; color:#94a3b8;">${navMode === 'buttons' ? '3-Button Navigation' : 'Gesture Navigation'}</div>
+                  <div style="font-size:11px; color:#94a3b8;">${navMode === 'buttons' ? (navLayout === 'right_back' ? 'Buttons (Back on Right)' : 'Buttons (Back on Left)') : 'Gesture Navigation'}</div>
                 </div>
               </div>
               <span class="arrow">›</span>
@@ -388,23 +418,4 @@ function closeApp() {
 }
 
 // 4. File Category Viewer
-function openFileCategory(catName) {
-  const content = document.getElementById('window-content');
-  const title = document.getElementById('window-title');
-  title.innerText = `Files > ${catName}`;
-  content.innerHTML = `
-    <div class="settings-container">
-      <div class="settings-card">
-        <div class="settings-item"><div class="item-left"><span>📄 Project_Nexus_Notes.pdf</span></div><span class="item-right">2.4 MB</span></div>
-        <div class="settings-item"><div class="item-left"><span>📄 Android_System_Config.xml</span></div><span class="item-right">45 KB</span></div>
-        <div class="settings-item"><div class="item-left"><span>📄 UI_Assets_List.txt</span></div><span class="item-right">12 KB</span></div>
-      </div>
-      <button onclick="openApp('files')" class="calc-btn action" style="width:100%; margin-top:10px;">← Back to Storage</button>
-    </div>
-  `;
-}
-
-// 5. Navigation Settings Menu
-function openNavSettings() {
-  const content = document.getElementById('window-content');
-  const title = document.g
+f
