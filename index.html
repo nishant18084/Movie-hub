@@ -8,57 +8,98 @@
 </head>
 <body>
 
-  <!-- Top Status & Clock -->
-  <div class="top-section">
-    <div class="status-bar">
-      <span id="top-time">--:--</span>
-      <span>VoLTE 5G • 100%</span>
+  <!-- Android 15 Quick Status Bar -->
+  <header class="status-bar">
+    <span id="top-time" class="time-badge">--:--</span>
+    <div class="status-icons">
+      <span>5G</span>
+      <span class="signal-bars">📶</span>
+      <span>100% 🔋</span>
     </div>
+  </header>
 
-    <div class="time-widget">
-      <div>
+  <!-- Modern Dynamic Widgets Area -->
+  <main class="home-screen">
+    <section class="widget-container">
+      <div class="clock-card">
         <h1 id="main-clock">--:--</h1>
         <p id="main-date">--</p>
       </div>
-      <span class="badge">⚡ NEXUS</span>
+      <div class="weather-chip">
+        <span class="weather-icon">⛅</span>
+        <div>
+          <b>29°C</b>
+          <small>AQI 42</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modern App Grid (Material You Rounded Squares) -->
+    <section class="grid" id="home-grid">
+      <button class="app-btn" onclick="openApp('photos')">
+        <div class="icon-box mat-purple">🖼️</div>
+        <span class="label">Photos</span>
+      </button>
+      <button class="app-btn" onclick="openApp('calc')">
+        <div class="icon-box mat-blue">🔢</div>
+        <span class="label">Calculator</span>
+      </button>
+      <button class="app-btn" onclick="openApp('notes')">
+        <div class="icon-box mat-yellow">📝</div>
+        <span class="label">Notes</span>
+      </button>
+      <button class="app-btn" onclick="openApp('weather')">
+        <div class="icon-box mat-sky">☀️</div>
+        <span class="label">Weather</span>
+      </button>
+      <button class="app-btn" onclick="openApp('music')">
+        <div class="icon-box mat-pink">🎵</div>
+        <span class="label">Music</span>
+      </button>
+      <button class="app-btn" onclick="openApp('recorder')">
+        <div class="icon-box mat-red">🎙️</div>
+        <span class="label">Recorder</span>
+      </button>
+      <button class="app-btn" onclick="openApp('files')">
+        <div class="icon-box mat-amber">📁</div>
+        <span class="label">Files</span>
+      </button>
+      <button class="app-btn" onclick="openApp('drivers')">
+        <div class="icon-box mat-cyan">🎛️</div>
+        <span class="label">Hardware</span>
+      </button>
+    </section>
+  </main>
+
+  <!-- Floating Glass Dock -->
+  <nav class="dock">
+    <button class="app-btn" onclick="openApp('dialer')"><div class="icon-box mat-green">📞</div></button>
+    <button class="app-btn" onclick="openApp('browser')"><div class="icon-box mat-sky">🌐</div></button>
+    <button class="app-btn" onclick="openApp('camera')"><div class="icon-box mat-slate">📷</div></button>
+    <button class="app-btn" onclick="openApp('settings')"><div class="icon-box mat-zinc">⚙️</div></button>
+  </nav>
+
+  <!-- Modern Navigation Bar -->
+  <footer class="nav-bar">
+    <div class="nav-btn" onclick="toggleRecents()">⏹</div>
+    <div class="nav-btn" onclick="navHome()">⚪</div>
+    <div class="nav-btn" onclick="navBack()">◀</div>
+  </footer>
+
+  <!-- Android 15 Recents Multitasking Screen -->
+  <section id="recents-screen">
+    <div class="recents-header">
+      <span>Active Tasks</span>
     </div>
-
-    <!-- Main Apps Grid -->
-    <div class="grid" id="home-grid">
-      <button class="app-btn" onclick="openApp('photos')"><div class="icon bg-purple">🖼️</div><span class="label">Photos</span></button>
-      <button class="app-btn" onclick="openApp('calc')"><div class="icon bg-blue">🔢</div><span class="label">Calculator</span></button>
-      <button class="app-btn" onclick="openApp('notes')"><div class="icon bg-yellow">📝</div><span class="label">Notes</span></button>
-      <button class="app-btn" onclick="openApp('weather')"><div class="icon bg-sky">☀️</div><span class="label">Weather</span></button>
-      <button class="app-btn" onclick="openApp('music')"><div class="icon bg-pink">🎵</div><span class="label">Music</span></button>
-      <button class="app-btn" onclick="openApp('recorder')"><div class="icon bg-red">🎙️</div><span class="label">Recorder</span></button>
-      <button class="app-btn" onclick="openApp('files')"><div class="icon bg-amber">📁</div><span class="label">Files</span></button>
-      <button class="app-btn" onclick="openApp('drivers')"><div class="icon bg-cyan">🎛️</div><span class="label">Drivers</span></button>
+    <div class="recents-cards-container" id="recents-cards"></div>
+    <div class="recents-bottom-bar">
+      <button class="close-all-btn" onclick="clearAllRecents()">
+        <span>✕</span> Close all
+      </button>
     </div>
-  </div>
+  </section>
 
-  <!-- Bottom Dock & Navigation -->
-  <div class="bottom-section">
-    <nav class="dock">
-      <button class="app-btn" onclick="openApp('dialer')"><div class="icon bg-green">📞</div></button>
-      <button class="app-btn" onclick="openApp('browser')"><div class="icon bg-sky">🌐</div></button>
-      <button class="app-btn" onclick="openApp('camera')"><div class="icon bg-slate">📷</div></button>
-      <button class="app-btn" onclick="openApp('settings')"><div class="icon bg-zinc">⚙️</div></button>
-    </nav>
-
-    <!-- Navigation Bar: 3-Buttons Mode -->
-    <footer class="nav-bar" id="nav-buttons-bar">
-      <div class="nav-btn" onclick="alert('Recents: 12 background services active')">⏹</div>
-      <div class="nav-btn" onclick="closeApp()">⚪</div>
-      <div class="nav-btn" onclick="closeApp()">◀</div>
-    </footer>
-
-    <!-- Gesture Bar Mode -->
-    <div class="gesture-bar-wrap" id="nav-gesture-bar" onclick="closeApp()">
-      <div class="gesture-pill"></div>
-    </div>
-  </div>
-
-  <!-- Fullscreen Modal Application Window -->
+  <!-- Fullscreen Modern App Modal -->
   <section id="app-modal">
     <div class="modal-hdr" id="modal-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
