@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- Boot Hello Animation -->
+  <!-- Boot Animation -->
   <div id="boot-screen">
     <svg class="hello-svg" viewBox="0 0 300 120">
       <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">Nexus</text>
@@ -29,7 +29,7 @@
           <h1 id="live-clock">--:--</h1>
           <p id="live-date">--</p>
         </div>
-        <span class="os-badge">⚡ hello</span>
+        <span class="os-badge">⚡ NEXUS</span>
       </section>
 
       <input type="text" id="app-search" class="search-box" placeholder="Search system, apps, tools..." oninput="filterApps()">
@@ -70,14 +70,10 @@
     <div class="app-item" onclick="openApp('settings')"><div class="icon bg-zinc">⚙️</div></div>
   </nav>
 
-  <!-- Navigation Bar: 3 Buttons Mode -->
-  <footer class="nav-bar" id="nav-buttons-bar">
-    <div class="nav-btn" onclick="navBack()">⏹</div>
-    <div class="nav-btn" onclick="navHome()">⚪</div>
-    <div class="nav-btn" onclick="navRecents()">◀</div>
-  </footer>
+  <!-- Navigation Bar: Dynamic Layout (Left or Right Back) -->
+  <footer class="nav-bar" id="nav-buttons-bar"></footer>
 
-  <!-- Gesture Bar Mode (Alternative) -->
+  <!-- Gesture Bar Mode -->
   <div class="gesture-bar-wrap" id="nav-gesture-bar" onclick="navHome()">
     <div class="gesture-pill"></div>
   </div>
