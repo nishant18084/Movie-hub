@@ -25,44 +25,7 @@ html, body {
   color: var(--text);
 }
 
-/* Boot Screen */
-#boot-screen {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: hideBoot 0.4s ease 1.8s forwards;
-  pointer-events: none;
-}
-
-.hello-svg { width: 260px; max-width: 80vw; }
-.hello-text {
-  font-family: 'Brush Script MT', 'Segoe Script', cursive, sans-serif;
-  font-size: 85px;
-  fill: transparent;
-  stroke: var(--accent);
-  stroke-width: 2.2;
-  stroke-dasharray: 600;
-  stroke-dashoffset: 600;
-  stroke-linecap: round;
-  animation: writeHello 1.6s ease-in-out forwards;
-  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.7));
-}
-
-@keyframes writeHello {
-  0% { stroke-dashoffset: 600; fill: transparent; }
-  75% { stroke-dashoffset: 0; fill: transparent; }
-  100% { stroke-dashoffset: 0; fill: var(--accent); }
-}
-
-@keyframes hideBoot {
-  to { opacity: 0; visibility: hidden; display: none; }
-}
-
-/* OS Container */
+/* OS Root Swipeable Layout */
 #os-container {
   display: flex;
   overflow-x: scroll;
@@ -140,11 +103,12 @@ html, body {
   font-size: 24px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.35);
   transition: transform 0.1s ease;
+  pointer-events: none;
 }
 .app-item:active .icon { transform: scale(0.88); }
-.label { font-size: 11px; color: #cbd5e1; margin-top: 5px; text-align: center; }
+.label { font-size: 11px; color: #cbd5e1; margin-top: 5px; text-align: center; pointer-events: none; }
 
-/* Colors */
+/* Themes & Badges */
 .bg-green { background: #22c55e; }
 .bg-blue { background: #0284c7; }
 .bg-slate { background: #475569; }
@@ -249,7 +213,7 @@ html, body {
 }
 .window-content { flex: 1; overflow-y: auto; padding: 18px; position: relative; }
 
-/* REALME CAMERA UI */
+/* Camera Viewport */
 .cam-wrapper {
   position: absolute;
   inset: 0;
@@ -268,13 +232,7 @@ html, body {
   z-index: 10;
   background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
 }
-.cam-top-btn {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 18px;
-  cursor: pointer;
-}
+.cam-top-btn { background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; }
 
 .cam-viewfinder {
   position: relative;
@@ -335,10 +293,7 @@ html, body {
   font-weight: 700;
   cursor: pointer;
 }
-.cam-zoom-btn.active {
-  background: rgba(255,255,255,0.2);
-  color: var(--yellow);
-}
+.cam-zoom-btn.active { background: rgba(255,255,255,0.2); color: var(--yellow); }
 
 .cam-mode-slider {
   display: flex;
@@ -394,7 +349,7 @@ html, body {
   cursor: pointer;
 }
 
-/* MORE Panel */
+/* Camera More Panel */
 .cam-more-panel {
   position: absolute;
   inset: 0;
@@ -424,24 +379,7 @@ html, body {
 }
 .more-label { font-size: 11px; font-weight: 600; color: #e2e8f0; text-align: center; }
 
-/* Recents Modal */
-#recents-modal {
-  position: fixed;
-  inset: 0;
-  bottom: 44px;
-  background: rgba(7, 10, 18, 0.95);
-  backdrop-filter: blur(25px);
-  z-index: 210;
-  display: none;
-  flex-direction: column;
-  padding: 24px 18px;
-}
-.recents-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.clear-task-btn { background: #ef4444; border: none; padding: 6px 14px; color: #fff; border-radius: 10px; font-weight: 600; cursor: pointer; }
-.task-list { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 20px; }
-.task-card { flex: 0 0 220px; height: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
-
-/* App UI & Cards */
+/* System Cards & General UI */
 .settings-container { display: flex; flex-direction: column; gap: 12px; }
 .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
 .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; }
@@ -459,6 +397,23 @@ html, body {
 input:checked + .slider { background-color: #22c55e; }
 input:checked + .slider:before { transform: translateX(20px); }
 
+/* Recents Modal */
+#recents-modal {
+  position: fixed;
+  inset: 0;
+  bottom: 44px;
+  background: rgba(7, 10, 18, 0.95);
+  backdrop-filter: blur(25px);
+  z-index: 210;
+  display: none;
+  flex-direction: column;
+  padding: 24px 18px;
+}
+.recents-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.clear-task-btn { background: #ef4444; border: none; padding: 6px 14px; color: #fff; border-radius: 10px; font-weight: 600; cursor: pointer; }
+.task-list { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 20px; }
+.task-card { flex: 0 0 220px; height: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
+
 /* Calculator */
 .calc-screen { background: rgba(255, 255, 255, 0.05); padding: 20px 14px; border-radius: 14px; font-size: 32px; text-align: right; margin-bottom: 16px; min-height: 70px; }
 .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
@@ -470,4 +425,3 @@ input:checked + .slider:before { transform: translateX(20px); }
 .dialer-screen { font-size: 28px; font-weight: 600; text-align: center; min-height: 40px; margin-bottom: 14px; }
 .dial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 280px; margin: 0 auto; }
 .dial-btn { height: 58px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: #fff; font-size: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-  
