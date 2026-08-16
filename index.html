@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Nexus OS</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Top Info Area -->
+  <!-- Top Status & Clock -->
   <div class="top-section">
     <div class="status-bar">
       <span id="top-time">--:--</span>
@@ -23,7 +23,7 @@
       <span class="badge">⚡ NEXUS</span>
     </div>
 
-    <!-- Main 8-App Grid -->
+    <!-- Main Apps Grid -->
     <div class="grid" id="home-grid">
       <button class="app-btn" onclick="openApp('photos')"><div class="icon bg-purple">🖼️</div><span class="label">Photos</span></button>
       <button class="app-btn" onclick="openApp('calc')"><div class="icon bg-blue">🔢</div><span class="label">Calculator</span></button>
@@ -36,7 +36,7 @@
     </div>
   </div>
 
-  <!-- Bottom Area -->
+  <!-- Bottom Dock & Navigation -->
   <div class="bottom-section">
     <nav class="dock">
       <button class="app-btn" onclick="openApp('dialer')"><div class="icon bg-green">📞</div></button>
@@ -45,15 +45,20 @@
       <button class="app-btn" onclick="openApp('settings')"><div class="icon bg-zinc">⚙️</div></button>
     </nav>
 
-    <!-- 3-Button Navigation Bar (Realme Layout: Recents, Home, Back) -->
-    <footer class="nav-bar">
-      <div class="nav-btn" onclick="alert('Recents: Background tasks active')">⏹</div>
+    <!-- Navigation Bar: 3-Buttons Mode -->
+    <footer class="nav-bar" id="nav-buttons-bar">
+      <div class="nav-btn" onclick="alert('Recents: 12 background services active')">⏹</div>
       <div class="nav-btn" onclick="closeApp()">⚪</div>
       <div class="nav-btn" onclick="closeApp()">◀</div>
     </footer>
+
+    <!-- Gesture Bar Mode -->
+    <div class="gesture-bar-wrap" id="nav-gesture-bar" onclick="closeApp()">
+      <div class="gesture-pill"></div>
+    </div>
   </div>
 
-  <!-- App Window Modal -->
+  <!-- Fullscreen Modal Application Window -->
   <section id="app-modal">
     <div class="modal-hdr" id="modal-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
