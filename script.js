@@ -3,22 +3,24 @@ function syncTime() {
   const d = new Date();
   const h = String(d.getHours()).padStart(2, '0');
   const m = String(d.getMinutes()).padStart(2, '0');
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const timeStr = `${h}:${m}`;
-  const dateStr = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
+  const timeStr = h + ':' + m;
+  const dateStr = days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()];
 
   const elTop = document.getElementById('top-time');
   const elClock = document.getElementById('main-clock');
   const elDate = document.getElementById('main-date');
-  const elLockClock = document.getElementById('lock-clock');
-  const elLockDate = document.getElementById('lock-date');
+  const elLockClock = document.getElementById('lock-big-clock');
+  const elLockDate = document.getElementById('lock-date-display');
+  const elLockTop = document.getElementById('lock-status-time');
 
   if (elTop) elTop.innerText = timeStr;
   if (elClock) elClock.innerText = timeStr;
   if (elDate) elDate.innerText = dateStr;
   if (elLockClock) elLockClock.innerText = timeStr;
   if (elLockDate) elLockDate.innerText = dateStr;
+  if (elLockTop) elLockTop.innerText = timeStr;
 }
 syncTime();
 setInterval(syncTime, 1000);
@@ -26,55 +28,40 @@ setInterval(syncTime, 1000);
 let calcBuffer = '';
 let dialPadStr = '';
 let mediaStream = null;
-let currentPinInput = '';
 
-// Load Saved Wallpaper & Lock Status
+// Load Wallpaper on Start
 window.addEventListener('DOMContentLoaded', () => {
   const savedWp = localStorage.getItem('nexus_wallpaper');
   if (savedWp) {
     document.body.style.backgroundImage = `url(${savedWp})`;
-  }
-  const isLockEnabled = localStorage.getItem('nexus_lock_enabled') === 'true';
-  if (isLockEnabled) {
-    showLockScreen();
+    const lockScreen = document.getElementById('lock-screen');
+    if (lockScreen) lockScreen.style.backgroundImage = `url(${savedWp})`;
   }
 });
 
-// Lock Screen Logic
-function showLockScreen() {
-  currentPinInput = '';
-  updatePinDots();
-  document.getElementById('lock-screen').style.display = 'flex';
-}
-function pressPin(num) {
-  if (currentPinInput.length < 4) {
-    currentPinInput += num;
-    updatePinDots();
-    if (currentPinInput.length === 4) submitPin();
-  }
-}
-function clearPin() {
-  currentPinInput = currentPinInput.slice(0, -1);
-  updatePinDots();
-}
-function updatePinDots() {
-  const dots = document.querySelectorAll('#pin-dots .dot');
-  dots.forEach((dot, idx) => {
-    dot.classList.toggle('filled', idx < currentPinInput.length);
-  });
-}
-function submitPin() {
-  const realPin = localStorage.getItem('nexus_pin') || '0000';
-  if (currentPinInput === realPin) {
-    document.getElementById('lock-screen').style.display = 'none';
-  } else {
-    alert('Incorrect PIN. Default is 0000');
-    currentPinInput = '';
-    updatePinDots();
+// Unlock Screen
+function unlockDevice() {
+  const ls = document.getElementById('lock-screen');
+  if (ls) {
+    ls.style.transform = 'translateY(-100%)';
+    ls.style.opacity = '0';
+    setTimeout(() => { ls.style.display = 'none'; }, 350);
   }
 }
 
-// Power Menu
+function lockDeviceNow() {
+  const ls = document.getElementById('lock-screen');
+  if (ls) {
+    ls.style.display = 'flex';
+    setTimeout(() => {
+      ls.style.transform = 'translateY(0)';
+      ls.style.opacity = '1';
+    }, 10);
+  }
+  closeApp();
+}
+
+// Power Options
 function showPowerMenu() { document.getElementById('power-overlay').style.display = 'flex'; }
 function hidePowerMenu() { document.getElementById('power-overlay').style.display = 'none'; }
 function restartDevice() {
@@ -102,11 +89,13 @@ function toggleFullscreenMode() {
   openApp('settings');
 }
 
-// Wallpaper Handler
+// Wallpaper Handler (Home & Lock Screen Both)
 function setSystemWallpaper(url) {
   document.body.style.backgroundImage = `url(${url})`;
+  const lockScreen = document.getElementById('lock-screen');
+  if (lockScreen) lockScreen.style.backgroundImage = `url(${url})`;
   localStorage.setItem('nexus_wallpaper', url);
-  alert('Wallpaper applied to Home & Lock Screen!');
+  alert('Wallpaper applied to Home Screen & Lock Screen!');
   openApp('settings');
 }
 
@@ -129,7 +118,6 @@ function openApp(name) {
   modal.style.display = 'flex';
   title.innerText = name.toUpperCase();
 
-  // 1. Live Camera
   if (name === 'camera') {
     hdr.style.display = 'none';
     body.style.padding = '0';
@@ -159,24 +147,17 @@ function openApp(name) {
   body.style.padding = '18px';
 
   switch(name) {
-    // 2. Settings (Lock + Wallpaper + Fullscreen + Power)
     case 'settings':
       const isFull = !!document.fullscreenElement;
-      const isLockOn = localStorage.getItem('nexus_lock_enabled') === 'true';
-      const curPin = localStorage.getItem('nexus_pin') || '0000';
       body.innerHTML = `
         <div class="card">
-          <h4 style="color:#38bdf8; margin-bottom:8px;">Customization & Display</h4>
+          <h4 style="color:#38bdf8; margin-bottom:8px;">Display & Wallpaper</h4>
           <div class="card-item" onclick="toggleFullscreenMode()">
-            <div>
-              <b>Full Screen Display</b>
-              <p style="font-size:12px; color:#94a3b8;">Hide browser navigation</p>
-            </div>
+            <div><b>Full Screen Mode</b><p style="font-size:12px; color:#94a3b8;">Immersive view</p></div>
             <span style="color:#38bdf8; font-weight:bold;">${isFull ? 'ON' : 'OFF'} ›</span>
           </div>
-
           <div style="padding:10px 0;">
-            <b>Change Wallpaper (Home & Lock)</b>
+            <b>Set Wallpaper (Home & Lock Screen)</b>
             <div style="display:flex; gap:8px; margin-top:8px;">
               <button onclick="setSystemWallpaper('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800')" class="calc-btn action" style="flex:1; font-size:12px; padding:8px;">Cyber</button>
               <button onclick="setSystemWallpaper('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800')" class="calc-btn action" style="flex:1; font-size:12px; padding:8px;">Nature</button>
@@ -190,59 +171,39 @@ function openApp(name) {
         </div>
 
         <div class="card">
-          <h4 style="color:#38bdf8; margin-bottom:8px;">Security & Lock Screen</h4>
-          <div class="card-item" onclick="toggleLockSetting()">
-            <div>
-              <b>Screen Lock (PIN)</b>
-              <p style="font-size:12px; color:#94a3b8;">Current PIN: ${curPin}</p>
-            </div>
-            <span style="color:#22c55e; font-weight:bold;">${isLockOn ? 'ENABLED' : 'DISABLED'} ›</span>
-          </div>
-          <div class="card-item" onclick="changePinSetting()">
-            <div>
-              <b>Change 4-Digit PIN</b>
-            </div>
-            <span style="color:#38bdf8;">Edit ›</span>
-          </div>
-          <div class="card-item" onclick="showLockScreen(); closeApp();">
-            <div>
-              <b>Lock Device Now</b>
-            </div>
-            <span style="color:#f59e0b;">Lock 🔒 ›</span>
+          <h4 style="color:#38bdf8; margin-bottom:8px;">Lock Screen</h4>
+          <div class="card-item" onclick="lockDeviceNow()">
+            <div><b>Lock Device Now</b><p style="font-size:12px; color:#94a3b8;">Show Big Clock Lock Screen</p></div>
+            <span style="color:#f59e0b; font-weight:bold;">Lock 🔒 ›</span>
           </div>
         </div>
 
         <div class="card">
           <div class="card-item" onclick="showPowerMenu()">
-            <div>
-              <b style="color:#ef4444;">Power & Restart Options</b>
-              <p style="font-size:12px; color:#94a3b8;">Reboot or shut down</p>
-            </div>
+            <div><b style="color:#ef4444;">Power & Restart Options</b><p style="font-size:12px; color:#94a3b8;">Reboot or shut down</p></div>
             <span style="color:#ef4444; font-weight:bold;">Menu ›</span>
           </div>
         </div>
       `;
       break;
 
-    // 3. Photos Gallery
     case 'photos':
       const savedPhoto = localStorage.getItem('nexus_last_photo');
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:16px;">
-          <h3 style="font-size:15px; color:#94a3b8;">Saved Camera Photos</h3>
+          <h3 style="font-size:15px; color:#94a3b8;">Saved Photos</h3>
           <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
             ${savedPhoto ? `
               <div style="position:relative; aspect-ratio:1; border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,0.2);">
-                <img src="${savedPhoto}" style="width:100%; height:100%; object-fit:cover;" onclick="window.open('${savedPhoto}')">
+                <img src="${savedPhoto}" style="width:100%; height:100%; object-fit:cover;">
               </div>
-            ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos clicked yet.<br>Open Camera to capture!</p>'}
+            ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos clicked yet.<br>Open Camera to take photos!</p>'}
           </div>
-          ${savedPhoto ? `<button onclick="localStorage.removeItem('nexus_last_photo'); openApp('photos')" class="calc-btn action" style="padding:12px; font-size:13px; border-radius:16px;">Clear Stored Photos</button>` : ''}
+          ${savedPhoto ? `<button onclick="localStorage.removeItem('nexus_last_photo'); openApp('photos')" class="calc-btn action" style="padding:12px; font-size:13px; border-radius:16px;">Clear Gallery</button>` : ''}
         </div>
       `;
       break;
 
-    // 4. Calculator
     case 'calc':
       calcBuffer = '';
       body.innerHTML = `
@@ -270,13 +231,11 @@ function openApp(name) {
       `;
       break;
 
-    // 5. Notes
     case 'notes':
       const savedNotes = localStorage.getItem('nexus_notes') || '';
-      body.innerHTML = `<textarea oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:60vh; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:16px; color:#fff; font-size:16px; resize:none;" placeholder="Write your notes here...">${savedNotes}</textarea>`;
+      body.innerHTML = `<textarea oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:60vh; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:16px; color:#fff; font-size:16px; resize:none;" placeholder="Write notes...">${savedNotes}</textarea>`;
       break;
 
-    // 6. Files
     case 'files':
       body.innerHTML = `
         <div class="card">
@@ -285,14 +244,13 @@ function openApp(name) {
         </div>
         <div class="card">
           <div class="card-item"><span>📄 Documents</span><span>24 files ›</span></div>
-          <div class="card-item" onclick="openApp('photos')"><span>🖼️ Images & Photos</span><span>186 photos ›</span></div>
+          <div class="card-item" onclick="openApp('photos')"><span>🖼️ Images</span><span>186 photos ›</span></div>
           <div class="card-item"><span>⬇️ Downloads</span><span>12 files ›</span></div>
           <div class="card-item"><span>🎵 Audio Tracks</span><span>8 tracks ›</span></div>
         </div>
       `;
       break;
 
-    // 7. Hardware Drivers
     case 'drivers':
       body.innerHTML = `
         <div class="card">
@@ -321,24 +279,6 @@ function closeApp() {
   }
 }
 
-function toggleLockSetting() {
-  const current = localStorage.getItem('nexus_lock_enabled') === 'true';
-  localStorage.setItem('nexus_lock_enabled', (!current).toString());
-  openApp('settings');
-}
-
-function changePinSetting() {
-  const newPin = prompt('Enter new 4-digit numeric PIN:');
-  if (newPin && newPin.length === 4 && !isNaN(newPin)) {
-    localStorage.setItem('nexus_pin', newPin);
-    alert('PIN updated successfully!');
-  } else {
-    alert('Invalid PIN. Must be 4 digits.');
-  }
-  openApp('settings');
-}
-
-// Camera Engine
 function startCamera() {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
@@ -361,7 +301,7 @@ function takeSnapshotPhoto() {
     ctx.drawImage(v, 0, 0, c.width, c.height);
     const data = c.toDataURL('image/png');
     localStorage.setItem('nexus_last_photo', data);
-    alert('Photo captured & saved to Photos app!');
+    alert('Photo saved to Photos app!');
   }
 }
 
@@ -372,4 +312,3 @@ function calcKey(k) {
   else if (k === '=') { try { calcBuffer = String(eval(calcBuffer)); v.innerText = calcBuffer; } catch(e) { v.innerText = 'Error'; calcBuffer = ''; } }
   else { calcBuffer += k; v.innerText = calcBuffer; }
 }
-  
