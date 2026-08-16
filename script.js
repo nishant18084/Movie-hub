@@ -1,25 +1,3 @@
-// 1. Clock Engine
-function renderTime() {
-  const d = new Date();
-  const h = String(d.getHours()).padStart(2, '0');
-  const m = String(d.getMinutes()).padStart(2, '0');
-  const tStr = `${h}:${m}`;
-  
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const dStr = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
-
-  const st = document.getElementById('live-status-time');
-  const lc = document.getElementById('live-clock');
-  const ld = document.getElementById('live-date');
-
-  if (st) st.innerText = tStr;
-  if (lc) lc.innerText = tStr;
-  if (ld) ld.innerText = dStr;
-}
-renderTime();
-setInterval(renderTime, 1000);
-
 let mediaStream = null;
 let currentFacingMode = "environment";
 let calcBuffer = '';
@@ -38,7 +16,7 @@ let navLayout = localStorage.getItem('nexus_nav_layout') || 'right_back';
 let currentCamMode = 'PHOTO';
 let currentZoom = 1;
 
-// 2. Navigation Functions
+// 1. Navigation Setup
 function renderNavButtons() {
   const btnBar = document.getElementById('nav-buttons-bar');
   if (!btnBar) return;
@@ -93,18 +71,9 @@ function setNavLayout(layout) {
   renderNavButtons();
 }
 
-setTimeout(() => applyNavMode(navMode), 50);
+applyNavMode(navMode);
 
-// Search Filter
-function filterApps() {
-  const q = document.getElementById('app-search').value.toLowerCase();
-  document.querySelectorAll('#home-grid .app-item').forEach(item => {
-    const label = item.querySelector('.label').innerText.toLowerCase();
-    item.style.display = label.includes(q) ? 'flex' : 'none';
-  });
-}
-
-// Navigation Actions
+// 2. Navigation Actions
 function navBack() {
   const recents = document.getElementById('recents-modal');
   const win = document.getElementById('app-window');
@@ -162,7 +131,15 @@ function clearAllTasks() {
   closeApp();
 }
 
-// 3. App Opener
+function filterApps() {
+  const q = document.getElementById('app-search').value.toLowerCase();
+  document.querySelectorAll('#home-grid .app-item').forEach(item => {
+    const label = item.querySelector('.label').innerText.toLowerCase();
+    item.style.display = label.includes(q) ? 'flex' : 'none';
+  });
+}
+
+// 3. App Router
 function openApp(appName) {
   const win = document.getElementById('app-window');
   const winHdr = document.getElementById('win-hdr');
@@ -182,7 +159,6 @@ function openApp(appName) {
     const lastThumb = localStorage.getItem('nexus_last_photo') || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="%23334155"><rect width="52" height="52"/></svg>';
     content.innerHTML = `
       <div class="cam-wrapper">
-        <!-- Top Toolbar -->
         <div class="cam-top-bar">
           <button class="cam-top-btn" onclick="toggleFlash(this)">⚡</button>
           <button class="cam-top-btn" onclick="alert('HDR: Auto Active')">HDR</button>
@@ -190,25 +166,21 @@ function openApp(appName) {
           <button class="cam-top-btn" onclick="closeApp()">✕</button>
         </div>
 
-        <!-- Viewfinder -->
         <div class="cam-viewfinder">
           <video id="cam-feed" autoplay playsinline muted></video>
           <div id="cam-flash-effect" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.12s;"></div>
 
-          <!-- Side Icons -->
           <div class="cam-side-controls">
             <div class="cam-circle-icon" onclick="toggleCamFilter()">🔘</div>
-            <div class="cam-circle-icon" onclick="alert('Retouch / Beauty: AI 50%')">✨</div>
+            <div class="cam-circle-icon" onclick="alert('Beauty Mode Active')">✨</div>
           </div>
 
-          <!-- Zoom 1x / 2x -->
           <div class="cam-zoom-bar">
             <button class="cam-zoom-btn active" id="z1-btn" onclick="setZoom(1)">1x</button>
             <button class="cam-zoom-btn" id="z2-btn" onclick="setZoom(2)">2</button>
           </div>
         </div>
 
-        <!-- MORE Fullscreen Panel -->
         <div class="cam-more-panel" id="cam-more-screen">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3 style="font-size:16px;">More Modes</h3>
@@ -228,7 +200,6 @@ function openApp(appName) {
           </div>
         </div>
 
-        <!-- Mode Slider -->
         <div class="cam-mode-slider">
           <span class="cam-mode-item" onclick="setCamMode('STREET')">STREET</span>
           <span class="cam-mode-item" onclick="setCamMode('VIDEO')">VIDEO</span>
@@ -237,7 +208,6 @@ function openApp(appName) {
           <span class="cam-mode-item" onclick="setCamMode('MORE')">MORE</span>
         </div>
 
-        <!-- Bottom Shutter & Controls -->
         <div class="cam-bottom-controls">
           <img id="cam-thumb" onclick="openApp('photos')" class="cam-thumb-box" src="${lastThumb}">
           <button onclick="takePhoto()" class="cam-shutter-ring">
@@ -252,7 +222,6 @@ function openApp(appName) {
     return;
   }
 
-  // Standard Header for Other Apps
   winHdr.style.display = 'flex';
   content.style.padding = '18px';
 
@@ -407,4 +376,26 @@ function openApp(appName) {
             </div>
             <button onclick="clearCanvas()" class="calc-btn action" style="padding:6px 12px; font-size:12px;">Clear</button>
           </div>
-          <canvas id="paint-canvas" style="width:100%; height:62vh; background:#111827; border-radius:18px; b
+          <canvas id="paint-canvas" style="width:100%; height:62vh; background:#111827; border-radius:18px; border:1px solid rgba(255,255,255,0.1); touch-action:none;"></canvas>
+        </div>
+      `;
+      setTimeout(initDrawingCanvas, 100);
+      break;
+
+    case 'game':
+      title.innerText = "Tic-Tac-Toe";
+      content.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; gap:20px; padding:20px 0;">
+          <h3 id="game-status" style="font-size:16px; color:#38bdf8;">Your Turn (X)</h3>
+          <div id="ttt-board" style="display:grid; grid-template-columns:repeat(3, 80px); gap:8px;">
+            ${[0,1,2,3,4,5,6,7,8].map(i => `<button onclick="makeMove(${i})" id="cell-${i}" style="width:80px; height:80px; border-radius:14px; background:#1e293b; border:1px solid rgba(255,255,255,0.1); color:#fff; font-size:28px; font-weight:700; cursor:pointer;"></button>`).join('')}
+          </div>
+          <button onclick="resetGame()" class="calc-btn action" style="padding:10px 24px; font-size:14px;">Restart</button>
+        </div>
+      `;
+      resetGameVars();
+      break;
+
+    case 'music':
+      title.innerText = "Music";
+      content.innerHTML =
