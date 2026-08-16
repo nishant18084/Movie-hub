@@ -8,16 +8,16 @@
 </head>
 <body>
 
-  <!-- Boot Animation -->
+  <!-- Boot Sequence -->
   <div id="boot-screen">
     <svg class="hello-svg" viewBox="0 0 300 120">
       <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">Nexus</text>
     </svg>
   </div>
 
-  <!-- Swipeable OS Root -->
+  <!-- Swipeable OS Container -->
   <div id="os-container">
-    <!-- Page 1: Main Apps -->
+    <!-- Page 1 -->
     <section class="page">
       <header class="status-bar">
         <span id="live-status-time">--:--</span>
@@ -46,7 +46,7 @@
       </div>
     </section>
 
-    <!-- Page 2: Tools & Games -->
+    <!-- Page 2 -->
     <section class="page">
       <header class="status-bar">
         <span>More Apps</span>
@@ -70,17 +70,17 @@
     <div class="app-item" onclick="openApp('settings')"><div class="icon bg-zinc">⚙️</div></div>
   </nav>
 
-  <!-- Navigation Bar: Dynamic Layout (Left or Right Back) -->
+  <!-- Navigation Bar -->
   <footer class="nav-bar" id="nav-buttons-bar"></footer>
 
-  <!-- Gesture Bar Mode -->
+  <!-- Gesture Bar -->
   <div class="gesture-bar-wrap" id="nav-gesture-bar" onclick="navHome()">
     <div class="gesture-pill"></div>
   </div>
 
   <!-- Modal Application Screen -->
   <section id="app-window">
-    <div class="window-header">
+    <div class="window-header" id="win-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
       <h3 id="window-title">App</h3>
       <div style="width: 50px;"></div>
@@ -88,7 +88,7 @@
     <div class="window-content" id="window-content"></div>
   </section>
 
-  <!-- Recents / Multi-Tasking Modal -->
+  <!-- Recents Modal -->
   <section id="recents-modal">
     <div class="recents-header">
       <h3>Active Tasks</h3>
