@@ -1,26 +1,35 @@
 let mediaStream = null;
+let currentFacingMode = "environment"; // Default back camera
+let swTimer = null, swElapsed = 0, isSwRunning = false;
+let calcBuffer = '';
+let dialPadStr = '';
 
 // 1. Boot Transition
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const boot = document.getElementById('boot-screen');
     const os = document.getElementById('main-os');
-    boot.classList.add('boot-fadeout');
-    os.classList.add('os-visible');
-    setTimeout(() => boot.remove(), 800);
+    if (boot) boot.classList.add('boot-fadeout');
+    if (os) os.classList.add('os-visible');
+    setTimeout(() => { if (boot) boot.remove(); }, 800);
   }, 2500);
 });
 
-// 2. Real-time Clock
+// 2. Real-time Clock & Status Bar
 function updateClock() {
   const now = new Date();
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   const dateStr = now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
   
-  document.getElementById('live-status-time').innerText = timeStr;
-  document.getElementById('shade-time').innerText = timeStr;
-  document.getElementById('live-clock').innerText = timeStr;
-  document.getElementById('live-date').innerText = dateStr;
+  const statusTime = document.getElementById('live-status-time');
+  const shadeTime = document.getElementById('shade-time');
+  const liveClock = document.getElementById('live-clock');
+  const liveDate = document.getElementById('live-date');
+
+  if (statusTime) statusTime.innerText = timeStr;
+  if (shadeTime) shadeTime.innerText = timeStr;
+  if (liveClock) liveClock.innerText = timeStr;
+  if (liveDate) liveDate.innerText = dateStr;
 }
 setInterval(updateClock, 1000);
 updateClock();
@@ -34,30 +43,34 @@ function toggleFullScreen() {
   }
 }
 
-// 4. Notification & Control Center Shade
+// 4. Control Center / Notification Shade
 function toggleControlCenter() {
   const cc = document.getElementById('control-center');
-  cc.classList.toggle('shade-active');
+  if (cc) cc.classList.toggle('shade-active');
 }
 
 function toggleTile(id) {
   const tile = document.getElementById(id);
-  tile.classList.toggle('active');
+  if (tile) tile.classList.toggle('active');
 }
 
 function toggleTorch() {
   const tile = document.getElementById('tile-torch');
-  tile.classList.toggle('active');
-  document.body.style.filter = tile.classList.contains('active') ? 'brightness(1.5)' : 'none';
+  if (tile) {
+    tile.classList.toggle('active');
+    document.body.style.filter = tile.classList.contains('active') ? 'brightness(1.4)' : 'none';
+  }
 }
 
 function changeBrightness(val) {
-  document.getElementById('main-os').style.filter = `brightness(${val}%)`;
+  const mainOs = document.getElementById('main-os');
+  if (mainOs) mainOs.style.filter = `brightness(${val}%)`;
 }
 
-// 5. Drawer & Search
+// 5. Drawer & Search Filter
 function toggleDrawer() {
-  document.getElementById('app-drawer').classList.toggle('drawer-active');
+  const drawer = document.getElementById('app-drawer');
+  if (drawer) drawer.classList.toggle('drawer-active');
 }
 
 function filterApps() {
@@ -68,16 +81,47 @@ function filterApps() {
   });
 }
 
-// 6. Application Routing & Handlers
+// 6. Application Routing
 function openApp(appName) {
   const win = document.getElementById('app-window');
   const title = document.getElementById('window-title');
   const content = document.getElementById('window-content');
+  if (!win || !title || !content) return;
+
   win.classList.add('window-active');
 
   switch(appName) {
+    case 'camera':
+      title.innerText = "Camera";
+      content.innerHTML = `
+        <div style="display:flex; flex-direction:column; height:100%; justify-content:space-between;">
+          <div class="camera-view" style="position:relative; width:100%; height:62vh; background:#000; border-radius:24px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+            <video id="cam-feed" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
+            <div id="cam-flash" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.15s;"></div>
+          </div>
+          
+          <canvas id="cam-canvas" style="display:none;"></canvas>
+
+          <div style="display:flex; justify-content:space-around; align-items:center; padding:16px 10px;">
+            <img id="cam-thumb" style="width:52px; height:52px; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,0.2); background:#1e293b;" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='52' height='52' fill='%23334155'><rect width='52' height='52'/></svg>">
+            
+            <button onclick="takePhoto()" style="width:72px; height:72px; border-radius:50%; border:4px solid #fff; background:transparent; padding:3px; cursor:pointer; outline:none;">
+              <div style="width:100%; height:100%; background:#fff; border-radius:50%;"></div>
+            </button>
+            
+            <button onclick="flipCamera()" style="width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:22px; cursor:pointer;">
+              🔄
+            </button>
+          </div>
+        </div>
+      `;
+      startCameraFeed();
+      break;
+
     case 'dialer':
+    case 'phone':
       title.innerText = "Phone";
+      dialPadStr = '';
       content.innerHTML = `
         <div class="dialer-screen" id="dial-number"></div>
         <div class="dial-grid">
@@ -100,22 +144,6 @@ function openApp(appName) {
       `;
       break;
 
-    case 'camera':
-      title.innerText = "Camera";
-      content.innerHTML = `
-        <div class="camera-view">
-          <video id="cam-feed" autoplay playsinline muted></video>
-        </div>
-        <canvas id="cam-canvas" style="display:none;"></canvas>
-        <div class="camera-actions">
-          <img id="cam-thumb" class="captured-thumb" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' fill='%23334155'><rect width='50' height='50'/></svg>">
-          <button class="shutter-btn" onclick="takePhoto()"></button>
-          <div style="width:50px;"></div>
-        </div>
-      `;
-      startCameraFeed();
-      break;
-
     case 'settings':
       title.innerText = "Settings";
       content.innerHTML = `
@@ -136,7 +164,12 @@ function openApp(appName) {
               <div class="item-left"><div class="s-icon" style="background:#2563eb;">ᛒ</div><span class="s-title">Bluetooth</span></div>
               <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
             </div>
+            <div class="settings-item" onclick="alert('Mobile Network Active')">
+              <div class="item-left"><div class="s-icon" style="background:#16a34a;">⇅</div><span class="s-title">Mobile network</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
           </div>
+          
           <div class="settings-card">
             <div class="settings-item" onclick="openAboutDevice()">
               <div class="item-left"><div class="s-icon" style="background:#16a34a;">📱</div><span class="s-title">About device</span></div>
@@ -149,6 +182,7 @@ function openApp(appName) {
 
     case 'calc':
       title.innerText = "Calculator";
+      calcBuffer = '';
       content.innerHTML = `
         <div class="calc-screen" id="calc-display">0</div>
         <div class="calc-grid">
@@ -205,11 +239,17 @@ function openApp(appName) {
         </div>
       `;
       break;
+
+    default:
+      title.innerText = appName.toUpperCase();
+      content.innerHTML = `<div style="text-align:center; margin-top:40px; color:#94a3b8;">${appName} app content goes here.</div>`;
   }
 }
 
 function closeApp() {
-  document.getElementById('app-window').classList.remove('window-active');
+  const win = document.getElementById('app-window');
+  if (win) win.classList.remove('window-active');
+  
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop());
     mediaStream = null;
@@ -218,51 +258,78 @@ function closeApp() {
   isSwRunning = false;
 }
 
-// 7. Dialer Functions
-let dialPadStr = '';
-function dialDigit(d) {
-  dialPadStr += d;
-  document.getElementById('dial-number').innerText = dialPadStr;
-}
-function dialClear() {
-  dialPadStr = dialPadStr.slice(0, -1);
-  document.getElementById('dial-number').innerText = dialPadStr;
-}
-function startCall() {
-  if (dialPadStr.length > 0) {
-    window.location.href = `tel:${dialPadStr}`;
-  }
-}
-
-// 8. Real Camera Stream & Shutter
+// 7. Live Camera Functions
 async function startCameraFeed() {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => track.stop());
+  }
   try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: currentFacingMode }
+    });
     const video = document.getElementById('cam-feed');
     if (video) video.srcObject = mediaStream;
   } catch (err) {
-    alert("Camera permission denied or camera not accessible.");
+    alert("Camera permission allow karein ya secure HTTPS connection par check karein.");
   }
+}
+
+function flipCamera() {
+  currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+  startCameraFeed();
 }
 
 function takePhoto() {
   const video = document.getElementById('cam-feed');
   const canvas = document.getElementById('cam-canvas');
   const thumb = document.getElementById('cam-thumb');
+  const flash = document.getElementById('cam-flash');
+
   if (video && canvas) {
+    if (flash) {
+      flash.style.opacity = '0.9';
+      setTimeout(() => { flash.style.opacity = '0'; }, 120);
+    }
+
     canvas.width = video.videoWidth || 640;
     canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext('2d');
+    
+    if (currentFacingMode === "user") {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+    
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imgData = canvas.toDataURL('image/png');
     if (thumb) thumb.src = imgData;
   }
 }
 
-// 9. About Device
+// 8. Dialer Logic
+function dialDigit(d) {
+  dialPadStr += d;
+  const numDisplay = document.getElementById('dial-number');
+  if (numDisplay) numDisplay.innerText = dialPadStr;
+}
+
+function dialClear() {
+  dialPadStr = dialPadStr.slice(0, -1);
+  const numDisplay = document.getElementById('dial-number');
+  if (numDisplay) numDisplay.innerText = dialPadStr;
+}
+
+function startCall() {
+  if (dialPadStr.length > 0) {
+    window.location.href = `tel:${dialPadStr}`;
+  }
+}
+
+// 9. About Device Page
 function openAboutDevice() {
   const content = document.getElementById('window-content');
   const title = document.getElementById('window-title');
+  if (!content || !title) return;
   title.innerText = "About device";
   content.innerHTML = `
     <div class="settings-container">
@@ -280,9 +347,10 @@ function openAboutDevice() {
 }
 
 // 10. Calculator Engine
-let calcBuffer = '';
 function calcAction(val) {
   const display = document.getElementById('calc-display');
+  if (!display) return;
+
   if (val === 'C') {
     calcBuffer = '';
     display.innerText = '0';
@@ -303,14 +371,13 @@ function calcAction(val) {
   }
 }
 
-// 11. Notes Storage
+// 11. Notes Auto-Save
 function saveNote() {
   const val = document.getElementById('note-input').value;
   localStorage.setItem('nexus_notes', val);
 }
 
-// 12. Stopwatch Engine
-let swTimer = null, swElapsed = 0, isSwRunning = false;
+// 12. Stopwatch Logic
 function toggleSw() {
   const btn = document.getElementById('sw-btn');
   if (!isSwRunning) {
@@ -320,16 +387,22 @@ function toggleSw() {
       const m = Math.floor(swElapsed / 60000);
       const s = Math.floor((swElapsed % 60000) / 1000);
       const ms = Math.floor((swElapsed % 1000) / 10);
-      document.getElementById('sw-display').innerText = 
-        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+      const disp = document.getElementById('sw-display');
+      if (disp) {
+        disp.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+      }
     }, 10);
-    btn.innerText = 'Stop';
-    btn.style.background = '#ef4444';
+    if (btn) {
+      btn.innerText = 'Stop';
+      btn.style.background = '#ef4444';
+    }
     isSwRunning = true;
   } else {
     clearInterval(swTimer);
-    btn.innerText = 'Start';
-    btn.style.background = '#22c55e';
+    if (btn) {
+      btn.innerText = 'Start';
+      btn.style.background = '#22c55e';
+    }
     isSwRunning = false;
   }
 }
