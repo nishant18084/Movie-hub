@@ -20,7 +20,6 @@ function renderTime() {
 renderTime();
 setInterval(renderTime, 1000);
 
-// Variables
 let mediaStream = null;
 let currentFacingMode = "environment";
 let calcBuffer = '';
@@ -45,11 +44,25 @@ function openApp(appName) {
 
   win.style.display = 'flex';
 
-  if (appName === 'settings') {
+  if (appName === 'photos') {
+    title.innerText = "Photos";
+    const savedImg = localStorage.getItem('nexus_last_photo');
+    content.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <h3 style="font-size:16px; color:#94a3b8;">Captured Photos</h3>
+        <div id="gallery-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+          ${savedImg ? `
+            <div style="position:relative; aspect-ratio:1; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,0.2);">
+              <img src="${savedImg}" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+          ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos captured yet.<br>Open Camera to click photos!</p>'}
+        </div>
+      </div>
+    `;
+  } else if (appName === 'settings') {
     title.innerText = "Settings";
     content.innerHTML = `
       <div class="settings-container">
-        <!-- Connectivity -->
         <div class="settings-card">
           <div class="settings-item">
             <div class="item-left"><div class="s-icon" style="background:#f59e0b;">✈️</div><span class="s-title">Aeroplane mode</span></div>
@@ -59,7 +72,7 @@ function openApp(appName) {
             <div class="item-left"><div class="s-icon" style="background:#0284c7;">📶</div><span class="s-title">Wi-Fi</span></div>
             <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
           </div>
-          <div class="settings-item" onclick="alert('Bluetooth is scanning...')">
+          <div class="settings-item" onclick="alert('Bluetooth scanning...')">
             <div class="item-left"><div class="s-icon" style="background:#2563eb;">ᛒ</div><span class="s-title">Bluetooth</span></div>
             <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
           </div>
@@ -67,37 +80,19 @@ function openApp(appName) {
             <div class="item-left"><div class="s-icon" style="background:#16a34a;">⇅</div><span class="s-title">Mobile network</span></div>
             <div class="item-right"><span class="arrow">›</span></div>
           </div>
-          <div class="settings-item" onclick="alert('Connected Devices: None')">
-            <div class="item-left"><div class="s-icon" style="background:#0ea5e9;">🔗</div><span class="s-title">Device Connect</span></div>
-            <div class="item-right"><span class="arrow">›</span></div>
-          </div>
         </div>
 
-        <!-- Display & Style -->
         <div class="settings-card">
-          <div class="settings-item" onclick="alert('Customization: Themes, Fonts, Icon pack')">
-            <div class="item-left"><div class="s-icon" style="background:#ea580c;">🎨</div><span class="s-title">Home screen, Lock screen & style</span></div>
-            <div class="item-right"><span class="arrow">›</span></div>
-          </div>
           <div class="settings-item" onclick="alert('Display: Dark Mode Active | 120Hz')">
             <div class="item-left"><div class="s-icon" style="background:#eab308;">☀️</div><span class="s-title">Display & brightness</span></div>
             <div class="item-right"><span class="arrow">›</span></div>
           </div>
-        </div>
-
-        <!-- Sound & Notifications -->
-        <div class="settings-card">
-          <div class="settings-item" onclick="alert('Volume: Ringtone 80%, Media 100%')">
+          <div class="settings-item" onclick="alert('Sound: Normal Mode')">
             <div class="item-left"><div class="s-icon" style="background:#22c55e;">🔔</div><span class="s-title">Sound & vibration</span></div>
             <div class="item-right"><span class="arrow">›</span></div>
           </div>
-          <div class="settings-item" onclick="alert('Notifications: Allowed')">
-            <div class="item-left"><div class="s-icon" style="background:#0284c7;">💬</div><span class="s-title">Notifications & Quick Settings</span></div>
-            <div class="item-right"><span class="arrow">›</span></div>
-          </div>
         </div>
 
-        <!-- Device Info -->
         <div class="settings-card">
           <div class="settings-item" onclick="openAboutDevice()">
             <div class="item-left"><div class="s-icon" style="background:#16a34a;">📱</div><span class="s-title">About device</span></div>
@@ -108,6 +103,7 @@ function openApp(appName) {
     `;
   } else if (appName === 'camera') {
     title.innerText = "Camera";
+    const lastThumb = localStorage.getItem('nexus_last_photo') || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="%23334155"><rect width="52" height="52"/></svg>';
     content.innerHTML = `
       <div style="display:flex; flex-direction:column; height:100%; justify-content:space-between;">
         <div style="position:relative; width:100%; height:62vh; background:#000; border-radius:24px; overflow:hidden;">
@@ -116,7 +112,7 @@ function openApp(appName) {
         </div>
         <canvas id="cam-canvas" style="display:none;"></canvas>
         <div style="display:flex; justify-content:space-around; align-items:center; padding:16px 10px;">
-          <img id="cam-thumb" style="width:52px; height:52px; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,0.2); background:#1e293b;" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='52' height='52' fill='%23334155'><rect width='52' height='52'/></svg>">
+          <img id="cam-thumb" onclick="openApp('photos')" style="width:52px; height:52px; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,0.2); background:#1e293b; cursor:pointer;" src="${lastThumb}">
           <button onclick="takePhoto()" style="width:72px; height:72px; border-radius:50%; border:4px solid #fff; background:transparent; padding:3px; cursor:pointer;">
             <div style="width:100%; height:100%; background:#fff; border-radius:50%;"></div>
           </button>
@@ -247,7 +243,11 @@ function takePhoto() {
     const ctx = c.getContext('2d');
     if (currentFacingMode === "user") { ctx.translate(c.width, 0); ctx.scale(-1, 1); }
     ctx.drawImage(v, 0, 0, c.width, c.height);
-    if (t) t.src = c.toDataURL('image/png');
+    const imgData = c.toDataURL('image/png');
+    
+    // Save to localStorage for Photos app
+    localStorage.setItem('nexus_last_photo', imgData);
+    if (t) t.src = imgData;
   }
 }
 
@@ -334,4 +334,5 @@ function resetSw() {
   const b = document.getElementById('sw-btn');
   if (d) d.innerText = '00:00.00';
   if (b) { b.innerText = 'Start'; b.style.background = '#22c55e'; }
-}
+             }
+    
