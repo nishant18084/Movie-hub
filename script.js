@@ -31,23 +31,25 @@ let paintCtx, isDrawing = false, paintColor = '#38bdf8';
 
 // Active Task Stack
 let activeTasks = [];
-let navMode = localStorage.getItem('nexus_nav_mode') || 'buttons'; // 'buttons' | 'gestures'
-let navLayout = localStorage.getItem('nexus_nav_layout') || 'right_back'; // 'right_back' | 'left_back'
+let navMode = localStorage.getItem('nexus_nav_mode') || 'buttons';
+let navLayout = localStorage.getItem('nexus_nav_layout') || 'right_back';
 
-// 2. Navigation Renderer & Switcher
+// Camera States
+let currentCamMode = 'PHOTO';
+let currentZoom = 1;
+
+// 2. Navigation Functions
 function renderNavButtons() {
   const btnBar = document.getElementById('nav-buttons-bar');
   if (!btnBar) return;
 
   if (navLayout === 'right_back') {
-    // Realme / Samsung standard: Recents on Left, Home Center, Back on Right
     btnBar.innerHTML = `
       <div class="nav-btn" onclick="navRecents()">⏹</div>
       <div class="nav-btn" onclick="navHome()">⚪</div>
       <div class="nav-btn" onclick="navBack()">◀</div>
     `;
   } else {
-    // Standard Google: Back on Left, Home Center, Recents on Right
     btnBar.innerHTML = `
       <div class="nav-btn" onclick="navBack()">◀</div>
       <div class="nav-btn" onclick="navHome()">⚪</div>
@@ -160,9 +162,10 @@ function clearAllTasks() {
   closeApp();
 }
 
-// 3. App Router
+// 3. App Opener
 function openApp(appName) {
   const win = document.getElementById('app-window');
+  const winHdr = document.getElementById('win-hdr');
   const title = document.getElementById('window-title');
   const content = document.getElementById('window-content');
   if (!win || !title || !content) return;
@@ -172,6 +175,86 @@ function openApp(appName) {
   }
 
   win.style.display = 'flex';
+
+  if (appName === 'camera') {
+    winHdr.style.display = 'none';
+    content.style.padding = '0';
+    const lastThumb = localStorage.getItem('nexus_last_photo') || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="%23334155"><rect width="52" height="52"/></svg>';
+    content.innerHTML = `
+      <div class="cam-wrapper">
+        <!-- Top Toolbar -->
+        <div class="cam-top-bar">
+          <button class="cam-top-btn" onclick="toggleFlash(this)">⚡</button>
+          <button class="cam-top-btn" onclick="alert('HDR: Auto Active')">HDR</button>
+          <button class="cam-top-btn" onclick="alert('Google Lens Scanner...')">⛶</button>
+          <button class="cam-top-btn" onclick="closeApp()">✕</button>
+        </div>
+
+        <!-- Viewfinder -->
+        <div class="cam-viewfinder">
+          <video id="cam-feed" autoplay playsinline muted></video>
+          <div id="cam-flash-effect" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.12s;"></div>
+
+          <!-- Side Icons -->
+          <div class="cam-side-controls">
+            <div class="cam-circle-icon" onclick="toggleCamFilter()">🔘</div>
+            <div class="cam-circle-icon" onclick="alert('Retouch / Beauty: AI 50%')">✨</div>
+          </div>
+
+          <!-- Zoom 1x / 2x -->
+          <div class="cam-zoom-bar">
+            <button class="cam-zoom-btn active" id="z1-btn" onclick="setZoom(1)">1x</button>
+            <button class="cam-zoom-btn" id="z2-btn" onclick="setZoom(2)">2</button>
+          </div>
+        </div>
+
+        <!-- MORE Fullscreen Panel -->
+        <div class="cam-more-panel" id="cam-more-screen">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="font-size:16px;">More Modes</h3>
+            <button onclick="setCamMode('PHOTO')" style="background:transparent; border:none; color:var(--yellow); font-size:18px; cursor:pointer;">✕</button>
+          </div>
+          <div class="more-grid">
+            <div class="more-item" onclick="selectMoreMode('PRO')"><div class="more-icon-box">PRO</div><span class="more-label">PRO</span></div>
+            <div class="more-item" onclick="selectMoreMode('PANO')"><div class="more-icon-box">🖼️</div><span class="more-label">PANO</span></div>
+            <div class="more-item" onclick="selectMoreMode('HI-RES')"><div class="more-icon-box">⊞</div><span class="more-label">HI-RES</span></div>
+            <div class="more-item" onclick="selectMoreMode('FILM')"><div class="more-icon-box">🎬</div><span class="more-label">FILM</span></div>
+            <div class="more-item" onclick="selectMoreMode('SLO-MO')"><div class="more-icon-box">⏳</div><span class="more-label">SLO-MO</span></div>
+            <div class="more-item" onclick="selectMoreMode('TIME-LAPSE')"><div class="more-icon-box">⏱️</div><span class="more-label">TIME-LAPSE</span></div>
+            <div class="more-item" onclick="selectMoreMode('DUAL-VIEW')"><div class="more-icon-box">📱</div><span class="more-label">DUAL-VIEW</span></div>
+            <div class="more-item" onclick="selectMoreMode('UNDERWATER')"><div class="more-icon-box">🌊</div><span class="more-label">UNDERWATER</span></div>
+            <div class="more-item" onclick="selectMoreMode('SCANNER')"><div class="more-icon-box">📄</div><span class="more-label">TEXT SCANNER</span></div>
+            <div class="more-item" onclick="selectMoreMode('TILT-SHIFT')"><div class="more-icon-box">🔄</div><span class="more-label">TILT-SHIFT</span></div>
+          </div>
+        </div>
+
+        <!-- Mode Slider -->
+        <div class="cam-mode-slider">
+          <span class="cam-mode-item" onclick="setCamMode('STREET')">STREET</span>
+          <span class="cam-mode-item" onclick="setCamMode('VIDEO')">VIDEO</span>
+          <span class="cam-mode-item active" id="mode-photo" onclick="setCamMode('PHOTO')">PHOTO</span>
+          <span class="cam-mode-item" onclick="setCamMode('PORTRAIT')">PORTRAIT</span>
+          <span class="cam-mode-item" onclick="setCamMode('MORE')">MORE</span>
+        </div>
+
+        <!-- Bottom Shutter & Controls -->
+        <div class="cam-bottom-controls">
+          <img id="cam-thumb" onclick="openApp('photos')" class="cam-thumb-box" src="${lastThumb}">
+          <button onclick="takePhoto()" class="cam-shutter-ring">
+            <div class="cam-shutter-fill"></div>
+          </button>
+          <button onclick="flipCamera()" class="cam-flip-btn">🔄</button>
+        </div>
+      </div>
+      <canvas id="cam-canvas" style="display:none;"></canvas>
+    `;
+    startCameraFeed();
+    return;
+  }
+
+  // Standard Header for Other Apps
+  winHdr.style.display = 'flex';
+  content.style.padding = '18px';
 
   switch(appName) {
     case 'files':
@@ -190,26 +273,11 @@ function openApp(appName) {
           </div>
 
           <div class="settings-card">
-            <div class="settings-item" onclick="openFileCategory('Documents')">
-              <div class="item-left"><div class="s-icon" style="background:#0284c7;">📄</div><span class="s-title">Documents</span></div>
-              <span class="item-right">24 files ›</span>
-            </div>
-            <div class="settings-item" onclick="openApp('photos')">
-              <div class="item-left"><div class="s-icon" style="background:#a855f7;">🖼️</div><span class="s-title">Images & Gallery</span></div>
-              <span class="item-right">186 photos ›</span>
-            </div>
-            <div class="settings-item" onclick="openFileCategory('Downloads')">
-              <div class="item-left"><div class="s-icon" style="background:#22c55e;">⬇️</div><span class="s-title">Downloads</span></div>
-              <span class="item-right">12 files ›</span>
-            </div>
-            <div class="settings-item" onclick="openFileCategory('Audio')">
-              <div class="item-left"><div class="s-icon" style="background:#ec4899;">🎵</div><span class="s-title">Audio & Recordings</span></div>
-              <span class="item-right">8 tracks ›</span>
-            </div>
-            <div class="settings-item" onclick="openFileCategory('APKs')">
-              <div class="item-left"><div class="s-icon" style="background:#f59e0b;">📦</div><span class="s-title">Installation Packages (APK)</span></div>
-              <span class="item-right">3 files ›</span>
-            </div>
+            <div class="settings-item" onclick="openFileCategory('Documents')"><div class="item-left"><div class="s-icon" style="background:#0284c7;">📄</div><span class="s-title">Documents</span></div><span class="item-right">24 files ›</span></div>
+            <div class="settings-item" onclick="openApp('photos')"><div class="item-left"><div class="s-icon" style="background:#a855f7;">🖼️</div><span class="s-title">Images & Gallery</span></div><span class="item-right">186 photos ›</span></div>
+            <div class="settings-item" onclick="openFileCategory('Downloads')"><div class="item-left"><div class="s-icon" style="background:#22c55e;">⬇️</div><span class="s-title">Downloads</span></div><span class="item-right">12 files ›</span></div>
+            <div class="settings-item" onclick="openFileCategory('Audio')"><div class="item-left"><div class="s-icon" style="background:#ec4899;">🎵</div><span class="s-title">Audio & Recordings</span></div><span class="item-right">8 tracks ›</span></div>
+            <div class="settings-item" onclick="openFileCategory('APKs')"><div class="item-left"><div class="s-icon" style="background:#f59e0b;">📦</div><span class="s-title">Installation Packages (APK)</span></div><span class="item-right">3 files ›</span></div>
           </div>
         </div>
       `;
@@ -219,7 +287,6 @@ function openApp(appName) {
       title.innerText = "Settings";
       content.innerHTML = `
         <div class="settings-container">
-          <!-- System Navigation Settings -->
           <div class="settings-card">
             <div class="settings-item" onclick="openNavSettings()">
               <div class="item-left">
@@ -247,28 +314,6 @@ function openApp(appName) {
           </div>
         </div>
       `;
-      break;
-
-    case 'camera':
-      title.innerText = "Camera";
-      const lastThumb = localStorage.getItem('nexus_last_photo') || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="%23334155"><rect width="52" height="52"/></svg>';
-      content.innerHTML = `
-        <div style="display:flex; flex-direction:column; height:100%; justify-content:space-between;">
-          <div style="position:relative; width:100%; height:60vh; background:#000; border-radius:24px; overflow:hidden;">
-            <video id="cam-feed" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
-            <div id="cam-flash" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.15s;"></div>
-          </div>
-          <canvas id="cam-canvas" style="display:none;"></canvas>
-          <div style="display:flex; justify-content:space-around; align-items:center; padding:16px 10px;">
-            <img id="cam-thumb" onclick="openApp('photos')" style="width:52px; height:52px; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,0.2); background:#1e293b; cursor:pointer;" src="${lastThumb}">
-            <button onclick="takePhoto()" style="width:68px; height:68px; border-radius:50%; border:4px solid #fff; background:transparent; padding:3px; cursor:pointer;">
-              <div style="width:100%; height:100%; background:#fff; border-radius:50%;"></div>
-            </button>
-            <button onclick="flipCamera()" style="width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:22px; cursor:pointer;">🔄</button>
-          </div>
-        </div>
-      `;
-      startCameraFeed();
       break;
 
     case 'photos':
@@ -362,60 +407,4 @@ function openApp(appName) {
             </div>
             <button onclick="clearCanvas()" class="calc-btn action" style="padding:6px 12px; font-size:12px;">Clear</button>
           </div>
-          <canvas id="paint-canvas" style="width:100%; height:62vh; background:#111827; border-radius:18px; border:1px solid rgba(255,255,255,0.1); touch-action:none;"></canvas>
-        </div>
-      `;
-      setTimeout(initDrawingCanvas, 100);
-      break;
-
-    case 'game':
-      title.innerText = "Tic-Tac-Toe";
-      content.innerHTML = `
-        <div style="display:flex; flex-direction:column; align-items:center; gap:20px; padding:20px 0;">
-          <h3 id="game-status" style="font-size:16px; color:#38bdf8;">Your Turn (X)</h3>
-          <div id="ttt-board" style="display:grid; grid-template-columns:repeat(3, 80px); gap:8px;">
-            ${[0,1,2,3,4,5,6,7,8].map(i => `<button onclick="makeMove(${i})" id="cell-${i}" style="width:80px; height:80px; border-radius:14px; background:#1e293b; border:1px solid rgba(255,255,255,0.1); color:#fff; font-size:28px; font-weight:700; cursor:pointer;"></button>`).join('')}
-          </div>
-          <button onclick="resetGame()" class="calc-btn action" style="padding:10px 24px; font-size:14px;">Restart</button>
-        </div>
-      `;
-      resetGameVars();
-      break;
-
-    case 'music':
-      title.innerText = "Music";
-      content.innerHTML = `
-        <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:20px 0; gap:20px;">
-          <div id="album-cover" style="width:200px; height:200px; border-radius:24px; background:linear-gradient(135deg, #ec4899, #8b5cf6); display:flex; align-items:center; justify-content:center; font-size:64px; box-shadow:0 12px 30px rgba(236,72,153,0.3); transition:transform 0.5s ease;">
-            🎵
-          </div>
-          <div>
-            <h2 style="font-size:20px; font-weight:600;">Nexus Synthwave</h2>
-            <p style="color:#94a3b8; font-size:14px; margin-top:4px;">Original Cyber Theme</p>
-          </div>
-          <div style="display:flex; justify-content:center; align-items:center; gap:24px;">
-            <button onclick="toggleMusicPlay()" id="play-btn" style="width:65px; height:65px; border-radius:50%; background:#ec4899; border:none; color:#fff; font-size:24px; cursor:pointer;">▶</button>
-          </div>
-        </div>
-      `;
-      break;
-
-    default:
-      title.innerText = appName.toUpperCase();
-      content.innerHTML = `<div style="text-align:center; margin-top:40px; color:#94a3b8;">${appName} is running on Nexus OS.</div>`;
-  }
-}
-
-function closeApp() {
-  const win = document.getElementById('app-window');
-  if (win) win.style.display = 'none';
-  if (mediaStream) {
-    mediaStream.getTracks().forEach(t => t.stop());
-    mediaStream = null;
-  }
-  if (swTimer) clearInterval(swTimer);
-  isSwRunning = false;
-}
-
-// 4. File Category Viewer
-f
+          <canvas id="paint-canvas" style="width:100%; height:62vh; background:#111827; border-radius:18px; b
