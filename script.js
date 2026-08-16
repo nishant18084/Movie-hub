@@ -91,6 +91,133 @@ function openApp(appName) {
   win.classList.add('window-active');
 
   switch(appName) {
+    case 'settings':
+      title.innerText = "Settings";
+      content.innerHTML = `
+        <div class="settings-container">
+          
+          <!-- Group 1: Connectivity -->
+          <div class="settings-card">
+            <div class="settings-item">
+              <div class="item-left">
+                <div class="s-icon" style="background:#f59e0b;">✈️</div>
+                <span class="s-title">Aeroplane mode</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="settings-item" onclick="alert('Wi-Fi scanning...')">
+              <div class="item-left"><div class="s-icon" style="background:#0284c7;">📶</div><span class="s-title">Wi-Fi</span></div>
+              <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Bluetooth scanning...')">
+              <div class="item-left"><div class="s-icon" style="background:#2563eb;">ᛒ</div><span class="s-title">Bluetooth</span></div>
+              <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('SIM: 5G Network Active')">
+              <div class="item-left"><div class="s-icon" style="background:#16a34a;">⇅</div><span class="s-title">Mobile network</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Connected Devices: None')">
+              <div class="item-left"><div class="s-icon" style="background:#0ea5e9;">🔗</div><span class="s-title">Device Connect</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+          </div>
+
+          <!-- Group 2: Personalisation & Display -->
+          <div class="settings-card">
+            <div class="settings-item" onclick="alert('Wallpapers, Themes & Icon Pack')">
+              <div class="item-left"><div class="s-icon" style="background:#ea580c;">🎨</div><span class="s-title">Home screen, Lock screen & style</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Display: Dark Mode Active | 120Hz')">
+              <div class="item-left"><div class="s-icon" style="background:#eab308;">☀️</div><span class="s-title">Display & brightness</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+          </div>
+
+          <!-- Group 3: Sound & Notifications -->
+          <div class="settings-card">
+            <div class="settings-item" onclick="alert('Volume: Media 100%, Ring 80%')">
+              <div class="item-left"><div class="s-icon" style="background:#22c55e;">🔔</div><span class="s-title">Sound & vibration</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Notifications: Allowed')">
+              <div class="item-left"><div class="s-icon" style="background:#0284c7;">💬</div><span class="s-title">Notifications & Quick Settings</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+          </div>
+
+          <!-- Group 4: Privacy & Safety -->
+          <div class="settings-card">
+            <div class="settings-item" onclick="alert('Security: Biometric & Passcode Protected')">
+              <div class="item-left"><div class="s-icon" style="background:#2563eb;">🛡️</div><span class="s-title">Security and privacy</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Emergency SOS Active')">
+              <div class="item-left"><div class="s-icon" style="background:#dc2626;">🆘</div><span class="s-title">Safety & emergency</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Location: System GPS enabled')">
+              <div class="item-left"><div class="s-icon" style="background:#eab308;">📍</div><span class="s-title">Location</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Screen time: 3h 15m today')">
+              <div class="item-left"><div class="s-icon" style="background:#0ea5e9;">👤</div><span class="s-title">Digital Wellbeing & parental controls</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+          </div>
+
+          <!-- Group 5: Apps & Battery -->
+          <div class="settings-card">
+            <div class="settings-item" onclick="alert('Installed Apps: 28')">
+              <div class="item-left"><div class="s-icon" style="background:#16a34a;">🎛️</div><span class="s-title">Apps</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Battery: 100% - Good condition')">
+              <div class="item-left"><div class="s-icon" style="background:#22c55e;">🔋</div><span class="s-title">Battery</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Accessibility: Gestures Active')">
+              <div class="item-left"><div class="s-icon" style="background:#ea580c;">🚶</div><span class="s-title">Accessibility & convenience</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+          </div>
+
+          <!-- Group 6: System & Device Info -->
+          <div class="settings-card">
+            <div class="settings-item" onclick="alert('System: Nexus OS 2.0 (Up to date)')">
+              <div class="item-left"><div class="s-icon" style="background:#64748b;">⚙️</div><span class="s-title">System & update</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="openAboutDevice()">
+              <div class="item-left"><div class="s-icon" style="background:#16a34a;">📱</div><span class="s-title">About device</span></div>
+              <div class="item-right"><span>Nexus Alpha</span><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Account: Primary User')">
+              <div class="item-left"><div class="s-icon" style="background:#2563eb;">👥</div><span class="s-title">Users & accounts</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Google Play Services Connected')">
+              <div class="item-left"><div class="s-icon" style="background:#0284c7;">G</div><span class="s-title">Google</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('realme Lab: DC Dimming Active')">
+              <div class="item-left"><div class="s-icon" style="background:#0284c7;">⚗️</div><span class="s-title">realme Lab</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+            <div class="settings-item" onclick="alert('Help & Feedback Online')">
+              <div class="item-left"><div class="s-icon" style="background:#ea580c;">📖</div><span class="s-title">Help & feedback</span></div>
+              <div class="item-right"><span class="arrow">›</span></div>
+            </div>
+          </div>
+
+        </div>
+      `;
+      break;
+
     case 'camera':
       title.innerText = "Camera";
       content.innerHTML = `
@@ -99,16 +226,12 @@ function openApp(appName) {
             <video id="cam-feed" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
             <div id="cam-flash" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.15s;"></div>
           </div>
-          
           <canvas id="cam-canvas" style="display:none;"></canvas>
-
           <div style="display:flex; justify-content:space-around; align-items:center; padding:16px 10px;">
             <img id="cam-thumb" style="width:52px; height:52px; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,0.2); background:#1e293b;" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='52' height='52' fill='%23334155'><rect width='52' height='52'/></svg>">
-            
             <button onclick="takePhoto()" style="width:72px; height:72px; border-radius:50%; border:4px solid #fff; background:transparent; padding:3px; cursor:pointer; outline:none;">
               <div style="width:100%; height:100%; background:#fff; border-radius:50%;"></div>
             </button>
-            
             <button onclick="flipCamera()" style="width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:22px; cursor:pointer;">
               🔄
             </button>
@@ -140,42 +263,6 @@ function openApp(appName) {
           <div class="dial-btn" onclick="dialClear()" style="font-size:18px;">⌫</div>
           <div class="dial-btn dial-call-btn" onclick="startCall()">📞</div>
           <div></div>
-        </div>
-      `;
-      break;
-
-    case 'settings':
-      title.innerText = "Settings";
-      content.innerHTML = `
-        <div class="settings-container">
-          <div class="settings-card">
-            <div class="settings-item">
-              <div class="item-left">
-                <div class="s-icon" style="background:#f59e0b;">✈️</div>
-                <span class="s-title">Aeroplane mode</span>
-              </div>
-              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="settings-item" onclick="toggleControlCenter()">
-              <div class="item-left"><div class="s-icon" style="background:#0284c7;">📶</div><span class="s-title">Wi-Fi</span></div>
-              <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
-            </div>
-            <div class="settings-item" onclick="toggleControlCenter()">
-              <div class="item-left"><div class="s-icon" style="background:#2563eb;">ᛒ</div><span class="s-title">Bluetooth</span></div>
-              <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
-            </div>
-            <div class="settings-item" onclick="alert('Mobile Network Active')">
-              <div class="item-left"><div class="s-icon" style="background:#16a34a;">⇅</div><span class="s-title">Mobile network</span></div>
-              <div class="item-right"><span class="arrow">›</span></div>
-            </div>
-          </div>
-          
-          <div class="settings-card">
-            <div class="settings-item" onclick="openAboutDevice()">
-              <div class="item-left"><div class="s-icon" style="background:#16a34a;">📱</div><span class="s-title">About device</span></div>
-              <div class="item-right"><span>Nexus Alpha</span><span class="arrow">›</span></div>
-            </div>
-          </div>
         </div>
       `;
       break;
@@ -258,7 +345,7 @@ function closeApp() {
   isSwRunning = false;
 }
 
-// 7. Live Camera Functions
+// 7. Camera Functions
 async function startCameraFeed() {
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop());
@@ -306,7 +393,7 @@ function takePhoto() {
   }
 }
 
-// 8. Dialer Logic
+// 8. Dialer Functions
 function dialDigit(d) {
   dialPadStr += d;
   const numDisplay = document.getElementById('dial-number');
@@ -328,94 +415,4 @@ function startCall() {
 // 9. About Device Page
 function openAboutDevice() {
   const content = document.getElementById('window-content');
-  const title = document.getElementById('window-title');
-  if (!content || !title) return;
-  title.innerText = "About device";
-  content.innerHTML = `
-    <div class="settings-container">
-      <div class="settings-card">
-        <div class="settings-item"><span class="s-title">Device name</span><span class="item-right" style="color:#38bdf8; font-weight:600;">Nexus Alpha</span></div>
-        <div class="settings-item"><span class="s-title">Model</span><span class="item-right">RMX_2026</span></div>
-        <div class="settings-item"><span class="s-title">Processor</span><span class="item-right">MediaTek Dimensity 7400</span></div>
-        <div class="settings-item"><span class="s-title">RAM</span><span class="item-right">8.00 GB</span></div>
-        <div class="settings-item"><span class="s-title">Storage</span><span class="item-right">128 GB (86 GB Free)</span></div>
-        <div class="settings-item"><span class="s-title">Android Version</span><span class="item-right">15</span></div>
-      </div>
-      <button onclick="openApp('settings')" class="calc-btn action" style="width:100%; margin-top:10px;">← Back to Settings</button>
-    </div>
-  `;
-}
-
-// 10. Calculator Engine
-function calcAction(val) {
-  const display = document.getElementById('calc-display');
-  if (!display) return;
-
-  if (val === 'C') {
-    calcBuffer = '';
-    display.innerText = '0';
-  } else if (val === 'DEL') {
-    calcBuffer = calcBuffer.slice(0, -1);
-    display.innerText = calcBuffer || '0';
-  } else if (val === '=') {
-    try {
-      calcBuffer = String(eval(calcBuffer));
-      display.innerText = calcBuffer;
-    } catch {
-      display.innerText = 'Error';
-      calcBuffer = '';
-    }
-  } else {
-    calcBuffer += val;
-    display.innerText = calcBuffer;
-  }
-}
-
-// 11. Notes Auto-Save
-function saveNote() {
-  const val = document.getElementById('note-input').value;
-  localStorage.setItem('nexus_notes', val);
-}
-
-// 12. Stopwatch Logic
-function toggleSw() {
-  const btn = document.getElementById('sw-btn');
-  if (!isSwRunning) {
-    const start = Date.now() - swElapsed;
-    swTimer = setInterval(() => {
-      swElapsed = Date.now() - start;
-      const m = Math.floor(swElapsed / 60000);
-      const s = Math.floor((swElapsed % 60000) / 1000);
-      const ms = Math.floor((swElapsed % 1000) / 10);
-      const disp = document.getElementById('sw-display');
-      if (disp) {
-        disp.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
-      }
-    }, 10);
-    if (btn) {
-      btn.innerText = 'Stop';
-      btn.style.background = '#ef4444';
-    }
-    isSwRunning = true;
-  } else {
-    clearInterval(swTimer);
-    if (btn) {
-      btn.innerText = 'Start';
-      btn.style.background = '#22c55e';
-    }
-    isSwRunning = false;
-  }
-}
-
-function resetSw() {
-  clearInterval(swTimer);
-  swElapsed = 0;
-  isSwRunning = false;
-  const disp = document.getElementById('sw-display');
-  const btn = document.getElementById('sw-btn');
-  if (disp) disp.innerText = '00:00.00';
-  if (btn) {
-    btn.innerText = 'Start';
-    btn.style.background = '#22c55e';
-  }
-}
+  const title = document.getElemen
