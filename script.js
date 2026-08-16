@@ -29,9 +29,39 @@ let isPlaying = false;
 let board = Array(9).fill(null), gameActive = true;
 let paintCtx, isDrawing = false, paintColor = '#38bdf8';
 
-// Active Task Stack for Recents / Navigation
+// Active Task Stack
 let activeTasks = [];
-let currentOpenApp = null;
+let navMode = localStorage.getItem('nexus_nav_mode') || 'buttons'; // 'buttons' | 'gestures'
+
+// 2. Navigation Switcher Function
+function applyNavMode(mode) {
+  navMode = mode;
+  localStorage.setItem('nexus_nav_mode', mode);
+
+  const btnBar = document.getElementById('nav-buttons-bar');
+  const gestBar = document.getElementById('nav-gesture-bar');
+  const dock = document.getElementById('main-dock');
+  const appWin = document.getElementById('app-window');
+  const recents = document.getElementById('recents-modal');
+  const osRoot = document.getElementById('os-container');
+
+  if (mode === 'gestures') {
+    if (btnBar) btnBar.style.display = 'none';
+    if (gestBar) gestBar.style.display = 'flex';
+    if (dock) dock.style.bottom = '26px';
+    if (appWin) appWin.style.bottom = '24px';
+    if (recents) recents.style.bottom = '24px';
+    if (osRoot) osRoot.style.height = 'calc(100dvh - 105px)';
+  } else {
+    if (btnBar) btnBar.style.display = 'flex';
+    if (gestBar) gestBar.style.display = 'none';
+    if (dock) dock.style.bottom = '50px';
+    if (appWin) appWin.style.bottom = '44px';
+    if (recents) recents.style.bottom = '44px';
+    if (osRoot) osRoot.style.height = 'calc(100dvh - 130px)';
+  }
+}
+setTimeout(() => applyNavMode(navMode), 50);
 
 // Search Filter
 function filterApps() {
@@ -42,7 +72,7 @@ function filterApps() {
   });
 }
 
-// 2. Navigation Actions
+// Navigation Triggers
 function navBack() {
   const recents = document.getElementById('recents-modal');
   const win = document.getElementById('app-window');
@@ -100,14 +130,13 @@ function clearAllTasks() {
   closeApp();
 }
 
-// 3. App Opener
+// 3. App Router
 function openApp(appName) {
   const win = document.getElementById('app-window');
   const title = document.getElementById('window-title');
   const content = document.getElementById('window-content');
   if (!win || !title || !content) return;
 
-  currentOpenApp = appName;
   if (!activeTasks.includes(appName)) {
     activeTasks.push(appName);
   }
@@ -115,6 +144,81 @@ function openApp(appName) {
   win.style.display = 'flex';
 
   switch(appName) {
+    case 'files':
+      title.innerText = "Files";
+      content.innerHTML = `
+        <div class="settings-container">
+          <div class="settings-card" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <h4 style="font-size:15px; font-weight:600;">Device Storage</h4>
+              <span style="font-size:12px; color:#38bdf8;">42 GB / 128 GB</span>
+            </div>
+            <div style="width:100%; height:8px; background:#1e293b; border-radius:4px; overflow:hidden; margin-bottom:12px;">
+              <div style="width:33%; height:100%; background:linear-gradient(90deg, #38bdf8, #22c55e);"></div>
+            </div>
+            <p style="color:#94a3b8; font-size:12px;">86 GB Free Space Available</p>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-item" onclick="openFileCategory('Documents')">
+              <div class="item-left"><div class="s-icon" style="background:#0284c7;">📄</div><span class="s-title">Documents</span></div>
+              <span class="item-right">24 files ›</span>
+            </div>
+            <div class="settings-item" onclick="openApp('photos')">
+              <div class="item-left"><div class="s-icon" style="background:#a855f7;">🖼️</div><span class="s-title">Images & Gallery</span></div>
+              <span class="item-right">186 photos ›</span>
+            </div>
+            <div class="settings-item" onclick="openFileCategory('Downloads')">
+              <div class="item-left"><div class="s-icon" style="background:#22c55e;">⬇️</div><span class="s-title">Downloads</span></div>
+              <span class="item-right">12 files ›</span>
+            </div>
+            <div class="settings-item" onclick="openFileCategory('Audio')">
+              <div class="item-left"><div class="s-icon" style="background:#ec4899;">🎵</div><span class="s-title">Audio & Recordings</span></div>
+              <span class="item-right">8 tracks ›</span>
+            </div>
+            <div class="settings-item" onclick="openFileCategory('APKs')">
+              <div class="item-left"><div class="s-icon" style="background:#f59e0b;">📦</div><span class="s-title">Installation Packages (APK)</span></div>
+              <span class="item-right">3 files ›</span>
+            </div>
+          </div>
+        </div>
+      `;
+      break;
+
+    case 'settings':
+      title.innerText = "Settings";
+      content.innerHTML = `
+        <div class="settings-container">
+          <!-- System Navigation Settings -->
+          <div class="settings-card">
+            <div class="settings-item" onclick="openNavSettings()">
+              <div class="item-left">
+                <div class="s-icon" style="background:#6366f1;">🧭</div>
+                <div>
+                  <div class="s-title">System Navigation</div>
+                  <div style="font-size:11px; color:#94a3b8;">${navMode === 'buttons' ? '3-Button Navigation' : 'Gesture Navigation'}</div>
+                </div>
+              </div>
+              <span class="arrow">›</span>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-item">
+              <div class="item-left"><div class="s-icon" style="background:#f59e0b;">✈️</div><span class="s-title">Aeroplane mode</span></div>
+              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="settings-item" onclick="alert('Wi-Fi is scanning...')"><div class="item-left"><div class="s-icon" style="background:#0284c7;">📶</div><span class="s-title">Wi-Fi</span></div><span class="item-right">Off ›</span></div>
+            <div class="settings-item" onclick="alert('Bluetooth scanning...')"><div class="item-left"><div class="s-icon" style="background:#2563eb;">ᛒ</div><span class="s-title">Bluetooth</span></div><span class="item-right">Off ›</span></div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-item" onclick="openAboutDevice()"><div class="item-left"><div class="s-icon" style="background:#16a34a;">📱</div><span class="s-title">About device</span></div><span class="item-right">Nexus Alpha ›</span></div>
+          </div>
+        </div>
+      `;
+      break;
+
     case 'camera':
       title.innerText = "Camera";
       const lastThumb = localStorage.getItem('nexus_last_photo') || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="%23334155"><rect width="52" height="52"/></svg>';
@@ -266,41 +370,6 @@ function openApp(appName) {
       `;
       break;
 
-    case 'browser':
-      title.innerText = "Browser";
-      content.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:16px;">
-          <div class="settings-card" style="padding:16px;">
-            <h4 style="font-size:14px; margin-bottom:12px; color:#38bdf8;">Quick Shortcuts</h4>
-            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; text-align:center;">
-              <a href="https://google.com" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon bg-blue" style="width:48px; height:48px; margin:0 auto 4px;">G</div>Google</a>
-              <a href="https://youtube.com" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon bg-rose" style="width:48px; height:48px; margin:0 auto 4px;">▶</div>YouTube</a>
-              <a href="https://github.com" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon bg-zinc" style="width:48px; height:48px; margin:0 auto 4px;">🐙</div>GitHub</a>
-            </div>
-          </div>
-        </div>
-      `;
-      break;
-
-    case 'settings':
-      title.innerText = "Settings";
-      content.innerHTML = `
-        <div class="settings-container">
-          <div class="settings-card">
-            <div class="settings-item">
-              <div class="item-left"><div class="s-icon" style="background:#f59e0b;">✈️</div><span class="s-title">Aeroplane mode</span></div>
-              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="settings-item" onclick="alert('Wi-Fi active')"><div class="item-left"><div class="s-icon" style="background:#0284c7;">📶</div><span class="s-title">Wi-Fi</span></div><span class="item-right">Off ›</span></div>
-            <div class="settings-item" onclick="alert('Bluetooth ready')"><div class="item-left"><div class="s-icon" style="background:#2563eb;">ᛒ</div><span class="s-title">Bluetooth</span></div><span class="item-right">Off ›</span></div>
-          </div>
-          <div class="settings-card">
-            <div class="settings-item" onclick="openAboutDevice()"><div class="item-left"><div class="s-icon" style="background:#16a34a;">📱</div><span class="s-title">About device</span></div><span class="item-right">Nexus ›</span></div>
-          </div>
-        </div>
-      `;
-      break;
-
     default:
       title.innerText = appName.toUpperCase();
       content.innerHTML = `<div style="text-align:center; margin-top:40px; color:#94a3b8;">${appName} is running on Nexus OS.</div>`;
@@ -318,122 +387,24 @@ function closeApp() {
   isSwRunning = false;
 }
 
-// 4. Camera Handlers
-function startCameraFeed() {
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
-      .then(stream => {
-        mediaStream = stream;
-        const v = document.getElementById('cam-feed');
-        if (v) v.srcObject = stream;
-      })
-      .catch(() => alert("Camera permission allow karein."));
-  }
+// 4. File Category Viewer
+function openFileCategory(catName) {
+  const content = document.getElementById('window-content');
+  const title = document.getElementById('window-title');
+  title.innerText = `Files > ${catName}`;
+  content.innerHTML = `
+    <div class="settings-container">
+      <div class="settings-card">
+        <div class="settings-item"><div class="item-left"><span>📄 Project_Nexus_Notes.pdf</span></div><span class="item-right">2.4 MB</span></div>
+        <div class="settings-item"><div class="item-left"><span>📄 Android_System_Config.xml</span></div><span class="item-right">45 KB</span></div>
+        <div class="settings-item"><div class="item-left"><span>📄 UI_Assets_List.txt</span></div><span class="item-right">12 KB</span></div>
+      </div>
+      <button onclick="openApp('files')" class="calc-btn action" style="width:100%; margin-top:10px;">← Back to Storage</button>
+    </div>
+  `;
 }
 
-function flipCamera() {
-  currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
-  if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-  startCameraFeed();
-}
-
-function takePhoto() {
-  const v = document.getElementById('cam-feed');
-  const c = document.getElementById('cam-canvas');
-  const t = document.getElementById('cam-thumb');
-  const f = document.getElementById('cam-flash');
-  if (v && c) {
-    if (f) { f.style.opacity = '0.9'; setTimeout(() => f.style.opacity = '0', 120); }
-    c.width = v.videoWidth || 640;
-    c.height = v.videoHeight || 480;
-    const ctx = c.getContext('2d');
-    if (currentFacingMode === "user") { ctx.translate(c.width, 0); ctx.scale(-1, 1); }
-    ctx.drawImage(v, 0, 0, c.width, c.height);
-    const imgData = c.toDataURL('image/png');
-    localStorage.setItem('nexus_last_photo', imgData);
-    if (t) t.src = imgData;
-  }
-}
-
-// 5. Paint Handlers
-function initDrawingCanvas() {
-  const canvas = document.getElementById('paint-canvas');
-  if (!canvas) return;
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-  paintCtx = canvas.getContext('2d');
-  paintCtx.lineWidth = 4;
-  paintCtx.lineCap = 'round';
-
-  function start(e) { isDrawing = true; draw(e); }
-  function end() { isDrawing = false; paintCtx.beginPath(); }
-  function draw(e) {
-    if (!isDrawing) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX || e.touches[0].clientX) - rect.left;
-    const y = (e.clientY || e.touches[0].clientY) - rect.top;
-    paintCtx.strokeStyle = paintColor;
-    paintCtx.lineTo(x, y);
-    paintCtx.stroke();
-    paintCtx.beginPath();
-    paintCtx.moveTo(x, y);
-  }
-
-  canvas.addEventListener('mousedown', start);
-  canvas.addEventListener('mouseup', end);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('touchstart', start);
-  canvas.addEventListener('touchend', end);
-  canvas.addEventListener('touchmove', draw);
-}
-function setPaintColor(c) { paintColor = c; }
-function clearCanvas() {
-  const canvas = document.getElementById('paint-canvas');
-  if (canvas && paintCtx) paintCtx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-// 6. Tic-Tac-Toe
-function resetGameVars() { board = Array(9).fill(null); gameActive = true; }
-function makeMove(i) {
-  if (!board[i] && gameActive) {
-    board[i] = 'X';
-    document.getElementById(`cell-${i}`).innerText = 'X';
-    if (checkWin('X')) {
-      document.getElementById('game-status').innerText = '🎉 You Won!';
-      gameActive = false;
-      return;
-    }
-    if (board.every(Boolean)) {
-      document.getElementById('game-status').innerText = 'Game Draw!';
-      return;
-    }
-    setTimeout(() => {
-      const empty = board.map((v, idx) => v === null ? idx : null).filter(v => v !== null);
-      if (empty.length > 0 && gameActive) {
-        const aiPick = empty[Math.floor(Math.random() * empty.length)];
-        board[aiPick] = 'O';
-        document.getElementById(`cell-${aiPick}`).innerText = 'O';
-        document.getElementById(`cell-${aiPick}`).style.color = '#ef4444';
-        if (checkWin('O')) {
-          document.getElementById('game-status').innerText = 'Nexus AI Won!';
-          gameActive = false;
-        }
-      }
-    }, 300);
-  }
-}
-function checkWin(p) {
-  const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  return wins.some(comb => comb.every(idx => board[idx] === p));
-}
-function resetGame() {
-  resetGameVars();
-  document.getElementById('game-status').innerText = 'Your Turn (X)';
-  for (let i = 0; i < 9; i++) {
-    const el = document.getElementById(`cell-${i}`);
-    if (el) { el.innerText = ''; el.style.color = '#fff'; }
-  }
-}
-
-// 7. Media & System Info
-fun
+// 5. Navigation Settings Menu
+function openNavSettings() {
+  const content = document.getElementById('window-content');
+  const title = document.g
