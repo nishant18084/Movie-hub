@@ -16,22 +16,53 @@
     </div>
   </div>
 
-  <!-- Real Smartphone Lock Screen (Swipe Up or Tap to Unlock) -->
-  <section id="lock-screen" onclick="unlockDevice()">
-    <div class="lock-top-info">
-      <span id="lock-status-time">--:--</span>
-      <span>5G 📶 100% 🔋</span>
-    </div>
-    
-    <div class="lock-center-widget">
-      <p id="lock-date-display">Sun, 16 Aug</p>
-      <h1 id="lock-big-clock">18:04</h1>
-      <p class="swipe-hint">Swipe up or Tap to unlock</p>
+  <!-- Real Smartphone Lock Screen -->
+  <section id="lock-screen">
+    <!-- View 1: Big Clock Wallpaper View -->
+    <div id="lock-clock-view" onclick="handleLockSwipe()">
+      <div class="lock-top-info">
+        <span id="lock-status-time">--:--</span>
+        <span>5G 📶 100% 🔋</span>
+      </div>
+      
+      <div class="lock-center-widget">
+        <p id="lock-date-display">Sun, 16 Aug</p>
+        <h1 id="lock-big-clock">18:53</h1>
+        <p class="swipe-hint">Swipe up or Tap to unlock</p>
+      </div>
+
+      <div class="lock-bottom-shortcuts">
+        <div class="lock-round-btn" onclick="event.stopPropagation(); alert('AI Assistant Ready');">✨</div>
+        <div class="lock-round-btn" onclick="event.stopPropagation(); directUnlock(); openApp('camera');">📷</div>
+      </div>
     </div>
 
-    <div class="lock-bottom-shortcuts">
-      <div class="lock-round-btn" onclick="event.stopPropagation(); alert('AI Assistant Ready');">✨</div>
-      <div class="lock-round-btn" onclick="event.stopPropagation(); unlockDevice(); openApp('camera');">📷</div>
+    <!-- View 2: PIN Security Keypad -->
+    <div id="lock-pin-view">
+      <div class="pin-header">
+        <div class="lock-padlock">🔒</div>
+        <h3>Enter PIN</h3>
+        <p id="pin-sub-text">Enter your 4-digit code</p>
+      </div>
+
+      <div class="pin-dots-wrap" id="pin-dots">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+
+      <div class="pin-keypad">
+        <button class="p-key" onclick="typePin('1')">1</button>
+        <button class="p-key" onclick="typePin('2')">2</button>
+        <button class="p-key" onclick="typePin('3')">3</button>
+        <button class="p-key" onclick="typePin('4')">4</button>
+        <button class="p-key" onclick="typePin('5')">5</button>
+        <button class="p-key" onclick="typePin('6')">6</button>
+        <button class="p-key" onclick="typePin('7')">7</button>
+        <button class="p-key" onclick="typePin('8')">8</button>
+        <button class="p-key" onclick="typePin('9')">9</button>
+        <button class="p-key cancel" onclick="backToClockView()">Cancel</button>
+        <button class="p-key" onclick="typePin('0')">0</button>
+        <button class="p-key" onclick="deletePin()">⌫</button>
+      </div>
     </div>
   </section>
 
@@ -82,7 +113,7 @@
     <button class="app-btn" onclick="openApp('settings')"><div class="icon-box mat-zinc">⚙️</div></button>
   </nav>
 
-  <!-- 3-Button Nav Bar -->
+  <!-- Navigation Bar -->
   <footer class="nav-bar">
     <div class="nav-btn" onclick="openApp('drivers')">⏹</div>
     <div class="nav-btn" onclick="closeApp()">⚪</div>
@@ -93,7 +124,7 @@
   <section id="app-modal">
     <div class="modal-hdr" id="modal-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
-      <h3 id="modal-title">App</h3>
+      <h3 id="modal-title">SETTINGS</h3>
       <div style="width: 40px;"></div>
     </div>
     <div class="modal-body" id="modal-body"></div>
