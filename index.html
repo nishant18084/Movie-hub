@@ -8,28 +8,64 @@
 </head>
 <body>
 
-  <!-- 1. Boot Screen (Hello Animation) -->
+  <!-- Boot Screen -->
   <div id="boot-screen">
     <svg class="hello-svg" viewBox="0 0 300 120">
-      <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">
-        hello
-      </text>
+      <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">hello</text>
     </svg>
   </div>
 
-  <!-- 2. Main OS Screen -->
+  <!-- Notification & Control Center Shade (Pull Down) -->
+  <div id="control-center" class="shade-hidden">
+    <div class="shade-header">
+      <span id="shade-time">--:--</span>
+      <span onclick="toggleControlCenter()" style="font-size:18px; cursor:pointer;">✕</span>
+    </div>
+    
+    <div class="qs-grid">
+      <div class="qs-tile active" id="tile-wifi" onclick="toggleTile('tile-wifi')">
+        <span class="qs-icon">📶</span>
+        <span class="qs-label">Wi-Fi</span>
+      </div>
+      <div class="qs-tile active" id="tile-bt" onclick="toggleTile('tile-bt')">
+        <span class="qs-icon">ᛒ</span>
+        <span class="qs-label">Bluetooth</span>
+      </div>
+      <div class="qs-tile" id="tile-torch" onclick="toggleTorch()">
+        <span class="qs-icon">🔦</span>
+        <span class="qs-label">Torch</span>
+      </div>
+      <div class="qs-tile" id="tile-dnd" onclick="toggleTile('tile-dnd')">
+        <span class="qs-icon">🌙</span>
+        <span class="qs-label">DND</span>
+      </div>
+    </div>
+
+    <!-- Brightness Slider -->
+    <div class="slider-box">
+      <span>☀️</span>
+      <input type="range" min="20" max="100" value="100" oninput="changeBrightness(this.value)">
+    </div>
+
+    <div class="notification-card">
+      <h4>System</h4>
+      <p>Nexus OS 2.0 is running smoothly.</p>
+    </div>
+  </div>
+
+  <!-- Main OS Screen -->
   <main id="main-os">
-    <!-- Status Bar -->
-    <header class="status-bar">
+    <!-- Status Bar (Tap to open Control Center) -->
+    <header class="status-bar" onclick="toggleControlCenter()">
       <span id="live-status-time">--:--</span>
       <div class="status-icons">
-        <span class="fs-btn" onclick="toggleFullScreen()">⛶</span>
+        <span class="fs-btn" onclick="event.stopPropagation(); toggleFullScreen()">⛶</span>
         <span>VoLTE 5G</span>
         <span>100%</span>
       </div>
     </header>
 
-    <!-- Home Widgets -->
+    <!-- Time Widget -->
     <section class="time-card">
       <div>
         <h1 id="live-clock">--:--</h1>
@@ -43,18 +79,18 @@
       <input type="text" id="app-search" class="search-box" placeholder="Search system, apps, tools..." oninput="filterApps()">
     </div>
 
-    <!-- Home App Grid -->
+    <!-- App Grid -->
     <section class="grid" id="home-grid">
-      <div class="app-item" onclick="openApp('phone')">
+      <div class="app-item" onclick="openApp('dialer')">
         <div class="icon bg-green">📞</div>
         <span class="label">Phone</span>
       </div>
-      <div class="app-item" onclick="openApp('messages')">
-        <div class="icon bg-blue">💬</div>
-        <span class="label">Messages</span>
+      <div class="app-item" onclick="openApp('camera')">
+        <div class="icon bg-slate">📷</div>
+        <span class="label">Camera</span>
       </div>
       <div class="app-item" onclick="openApp('calc')">
-        <div class="icon bg-slate">🔢</div>
+        <div class="icon bg-blue">🔢</div>
         <span class="label">Calculator</span>
       </div>
       <div class="app-item" onclick="openApp('notes')">
@@ -75,30 +111,30 @@
       </div>
     </section>
 
-    <!-- Bottom Dock / Drawer Handle -->
+    <!-- Bottom Drawer Handle -->
     <div class="dock-handle" onclick="toggleDrawer()">
       <div class="bar"></div>
       <span>Swipe up for App Drawer</span>
     </div>
   </main>
 
-  <!-- 3. Slide-up App Drawer -->
+  <!-- Slide-up App Drawer -->
   <section id="app-drawer" class="drawer-hidden">
     <div class="drawer-header">
       <div class="bar" onclick="toggleDrawer()"></div>
       <h3>All Applications</h3>
     </div>
-    <div class="grid" id="drawer-grid">
-      <div class="app-item" onclick="openApp('phone'); toggleDrawer();">
+    <div class="grid">
+      <div class="app-item" onclick="openApp('dialer'); toggleDrawer();">
         <div class="icon bg-green">📞</div>
         <span class="label">Phone</span>
       </div>
-      <div class="app-item" onclick="openApp('messages'); toggleDrawer();">
-        <div class="icon bg-blue">💬</div>
-        <span class="label">Messages</span>
+      <div class="app-item" onclick="openApp('camera'); toggleDrawer();">
+        <div class="icon bg-slate">📷</div>
+        <span class="label">Camera</span>
       </div>
       <div class="app-item" onclick="openApp('calc'); toggleDrawer();">
-        <div class="icon bg-slate">🔢</div>
+        <div class="icon bg-blue">🔢</div>
         <span class="label">Calculator</span>
       </div>
       <div class="app-item" onclick="openApp('notes'); toggleDrawer();">
@@ -120,7 +156,7 @@
     </div>
   </section>
 
-  <!-- 4. Global App Window System -->
+  <!-- App Window Modal -->
   <section id="app-window" class="window-hidden">
     <div class="window-header">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
