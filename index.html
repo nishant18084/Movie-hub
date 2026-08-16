@@ -8,19 +8,19 @@
 </head>
 <body>
 
-  <!-- Main Swipeable OS Container -->
+  <!-- Swipeable OS Root Layout -->
   <div id="os-container">
     <!-- Page 1: Main System Apps -->
     <section class="page">
       <header class="status-bar">
-        <span id="live-status-time">--:--</span>
+        <span id="live-status-time">16:25</span>
         <span>VoLTE 5G • 100%</span>
       </header>
 
       <section class="time-card">
         <div>
-          <h1 id="live-clock">--:--</h1>
-          <p id="live-date">--</p>
+          <h1 id="live-clock">16:25</h1>
+          <p id="live-date">Sunday, Aug 16</p>
         </div>
         <span class="os-badge">⚡ NEXUS</span>
       </section>
@@ -39,7 +39,7 @@
       </div>
     </section>
 
-    <!-- Page 2: Tools, Sensors & Games -->
+    <!-- Page 2: Tools & Games -->
     <section class="page">
       <header class="status-bar">
         <span>More Tools & Sensors</span>
@@ -65,9 +65,13 @@
   </nav>
 
   <!-- Navigation Bar: 3-Buttons Mode -->
-  <footer class="nav-bar" id="nav-buttons-bar"></footer>
+  <footer class="nav-bar" id="nav-buttons-bar">
+    <div class="nav-btn" onclick="navRecents()">⏹</div>
+    <div class="nav-btn" onclick="navHome()">⚪</div>
+    <div class="nav-btn" onclick="navBack()">◀</div>
+  </footer>
 
-  <!-- Gesture Navigation Bar Mode -->
+  <!-- Gesture Bar -->
   <div class="gesture-bar-wrap" id="nav-gesture-bar" onclick="navHome()">
     <div class="gesture-pill"></div>
   </div>
@@ -82,7 +86,7 @@
     <div class="window-content" id="window-content"></div>
   </section>
 
-  <!-- Recents / Multi-Tasking Modal -->
+  <!-- Recents Modal -->
   <section id="recents-modal">
     <div class="recents-header">
       <h3>Active Tasks</h3>
@@ -91,6 +95,298 @@
     <div class="task-list" id="task-list"></div>
   </section>
 
-  <script src="script.js"></script>
-</body>
-</html>
+  <!-- Self-Contained JavaScript Engine -->
+  <script>
+    function syncTime() {
+      const d = new Date();
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const t = h + ':' + m;
+      const dt = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
+      const s = document.getElementById('live-status-time');
+      const c = document.getElementById('live-clock');
+      const dateEl = document.getElementById('live-date');
+      if (s) s.innerText = t;
+      if (c) c.innerText = t;
+      if (dateEl) dateEl.innerText = dt;
+    }
+    syncTime();
+    setInterval(syncTime, 1000);
+
+    let mediaStream = null;
+    let currentFacingMode = "environment";
+    let calcBuffer = '';
+    let dialPadStr = '';
+    let swTimer = null, swElapsed = 0, isSwRunning = false;
+    let isPlaying = false;
+    let board = Array(9).fill(null), gameActive = true;
+    let paintCtx, isDrawing = false, paintColor = '#38bdf8';
+
+    let activeTasks = [];
+    let navMode = 'buttons';
+    let navLayout = 'right_back';
+    try {
+      navMode = localStorage.getItem('nexus_nav_mode') || 'buttons';
+      navLayout = localStorage.getItem('nexus_nav_layout') || 'right_back';
+    } catch(e) {}
+
+    let currentCamMode = 'PHOTO';
+    let currentZoom = 1;
+
+    function renderNavButtons() {
+      const btnBar = document.getElementById('nav-buttons-bar');
+      if (!btnBar) return;
+      if (navLayout === 'right_back') {
+        btnBar.innerHTML = `
+          <div class="nav-btn" onclick="navRecents()">⏹</div>
+          <div class="nav-btn" onclick="navHome()">⚪</div>
+          <div class="nav-btn" onclick="navBack()">◀</div>
+        `;
+      } else {
+        btnBar.innerHTML = `
+          <div class="nav-btn" onclick="navBack()">◀</div>
+          <div class="nav-btn" onclick="navHome()">⚪</div>
+          <div class="nav-btn" onclick="navRecents()">⏹</div>
+        `;
+      }
+    }
+
+    function applyNavMode(mode) {
+      navMode = mode;
+      try { localStorage.setItem('nexus_nav_mode', mode); } catch(e) {}
+      const btnBar = document.getElementById('nav-buttons-bar');
+      const gestBar = document.getElementById('nav-gesture-bar');
+      const dock = document.getElementById('main-dock');
+      const appWin = document.getElementById('app-window');
+      const recents = document.getElementById('recents-modal');
+      const osRoot = document.getElementById('os-container');
+
+      if (mode === 'gestures') {
+        if (btnBar) btnBar.style.display = 'none';
+        if (gestBar) gestBar.style.display = 'flex';
+        if (dock) dock.style.bottom = '26px';
+        if (appWin) appWin.style.bottom = '24px';
+        if (recents) recents.style.bottom = '24px';
+        if (osRoot) osRoot.style.height = 'calc(100dvh - 105px)';
+      } else {
+        renderNavButtons();
+        if (btnBar) btnBar.style.display = 'flex';
+        if (gestBar) gestBar.style.display = 'none';
+        if (dock) dock.style.bottom = '50px';
+        if (appWin) appWin.style.bottom = '44px';
+        if (recents) recents.style.bottom = '44px';
+        if (osRoot) osRoot.style.height = 'calc(100dvh - 130px)';
+      }
+    }
+
+    function setNavLayout(layout) {
+      navLayout = layout;
+      try { localStorage.setItem('nexus_nav_layout', layout); } catch(e) {}
+      renderNavButtons();
+    }
+    applyNavMode(navMode);
+
+    function navBack() {
+      const recents = document.getElementById('recents-modal');
+      const win = document.getElementById('app-window');
+      if (recents && recents.style.display === 'flex') {
+        recents.style.display = 'none';
+      } else if (win && win.style.display === 'flex') {
+        closeApp();
+      }
+    }
+
+    function navHome() {
+      const recents = document.getElementById('recents-modal');
+      const win = document.getElementById('app-window');
+      if (recents) recents.style.display = 'none';
+      if (win) closeApp();
+      const container = document.getElementById('os-container');
+      if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+
+    function navRecents() {
+      const recents = document.getElementById('recents-modal');
+      const list = document.getElementById('task-list');
+      if (!recents || !list) return;
+
+      if (recents.style.display === 'flex') {
+        recents.style.display = 'none';
+        return;
+      }
+
+      list.innerHTML = '';
+      if (activeTasks.length === 0) {
+        list.innerHTML = '<p style="color:#64748b; padding:40px 0;">No active background apps.</p>';
+      } else {
+        activeTasks.forEach((app, idx) => {
+          list.innerHTML += `
+            <div class="task-card" onclick="openApp('${app}'); document.getElementById('recents-modal').style.display='none';">
+              <h4>${app.toUpperCase()}</h4>
+              <p style="color:#94a3b8; font-size:12px;">Active in background</p>
+              <button class="clear-task-btn" style="background:#334155;" onclick="event.stopPropagation(); removeTask(${idx})">Close</button>
+            </div>
+          `;
+        });
+      }
+      recents.style.display = 'flex';
+    }
+
+    function removeTask(idx) {
+      activeTasks.splice(idx, 1);
+      navRecents();
+    }
+
+    function clearAllTasks() {
+      activeTasks = [];
+      navRecents();
+      closeApp();
+    }
+
+    function filterApps() {
+      const q = document.getElementById('app-search').value.toLowerCase();
+      document.querySelectorAll('#home-grid .app-item').forEach(item => {
+        const label = item.querySelector('.label').innerText.toLowerCase();
+        item.style.display = label.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function openApp(appName) {
+      const win = document.getElementById('app-window');
+      const winHdr = document.getElementById('win-hdr');
+      const title = document.getElementById('window-title');
+      const content = document.getElementById('window-content');
+      if (!win || !title || !content) return;
+
+      if (!activeTasks.includes(appName)) {
+        activeTasks.push(appName);
+      }
+
+      win.style.display = 'flex';
+
+      if (appName === 'camera') {
+        winHdr.style.display = 'none';
+        content.style.padding = '0';
+        let lastThumb = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="%23334155"><rect width="52" height="52"/></svg>';
+        try { lastThumb = localStorage.getItem('nexus_last_photo') || lastThumb; } catch(e) {}
+
+        content.innerHTML = `
+          <div class="cam-wrapper">
+            <div class="cam-top-bar">
+              <button class="cam-top-btn" onclick="toggleFlash(this)">⚡</button>
+              <button class="cam-top-btn" onclick="alert('HDR: Auto Active')">HDR</button>
+              <button class="cam-top-btn" onclick="alert('Google Lens Scanner...')">⛶</button>
+              <button class="cam-top-btn" onclick="closeApp()">✕</button>
+            </div>
+
+            <div class="cam-viewfinder">
+              <video id="cam-feed" autoplay playsinline muted></video>
+              <div id="cam-flash-effect" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.12s;"></div>
+
+              <div class="cam-side-controls">
+                <div class="cam-circle-icon" onclick="toggleCamFilter()">🔘</div>
+                <div class="cam-circle-icon" onclick="alert('Beauty Mode Active')">✨</div>
+              </div>
+
+              <div class="cam-zoom-bar">
+                <button class="cam-zoom-btn active" id="z1-btn" onclick="setZoom(1)">1x</button>
+                <button class="cam-zoom-btn" id="z2-btn" onclick="setZoom(2)">2</button>
+              </div>
+            </div>
+
+            <div class="cam-more-panel" id="cam-more-screen">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="font-size:16px;">More Modes</h3>
+                <button onclick="setCamMode('PHOTO')" style="background:transparent; border:none; color:var(--yellow); font-size:18px; cursor:pointer;">✕</button>
+              </div>
+              <div class="more-grid">
+                <div class="more-item" onclick="selectMoreMode('PRO')"><div class="more-icon-box">PRO</div><span class="more-label">PRO</span></div>
+                <div class="more-item" onclick="selectMoreMode('PANO')"><div class="more-icon-box">🖼️</div><span class="more-label">PANO</span></div>
+                <div class="more-item" onclick="selectMoreMode('HI-RES')"><div class="more-icon-box">⊞</div><span class="more-label">HI-RES</span></div>
+                <div class="more-item" onclick="selectMoreMode('FILM')"><div class="more-icon-box">🎬</div><span class="more-label">FILM</span></div>
+                <div class="more-item" onclick="selectMoreMode('SLO-MO')"><div class="more-icon-box">⏳</div><span class="more-label">SLO-MO</span></div>
+                <div class="more-item" onclick="selectMoreMode('TIME-LAPSE')"><div class="more-icon-box">⏱️</div><span class="more-label">TIME-LAPSE</span></div>
+                <div class="more-item" onclick="selectMoreMode('DUAL-VIEW')"><div class="more-icon-box">📱</div><span class="more-label">DUAL-VIEW</span></div>
+                <div class="more-item" onclick="selectMoreMode('UNDERWATER')"><div class="more-icon-box">🌊</div><span class="more-label">UNDERWATER</span></div>
+                <div class="more-item" onclick="selectMoreMode('SCANNER')"><div class="more-icon-box">📄</div><span class="more-label">TEXT SCANNER</span></div>
+                <div class="more-item" onclick="selectMoreMode('TILT-SHIFT')"><div class="more-icon-box">🔄</div><span class="more-label">TILT-SHIFT</span></div>
+              </div>
+            </div>
+
+            <div class="cam-mode-slider">
+              <span class="cam-mode-item" onclick="setCamMode('STREET')">STREET</span>
+              <span class="cam-mode-item" onclick="setCamMode('VIDEO')">VIDEO</span>
+              <span class="cam-mode-item active" id="mode-photo" onclick="setCamMode('PHOTO')">PHOTO</span>
+              <span class="cam-mode-item" onclick="setCamMode('PORTRAIT')">PORTRAIT</span>
+              <span class="cam-mode-item" onclick="setCamMode('MORE')">MORE</span>
+            </div>
+
+            <div class="cam-bottom-controls">
+              <img id="cam-thumb" onclick="openApp('photos')" class="cam-thumb-box" src="${lastThumb}">
+              <button onclick="takePhoto()" class="cam-shutter-ring">
+                <div class="cam-shutter-fill"></div>
+              </button>
+              <button onclick="flipCamera()" class="cam-flip-btn">🔄</button>
+            </div>
+          </div>
+          <canvas id="cam-canvas" style="display:none;"></canvas>
+        `;
+        startCameraFeed();
+        return;
+      }
+
+      winHdr.style.display = 'flex';
+      content.style.padding = '18px';
+
+      switch(appName) {
+        case 'drivers':
+          title.innerText = "Device Drivers & Sensors";
+          content.innerHTML = `
+            <div class="settings-container">
+              <div class="settings-card" style="padding:16px;">
+                <h4 style="font-size:15px; font-weight:600; color:#38bdf8; margin-bottom:4px;">Hardware Driver Status</h4>
+                <p style="color:#94a3b8; font-size:12px;">Real-time hardware interfaces connected to Nexus Kernel</p>
+              </div>
+
+              <div class="settings-card">
+                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#0284c7;">📷</div><span class="s-title">Camera Sensor Driver</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">Active (v2.4)</span></div>
+                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#ec4899;">🎙️</div><span class="s-title">Audio I/O Driver</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">Active (48kHz)</span></div>
+                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#14b8a6;">🧭</div><span class="s-title">Gyroscope & Motion Driver</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">Online</span></div>
+                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#eab308;">⚡</div><span class="s-title">GPU Acceleration</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">120Hz Native</span></div>
+                <div class="settings-item"><div class="item-left"><div class="s-icon" style="background:#22c55e;">📶</div><span class="s-title">5G Modem Baseband</span></div><span class="item-right" style="color:#22c55e; font-weight:bold;">Connected</span></div>
+              </div>
+              <button onclick="alert('Driver diagnostics passed: All hardware functioning normally.')" class="calc-btn action" style="width:100%; margin-top:10px;">Run Diagnostics</button>
+            </div>
+          `;
+          break;
+
+        case 'files':
+          title.innerText = "Files";
+          content.innerHTML = `
+            <div class="settings-container">
+              <div class="settings-card" style="padding:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <h4 style="font-size:15px; font-weight:600;">Internal Storage</h4>
+                  <span style="font-size:12px; color:#38bdf8;">42 GB / 128 GB</span>
+                </div>
+                <div style="width:100%; height:8px; background:#1e293b; border-radius:4px; overflow:hidden; margin-bottom:12px;">
+                  <div style="width:33%; height:100%; background:linear-gradient(90deg, #38bdf8, #22c55e);"></div>
+                </div>
+                <p style="color:#94a3b8; font-size:12px;">86 GB Free Space Available</p>
+              </div>
+
+              <div class="settings-card">
+                <div class="settings-item" onclick="openFileCategory('Documents')"><div class="item-left"><div class="s-icon" style="background:#0284c7;">📄</div><span class="s-title">Documents</span></div><span class="item-right">24 files ›</span></div>
+                <div class="settings-item" onclick="openApp('photos')"><div class="item-left"><div class="s-icon" style="background:#a855f7;">🖼️</div><span class="s-title">Images & Gallery</span></div><span class="item-right">186 photos ›</span></div>
+                <div class="settings-item" onclick="openFileCategory('Downloads')"><div class="item-left"><div class="s-icon" style="background:#22c55e;">⬇️</div><span class="s-title">Downloads</span></div><span class="item-right">12 files ›</span></div>
+                <div class="settings-item" onclick="openFileCategory('Audio')"><div class="item-left"><div class="s-icon" style="background:#ec4899;">🎵</div><span class="s-title">Audio & Recordings</span></div><span class="item-right">8 tracks ›</span></div>
+                <div class="settings-item" onclick="openFileCategory('APKs')"><div class="item-left"><div class="s-icon" style="background:#f59e0b;">📦</div><span class="s-title">Packages (APK)</span></div><span class="item-right">3 files ›</span></div>
+              </div>
+            </div>
+          `;
+          break;
+
+        case 'settings':
+          title.i
