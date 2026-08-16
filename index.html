@@ -4,30 +4,212 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Nexus OS</title>
-  <link rel="stylesheet" href="style.css">
   <style>
-    /* Inline transitions & safety */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: #070a12;
+      color: #fff;
+    }
+
+    /* 1. HELLO BOOT ANIMATION (PURE CSS AUTO-HIDE) */
     #boot-screen {
       position: fixed;
       inset: 0;
       background: #000;
-      z-index: 999;
+      z-index: 9999;
       display: flex;
       justify-content: center;
       align-items: center;
-      transition: opacity 0.8s ease, transform 0.8s ease;
+      animation: hideBoot 0.6s ease 2.2s forwards;
+      pointer-events: none;
     }
-    .boot-fadeout {
-      opacity: 0 !important;
-      transform: scale(1.05);
-      pointer-events: none !important;
+
+    .hello-svg { width: 280px; max-width: 80vw; }
+    .hello-text {
+      font-family: 'Brush Script MT', 'Segoe Script', cursive, sans-serif;
+      font-size: 85px;
+      fill: transparent;
+      stroke: #38bdf8;
+      stroke-width: 2.2;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      stroke-linecap: round;
+      animation: writeHello 2.0s ease-in-out forwards;
+      filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.7));
     }
+
+    @keyframes writeHello {
+      0% { stroke-dashoffset: 600; fill: transparent; }
+      75% { stroke-dashoffset: 0; fill: transparent; }
+      100% { stroke-dashoffset: 0; fill: #38bdf8; }
+    }
+
+    @keyframes hideBoot {
+      0% { opacity: 1; transform: scale(1); visibility: visible; }
+      100% { opacity: 0; transform: scale(1.05); visibility: hidden; }
+    }
+
+    /* 2. MAIN OS CONTAINER */
+    #main-os {
+      width: 100%;
+      height: 100dvh;
+      background: linear-gradient(180deg, #131929 0%, #070a12 100%);
+      padding: env(safe-area-inset-top, 16px) 20px env(safe-area-inset-bottom, 16px) 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #94a3b8;
+      padding-top: 4px;
+      cursor: pointer;
+    }
+
+    .time-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(14px);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .time-card h1 { font-size: 42px; line-height: 1; font-weight: 600; }
+    .time-card p { font-size: 13px; color: #94a3b8; margin-top: 6px; }
+    .os-badge { color: #f59e0b; font-weight: 700; font-size: 15px; }
+
+    .search-box {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 13px 16px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-box::placeholder { color: #64748b; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px 12px;
+      margin-top: 8px;
+    }
+
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+      transition: transform 0.1s ease;
+    }
+    .app-item:active .icon { transform: scale(0.9); }
+    .label { font-size: 12px; color: #e2e8f0; margin-top: 7px; text-align: center; }
+
+    .bg-green { background: #22c55e; }
+    .bg-blue { background: #0284c7; }
+    .bg-slate { background: #475569; }
+    .bg-yellow { background: #eab308; }
+    .bg-sky { background: #38bdf8; }
+    .bg-rose { background: #e11d48; }
+    .bg-zinc { background: #52525b; }
+
+    /* 3. APP WINDOW SYSTEM */
+    #app-window {
+      position: fixed;
+      inset: 0;
+      background: #080c16;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #app-window.window-active { transform: translateY(0); }
+
+    .window-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: #38bdf8;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .window-content { flex: 1; overflow-y: auto; padding: 20px; }
+
+    /* Settings UI */
+    .settings-container { display: flex; flex-direction: column; gap: 14px; padding-bottom: 30px; }
+    .settings-card { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; overflow: hidden; }
+    .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; }
+    .settings-item:last-child { border-bottom: none; }
+    .item-left { display: flex; align-items: center; gap: 14px; }
+    .s-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; }
+    .s-title { font-size: 15px; color: #f1f5f9; font-weight: 500; }
+    .item-right { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #94a3b8; }
+    .arrow { color: #64748b; font-size: 16px; font-weight: 600; }
+
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .3s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: #22c55e; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Calculator */
+    .calc-screen { background: rgba(255, 255, 255, 0.05); padding: 24px 16px; border-radius: 16px; font-size: 36px; text-align: right; margin-bottom: 20px; min-height: 80px; }
+    .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .calc-btn { padding: 16px 0; border-radius: 14px; border: none; background: #1e293b; color: #fff; font-size: 20px; font-weight: 600; cursor: pointer; }
+    .calc-btn.op { background: #f59e0b; color: #000; }
+    .calc-btn.action { background: #475569; }
+
+    /* Dialer */
+    .dialer-screen { font-size: 32px; font-weight: 600; text-align: center; min-height: 48px; margin-bottom: 16px; }
+    .dial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; max-width: 300px; margin: 0 auto; }
+    .dial-btn { height: 64px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.08); color: #fff; font-size: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+    .dial-sub { font-size: 9px; color: #94a3b8; }
   </style>
 </head>
 <body>
 
-  <!-- 1. Boot Screen -->
-  <div id="boot-screen" onclick="forceBoot()">
+  <!-- 1. Boot Hello Layer -->
+  <div id="boot-screen">
     <svg class="hello-svg" viewBox="0 0 300 120">
       <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">
         hello
@@ -35,70 +217,26 @@
     </svg>
   </div>
 
-  <!-- 2. Control Center / Notification Shade -->
-  <div id="control-center" class="shade-hidden">
-    <div class="shade-header">
-      <span id="shade-time">--:--</span>
-      <span onclick="toggleControlCenter()" style="font-size:18px; cursor:pointer; padding:5px;">✕</span>
-    </div>
-    
-    <div class="qs-grid">
-      <div class="qs-tile active" id="tile-wifi" onclick="toggleTile('tile-wifi')">
-        <span class="qs-icon">📶</span>
-        <span class="qs-label">Wi-Fi</span>
-      </div>
-      <div class="qs-tile active" id="tile-bt" onclick="toggleTile('tile-bt')">
-        <span class="qs-icon">ᛒ</span>
-        <span class="qs-label">Bluetooth</span>
-      </div>
-      <div class="qs-tile" id="tile-torch" onclick="toggleTorch()">
-        <span class="qs-icon">🔦</span>
-        <span class="qs-label">Torch</span>
-      </div>
-      <div class="qs-tile" id="tile-dnd" onclick="toggleTile('tile-dnd')">
-        <span class="qs-icon">🌙</span>
-        <span class="qs-label">DND</span>
-      </div>
-    </div>
-
-    <div class="slider-box">
-      <span>☀️</span>
-      <input type="range" min="20" max="100" value="100" oninput="changeBrightness(this.value)">
-    </div>
-
-    <div class="notification-card">
-      <h4>System</h4>
-      <p>Nexus OS 2.0 is running smoothly.</p>
-    </div>
-  </div>
-
-  <!-- 3. Main OS Screen -->
+  <!-- 2. Main OS Screen -->
   <main id="main-os">
-    <!-- Status Bar (Tap to toggle Control Center) -->
-    <header class="status-bar" onclick="toggleControlCenter()">
+    <header class="status-bar">
       <span id="live-status-time">--:--</span>
-      <div class="status-icons">
-        <span class="fs-btn" onclick="event.stopPropagation(); toggleFullScreen()">⛶</span>
+      <div style="display:flex; gap:8px;">
         <span>VoLTE 5G</span>
         <span>100%</span>
       </div>
     </header>
 
-    <!-- Time Widget -->
     <section class="time-card">
       <div>
         <h1 id="live-clock">--:--</h1>
-        <p id="live-date">Sunday, Aug 16</p>
+        <p id="live-date">Loading...</p>
       </div>
       <span class="os-badge">⚡ NEXUS OS</span>
     </section>
 
-    <!-- Search Input -->
-    <div class="search-wrap">
-      <input type="text" id="app-search" class="search-box" placeholder="Search system, apps, tools..." oninput="filterApps()">
-    </div>
+    <input type="text" id="app-search" class="search-box" placeholder="Search system, apps, tools..." oninput="filterApps()">
 
-    <!-- App Grid -->
     <section class="grid" id="home-grid">
       <div class="app-item" onclick="openApp('dialer')">
         <div class="icon bg-green">📞</div>
@@ -129,54 +267,10 @@
         <span class="label">Settings</span>
       </div>
     </section>
-
-    <!-- Bottom Drawer Handle -->
-    <div class="dock-handle" onclick="toggleDrawer()">
-      <div class="bar"></div>
-      <span>Swipe up for App Drawer</span>
-    </div>
   </main>
 
-  <!-- 4. Slide-up App Drawer -->
-  <section id="app-drawer" class="drawer-hidden">
-    <div class="drawer-header">
-      <div class="bar" onclick="toggleDrawer()"></div>
-      <h3>All Applications</h3>
-    </div>
-    <div class="grid">
-      <div class="app-item" onclick="openApp('dialer'); toggleDrawer();">
-        <div class="icon bg-green">📞</div>
-        <span class="label">Phone</span>
-      </div>
-      <div class="app-item" onclick="openApp('camera'); toggleDrawer();">
-        <div class="icon bg-slate">📷</div>
-        <span class="label">Camera</span>
-      </div>
-      <div class="app-item" onclick="openApp('calc'); toggleDrawer();">
-        <div class="icon bg-blue">🔢</div>
-        <span class="label">Calculator</span>
-      </div>
-      <div class="app-item" onclick="openApp('notes'); toggleDrawer();">
-        <div class="icon bg-yellow">📝</div>
-        <span class="label">Notes</span>
-      </div>
-      <div class="app-item" onclick="openApp('weather'); toggleDrawer();">
-        <div class="icon bg-sky">☀️</div>
-        <span class="label">Weather</span>
-      </div>
-      <div class="app-item" onclick="openApp('watch'); toggleDrawer();">
-        <div class="icon bg-rose">⏱️</div>
-        <span class="label">Watch</span>
-      </div>
-      <div class="app-item" onclick="openApp('settings'); toggleDrawer();">
-        <div class="icon bg-zinc">⚙️</div>
-        <span class="label">Settings</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. App Window Modal -->
-  <section id="app-window" class="window-hidden">
+  <!-- 3. App Window System -->
+  <section id="app-window">
     <div class="window-header">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
       <h3 id="window-title">App</h3>
@@ -185,72 +279,27 @@
     <div class="window-content" id="window-content"></div>
   </section>
 
-  <!-- Inbuilt Engine Script -->
+  <!-- Complete Inlined Working Engine -->
   <script>
     let mediaStream = null;
     let currentFacingMode = "environment";
-    let swTimer = null, swElapsed = 0, isSwRunning = false;
     let calcBuffer = '';
     let dialPadStr = '';
+    let swTimer = null, swElapsed = 0, isSwRunning = false;
 
-    // Boot transition
-    function forceBoot() {
-      const boot = document.getElementById('boot-screen');
-      const os = document.getElementById('main-os');
-      if (boot) boot.classList.add('boot-fadeout');
-      if (os) os.classList.add('os-visible');
-      setTimeout(() => { if (boot) boot.remove(); }, 800);
-    }
-    setTimeout(forceBoot, 2200);
-
-    // Live Clock & Date Update
+    // Clock
     function updateClock() {
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
       const dateStr = now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
       
-      const statusTime = document.getElementById('live-status-time');
-      const shadeTime = document.getElementById('shade-time');
-      const liveClock = document.getElementById('live-clock');
-      const liveDate = document.getElementById('live-date');
-
-      if (statusTime) statusTime.innerText = timeStr;
-      if (shadeTime) shadeTime.innerText = timeStr;
-      if (liveClock) liveClock.innerText = timeStr;
-      if (liveDate) liveDate.innerText = dateStr;
+      document.getElementById('live-status-time').innerText = timeStr;
+      document.getElementById('live-clock').innerText = timeStr;
+      document.getElementById('live-date').innerText = dateStr;
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Fullscreen
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      } else {
-        document.exitFullscreen().catch(() => {});
-      }
-    }
-
-    // Control Center
-    function toggleControlCenter() {
-      document.getElementById('control-center').classList.toggle('shade-active');
-    }
-    function toggleTile(id) {
-      document.getElementById(id).classList.toggle('active');
-    }
-    function toggleTorch() {
-      const tile = document.getElementById('tile-torch');
-      tile.classList.toggle('active');
-      document.body.style.filter = tile.classList.contains('active') ? 'brightness(1.4)' : 'none';
-    }
-    function changeBrightness(val) {
-      document.getElementById('main-os').style.filter = `brightness(${val}%)`;
-    }
-
-    // Drawer & Search
-    function toggleDrawer() {
-      document.getElementById('app-drawer').classList.toggle('drawer-active');
-    }
     function filterApps() {
       const q = document.getElementById('app-search').value.toLowerCase();
       document.querySelectorAll('#home-grid .app-item').forEach(item => {
@@ -259,13 +308,11 @@
       });
     }
 
-    // App Router
+    // App Open Handler
     function openApp(appName) {
       const win = document.getElementById('app-window');
       const title = document.getElementById('window-title');
       const content = document.getElementById('window-content');
-      if (!win || !title || !content) return;
-
       win.classList.add('window-active');
 
       switch(appName) {
@@ -278,26 +325,26 @@
                   <div class="item-left"><div class="s-icon" style="background:#f59e0b;">✈️</div><span class="s-title">Aeroplane mode</span></div>
                   <label class="switch"><input type="checkbox"><span class="slider"></span></label>
                 </div>
-                <div class="settings-item" onclick="alert('Wi-Fi is scanning...')">
+                <div class="settings-item" onclick="alert('Wi-Fi is ready')">
                   <div class="item-left"><div class="s-icon" style="background:#0284c7;">📶</div><span class="s-title">Wi-Fi</span></div>
                   <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
                 </div>
-                <div class="settings-item" onclick="alert('Bluetooth is scanning...')">
+                <div class="settings-item" onclick="alert('Bluetooth scanning...')">
                   <div class="item-left"><div class="s-icon" style="background:#2563eb;">ᛒ</div><span class="s-title">Bluetooth</span></div>
                   <div class="item-right"><span>Off</span><span class="arrow">›</span></div>
                 </div>
-                <div class="settings-item" onclick="alert('Mobile Network Active: 5G')">
+                <div class="settings-item" onclick="alert('Mobile Network 5G')">
                   <div class="item-left"><div class="s-icon" style="background:#16a34a;">⇅</div><span class="s-title">Mobile network</span></div>
                   <div class="item-right"><span class="arrow">›</span></div>
                 </div>
               </div>
 
               <div class="settings-card">
-                <div class="settings-item" onclick="alert('Display: Dark Mode Active')">
+                <div class="settings-item" onclick="alert('Display Settings')">
                   <div class="item-left"><div class="s-icon" style="background:#eab308;">☀️</div><span class="s-title">Display & brightness</span></div>
                   <div class="item-right"><span class="arrow">›</span></div>
                 </div>
-                <div class="settings-item" onclick="alert('Sound: Normal Mode')">
+                <div class="settings-item" onclick="alert('Sound & Vibration')">
                   <div class="item-left"><div class="s-icon" style="background:#22c55e;">🔔</div><span class="s-title">Sound & vibration</span></div>
                   <div class="item-right"><span class="arrow">›</span></div>
                 </div>
@@ -317,7 +364,7 @@
           title.innerText = "Camera";
           content.innerHTML = `
             <div style="display:flex; flex-direction:column; height:100%; justify-content:space-between;">
-              <div class="camera-view" style="position:relative; width:100%; height:62vh; background:#000; border-radius:24px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+              <div style="position:relative; width:100%; height:62vh; background:#000; border-radius:24px; overflow:hidden;">
                 <video id="cam-feed" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
                 <div id="cam-flash" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.15s;"></div>
               </div>
@@ -353,7 +400,7 @@
               <div class="dial-btn" onclick="dialDigit('0')">0<span class="dial-sub">+</span></div>
               <div class="dial-btn" onclick="dialDigit('#')">#</div>
               <div class="dial-btn" onclick="dialClear()" style="font-size:18px;">⌫</div>
-              <div class="dial-btn dial-call-btn" onclick="startCall()">📞</div>
+              <div class="dial-btn" onclick="if(dialPadStr) window.location.href='tel:'+dialPadStr" style="background:#22c55e;">📞</div>
               <div></div>
             </div>
           `;
@@ -391,7 +438,7 @@
           title.innerText = "Quick Notes";
           const saved = localStorage.getItem('nexus_notes') || '';
           content.innerHTML = `
-            <textarea id="note-input" oninput="saveNote()" style="width:100%; height:70vh; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:14px; color:#fff; font-size:16px; outline:none; resize:none;" placeholder="Start typing...">${saved}</textarea>
+            <textarea oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:70vh; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:14px; color:#fff; font-size:16px; outline:none; resize:none;" placeholder="Start typing...">${saved}</textarea>
           `;
           break;
 
@@ -404,52 +451,4 @@
               <p style="color:#94a3b8; margin-top:8px;">Humidity: 65% • Wind: 12 km/h</p>
             </div>
           `;
-          break;
-
-        case 'watch':
-          title.innerText = "Stopwatch";
-          content.innerHTML = `
-            <div style="text-align:center; padding:40px 0;">
-              <h1 id="sw-display" style="font-size:44px; font-variant-numeric: tabular-nums; margin-bottom:24px;">00:00.00</h1>
-              <div style="display:flex; justify-content:center; gap:16px;">
-                <button id="sw-btn" onclick="toggleSw()" class="calc-btn action" style="width:100px; background:#22c55e;">Start</button>
-                <button onclick="resetSw()" class="calc-btn action" style="width:100px;">Reset</button>
-              </div>
-            </div>
-          `;
-          break;
-      }
-    }
-
-    function closeApp() {
-      document.getElementById('app-window').classList.remove('window-active');
-      if (mediaStream) {
-        mediaStream.getTracks().forEach(t => t.stop());
-        mediaStream = null;
-      }
-      if (swTimer) clearInterval(swTimer);
-      isSwRunning = false;
-    }
-
-    // Camera helpers
-    async function startCameraFeed() {
-      if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-      try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } });
-        const v = document.getElementById('cam-feed');
-        if (v) v.srcObject = mediaStream;
-      } catch (err) {
-        alert("Camera permission allow karein.");
-      }
-    }
-
-    function flipCamera() {
-      currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
-      startCameraFeed();
-    }
-
-    function takePhoto() {
-      const v = document.getElementById('cam-feed');
-      const c = document.getElementById('cam-canvas');
-      const t = document.getElementById('cam-thumb');
-      const f = document.ge
+        
