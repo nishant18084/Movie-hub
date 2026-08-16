@@ -3,80 +3,309 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  
-  <!-- Standalone Web App Meta Tags -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#070a12">
-  
   <title>Nexus OS</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body onclick="launchFullScreen()">
+  <style>
+    :root {
+      --bg: #070a12;
+      --surface: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #38bdf8;
+      --text: #ffffff;
+      --muted: #94a3b8;
+    }
 
-  <!-- Boot Screen -->
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Boot Hello Sequence */
+    #boot-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: hideBoot 0.4s ease 1.8s forwards;
+      pointer-events: none;
+    }
+
+    .hello-svg { width: 260px; max-width: 80vw; }
+    .hello-text {
+      font-family: 'Brush Script MT', 'Segoe Script', cursive, sans-serif;
+      font-size: 85px;
+      fill: transparent;
+      stroke: var(--accent);
+      stroke-width: 2.2;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      stroke-linecap: round;
+      animation: writeHello 1.6s ease-in-out forwards;
+      filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.7));
+    }
+
+    @keyframes writeHello {
+      0% { stroke-dashoffset: 600; fill: transparent; }
+      75% { stroke-dashoffset: 0; fill: transparent; }
+      100% { stroke-dashoffset: 0; fill: var(--accent); }
+    }
+
+    @keyframes hideBoot {
+      to { opacity: 0; visibility: hidden; display: none; }
+    }
+
+    /* Swipeable OS Container */
+    #os-container {
+      display: flex;
+      overflow-x: scroll;
+      scroll-snap-type: x mandatory;
+      width: 100vw;
+      height: calc(100dvh - 85px);
+      scrollbar-width: none;
+    }
+    #os-container::-webkit-scrollbar { display: none; }
+
+    .page {
+      flex: 0 0 100vw;
+      width: 100vw;
+      scroll-snap-align: start;
+      padding: env(safe-area-inset-top, 14px) 16px 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .time-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .time-card h1 { font-size: 38px; line-height: 1; font-weight: 600; }
+    .time-card p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .os-badge { color: #f59e0b; font-weight: 700; font-size: 13px; }
+
+    .search-box {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 11px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-box::placeholder { color: #64748b; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px 10px;
+    }
+
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      transition: transform 0.1s ease;
+    }
+    .app-item:active .icon { transform: scale(0.88); }
+    .label { font-size: 11px; color: #cbd5e1; margin-top: 5px; text-align: center; }
+
+    /* Colors */
+    .bg-green { background: #22c55e; }
+    .bg-blue { background: #0284c7; }
+    .bg-slate { background: #475569; }
+    .bg-yellow { background: #eab308; }
+    .bg-sky { background: #38bdf8; }
+    .bg-rose { background: #e11d48; }
+    .bg-zinc { background: #52525b; }
+    .bg-purple { background: #a855f7; }
+    .bg-pink { background: #ec4899; }
+    .bg-cyan { background: #06b6d4; }
+    .bg-red { background: #ef4444; }
+    .bg-amber { background: #f59e0b; }
+    .bg-indigo { background: #6366f1; }
+    .bg-emerald { background: #10b981; }
+    .bg-teal { background: #14b8a6; }
+
+    /* Bottom Dock */
+    .dock {
+      position: fixed;
+      bottom: 12px;
+      left: 16px;
+      right: 16px;
+      height: 70px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 50;
+    }
+
+    /* Modal App Window */
+    #app-window {
+      position: fixed;
+      inset: 0;
+      background: #080c16;
+      z-index: 200;
+      display: none;
+      flex-direction: column;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .window-header {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .window-content { flex: 1; overflow-y: auto; padding: 18px; }
+
+    /* App Elements */
+    .settings-container { display: flex; flex-direction: column; gap: 12px; }
+    .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+    .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; }
+    .settings-item:last-child { border-bottom: none; }
+    .item-left { display: flex; align-items: center; gap: 12px; }
+    .s-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #fff; }
+    .s-title { font-size: 14px; color: #f1f5f9; font-weight: 500; }
+    .item-right { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+
+    .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .3s; border-radius: 22px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: #22c55e; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    .calc-screen { background: rgba(255, 255, 255, 0.05); padding: 20px 14px; border-radius: 14px; font-size: 32px; text-align: right; margin-bottom: 16px; min-height: 70px; }
+    .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .calc-btn { padding: 14px 0; border-radius: 12px; border: none; background: #1e293b; color: #fff; font-size: 18px; font-weight: 600; cursor: pointer; }
+    .calc-btn.op { background: #f59e0b; color: #000; }
+    .calc-btn.action { background: #475569; }
+
+    .dialer-screen { font-size: 28px; font-weight: 600; text-align: center; min-height: 40px; margin-bottom: 14px; }
+    .dial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 280px; margin: 0 auto; }
+    .dial-btn { height: 58px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: #fff; font-size: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <!-- Boot Animation -->
   <div id="boot-screen">
     <svg class="hello-svg" viewBox="0 0 300 120">
-      <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">hello</text>
+      <text x="50%" y="65%" text-anchor="middle" dominant-baseline="middle" class="hello-text">Nexus</text>
     </svg>
   </div>
 
-  <!-- Main OS Screen -->
-  <main id="main-os">
-    <header class="status-bar">
-      <span id="live-status-time">--:--</span>
-      <span>VoLTE 5G • 100%</span>
-    </header>
+  <!-- Swipeable OS Root -->
+  <div id="os-container">
+    <!-- Page 1: Main Apps -->
+    <section class="page">
+      <header class="status-bar">
+        <span id="live-status-time">--:--</span>
+        <span>VoLTE 5G • 100%</span>
+      </header>
 
-    <section class="time-card">
-      <div>
-        <h1 id="live-clock">--:--</h1>
-        <p id="live-date">--</p>
+      <section class="time-card">
+        <div>
+          <h1 id="live-clock">--:--</h1>
+          <p id="live-date">--</p>
+        </div>
+        <span class="os-badge">⚡ NEXUS</span>
+      </section>
+
+      <input type="text" id="app-search" class="search-box" placeholder="Search system, apps, tools..." oninput="filterApps()">
+
+      <div class="grid" id="home-grid">
+        <div class="app-item" onclick="openApp('photos')"><div class="icon bg-purple">🖼️</div><span class="label">Photos</span></div>
+        <div class="app-item" onclick="openApp('calc')"><div class="icon bg-blue">🔢</div><span class="label">Calculator</span></div>
+        <div class="app-item" onclick="openApp('notes')"><div class="icon bg-yellow">📝</div><span class="label">Notes</span></div>
+        <div class="app-item" onclick="openApp('weather')"><div class="icon bg-sky">☀️</div><span class="label">Weather</span></div>
+        <div class="app-item" onclick="openApp('music')"><div class="icon bg-pink">🎵</div><span class="label">Music</span></div>
+        <div class="app-item" onclick="openApp('recorder')"><div class="icon bg-red">🎙️</div><span class="label">Recorder</span></div>
+        <div class="app-item" onclick="openApp('files')"><div class="icon bg-amber">📁</div><span class="label">Files</span></div>
+        <div class="app-item" onclick="openApp('paint')"><div class="icon bg-indigo">🎨</div><span class="label">Paint</span></div>
       </div>
-      <span class="os-badge">⚡ NEXUS OS</span>
     </section>
 
-    <input type="text" id="app-search" class="search-box" placeholder="Search system, apps, tools..." oninput="filterApps()">
+    <!-- Page 2: Games & Tools -->
+    <section class="page">
+      <header class="status-bar">
+        <span>More Apps</span>
+        <span>Page 2/2</span>
+      </header>
 
-    <section class="grid" id="home-grid">
-      <div class="app-item" onclick="openApp('dialer')">
-        <div class="icon bg-green">📞</div>
-        <span class="label">Phone</span>
-      </div>
-      <div class="app-item" onclick="openApp('camera')">
-        <div class="icon bg-slate">📷</div>
-        <span class="label">Camera</span>
-      </div>
-      <div class="app-item" onclick="openApp('photos')">
-        <div class="icon bg-purple">🖼️</div>
-        <span class="label">Photos</span>
-      </div>
-      <div class="app-item" onclick="openApp('calc')">
-        <div class="icon bg-blue">🔢</div>
-        <span class="label">Calculator</span>
-      </div>
-      <div class="app-item" onclick="openApp('notes')">
-        <div class="icon bg-yellow">📝</div>
-        <span class="label">Notes</span>
-      </div>
-      <div class="app-item" onclick="openApp('weather')">
-        <div class="icon bg-sky">☀️</div>
-        <span class="label">Weather</span>
-      </div>
-      <div class="app-item" onclick="openApp('watch')">
-        <div class="icon bg-rose">⏱️</div>
-        <span class="label">Watch</span>
-      </div>
-      <div class="app-item" onclick="openApp('settings')">
-        <div class="icon bg-zinc">⚙️</div>
-        <span class="label">Settings</span>
+      <div class="grid" style="margin-top: 10px;">
+        <div class="app-item" onclick="openApp('game')"><div class="icon bg-emerald">🎮</div><span class="label">Games</span></div>
+        <div class="app-item" onclick="openApp('compass')"><div class="icon bg-teal">🧭</div><span class="label">Compass</span></div>
+        <div class="app-item" onclick="openApp('watch')"><div class="icon bg-rose">⏱️</div><span class="label">Watch</span></div>
+        <div class="app-item" onclick="openApp('messages')"><div class="icon bg-blue">💬</div><span class="label">Messages</span></div>
       </div>
     </section>
-  </main>
+  </div>
 
-  <!-- App Window Modal -->
+  <!-- Persistent Dock -->
+  <nav class="dock">
+    <div class="app-item" onclick="openApp('dialer')"><div class="icon bg-green">📞</div></div>
+    <div class="app-item" onclick="openApp('browser')"><div class="icon bg-cyan">🌐</div></div>
+    <div class="app-item" onclick="openApp('camera')"><div class="icon bg-slate">📷</div></div>
+    <div class="app-item" onclick="openApp('settings')"><div class="icon bg-zinc">⚙️</div></div>
+  </nav>
+
+  <!-- Modal Application Screen -->
   <section id="app-window">
     <div class="window-header">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
@@ -86,6 +315,158 @@
     <div class="window-content" id="window-content"></div>
   </section>
 
-  <script src="script.js"></script>
-</body>
-</html>
+  <!-- Single File JS Runtime -->
+  <script>
+    // Clock
+    function renderTime() {
+      const d = new Date();
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      const tStr = `${h}:${m}`;
+      
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const dStr = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
+
+      const st = document.getElementById('live-status-time');
+      const lc = document.getElementById('live-clock');
+      const ld = document.getElementById('live-date');
+
+      if (st) st.innerText = tStr;
+      if (lc) lc.innerText = tStr;
+      if (ld) ld.innerText = dStr;
+    }
+    renderTime();
+    setInterval(renderTime, 1000);
+
+    let mediaStream = null;
+    let currentFacingMode = "environment";
+    let calcBuffer = '';
+    let dialPadStr = '';
+    let swTimer = null, swElapsed = 0, isSwRunning = false;
+    let isPlaying = false;
+    let board = Array(9).fill(null), gameActive = true;
+    let paintCtx, isDrawing = false, paintColor = '#38bdf8';
+
+    function filterApps() {
+      const q = document.getElementById('app-search').value.toLowerCase();
+      document.querySelectorAll('#home-grid .app-item').forEach(item => {
+        const label = item.querySelector('.label').innerText.toLowerCase();
+        item.style.display = label.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    // App Opener
+    function openApp(appName) {
+      const win = document.getElementById('app-window');
+      const title = document.getElementById('window-title');
+      const content = document.getElementById('window-content');
+      if (!win || !title || !content) return;
+
+      win.style.display = 'flex';
+
+      switch(appName) {
+        case 'camera':
+          title.innerText = "Camera";
+          const lastThumb = localStorage.getItem('nexus_last_photo') || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="%23334155"><rect width="52" height="52"/></svg>';
+          content.innerHTML = `
+            <div style="display:flex; flex-direction:column; height:100%; justify-content:space-between;">
+              <div style="position:relative; width:100%; height:60vh; background:#000; border-radius:24px; overflow:hidden;">
+                <video id="cam-feed" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
+                <div id="cam-flash" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.15s;"></div>
+              </div>
+              <canvas id="cam-canvas" style="display:none;"></canvas>
+              <div style="display:flex; justify-content:space-around; align-items:center; padding:16px 10px;">
+                <img id="cam-thumb" onclick="openApp('photos')" style="width:52px; height:52px; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,0.2); background:#1e293b; cursor:pointer;" src="${lastThumb}">
+                <button onclick="takePhoto()" style="width:68px; height:68px; border-radius:50%; border:4px solid #fff; background:transparent; padding:3px; cursor:pointer;">
+                  <div style="width:100%; height:100%; background:#fff; border-radius:50%;"></div>
+                </button>
+                <button onclick="flipCamera()" style="width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:22px; cursor:pointer;">🔄</button>
+              </div>
+            </div>
+          `;
+          startCameraFeed();
+          break;
+
+        case 'photos':
+          title.innerText = "Photos";
+          const savedImg = localStorage.getItem('nexus_last_photo');
+          content.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <h3 style="font-size:16px; color:#94a3b8;">Captured Photos</h3>
+              <div id="gallery-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+                ${savedImg ? `
+                  <div style="position:relative; aspect-ratio:1; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,0.2);">
+                    <img src="${savedImg}" style="width:100%; height:100%; object-fit:cover;">
+                  </div>
+                ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos captured yet.<br>Open Camera to click photos!</p>'}
+              </div>
+            </div>
+          `;
+          break;
+
+        case 'dialer':
+          title.innerText = "Phone";
+          dialPadStr = '';
+          content.innerHTML = `
+            <div class="dialer-screen" id="dial-number"></div>
+            <div class="dial-grid">
+              <div class="dial-btn" onclick="dialDigit('1')">1</div>
+              <div class="dial-btn" onclick="dialDigit('2')">2</div>
+              <div class="dial-btn" onclick="dialDigit('3')">3</div>
+              <div class="dial-btn" onclick="dialDigit('4')">4</div>
+              <div class="dial-btn" onclick="dialDigit('5')">5</div>
+              <div class="dial-btn" onclick="dialDigit('6')">6</div>
+              <div class="dial-btn" onclick="dialDigit('7')">7</div>
+              <div class="dial-btn" onclick="dialDigit('8')">8</div>
+              <div class="dial-btn" onclick="dialDigit('9')">9</div>
+              <div class="dial-btn" onclick="dialDigit('*')">*</div>
+              <div class="dial-btn" onclick="dialDigit('0')">0</div>
+              <div class="dial-btn" onclick="dialDigit('#')">#</div>
+              <div class="dial-btn" onclick="dialClear()">⌫</div>
+              <div class="dial-btn" onclick="if(dialPadStr) window.location.href='tel:'+dialPadStr" style="background:#22c55e;">📞</div>
+              <div></div>
+            </div>
+          `;
+          break;
+
+        case 'calc':
+          title.innerText = "Calculator";
+          calcBuffer = '';
+          content.innerHTML = `
+            <div class="calc-screen" id="calc-display">0</div>
+            <div class="calc-grid">
+              <button class="calc-btn action" onclick="calcAction('C')">C</button>
+              <button class="calc-btn action" onclick="calcAction('DEL')">⌫</button>
+              <button class="calc-btn op" onclick="calcAction('/')">/</button>
+              <button class="calc-btn op" onclick="calcAction('*')">×</button>
+              <button class="calc-btn" onclick="calcAction('7')">7</button>
+              <button class="calc-btn" onclick="calcAction('8')">8</button>
+              <button class="calc-btn" onclick="calcAction('9')">9</button>
+              <button class="calc-btn op" onclick="calcAction('-')">-</button>
+              <button class="calc-btn" onclick="calcAction('4')">4</button>
+              <button class="calc-btn" onclick="calcAction('5')">5</button>
+              <button class="calc-btn" onclick="calcAction('6')">6</button>
+              <button class="calc-btn op" onclick="calcAction('+')">+</button>
+              <button class="calc-btn" onclick="calcAction('1')">1</button>
+              <button class="calc-btn" onclick="calcAction('2')">2</button>
+              <button class="calc-btn" onclick="calcAction('3')">3</button>
+              <button class="calc-btn op" onclick="calcAction('=')">=</button>
+              <button class="calc-btn" style="grid-column: span 2;" onclick="calcAction('0')">0</button>
+              <button class="calc-btn" onclick="calcAction('.')">.</button>
+            </div>
+          `;
+          break;
+
+        case 'notes':
+          title.innerText = "Quick Notes";
+          const saved = localStorage.getItem('nexus_notes') || '';
+          content.innerHTML = `
+            <textarea oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:70vh; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:14px; color:#fff; font-size:16px; outline:none; resize:none;" placeholder="Start typing...">${saved}</textarea>
+          `;
+          break;
+
+        case 'paint':
+          title.innerText = "Paint";
+          content.innerHTML = `
+            <div style="disp
