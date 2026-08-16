@@ -57,7 +57,7 @@ html, body {
   width: 100%;
   height: 100dvh;
   background: linear-gradient(180deg, #131929 0%, #070a12 100%);
-  padding: 16px 20px;
+  padding: env(safe-area-inset-top, 16px) 20px env(safe-area-inset-bottom, 16px) 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -143,6 +143,8 @@ html, body {
   z-index: 200;
   display: none;
   flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .window-header {
