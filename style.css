@@ -61,7 +61,7 @@ html, body {
   to { opacity: 0; visibility: hidden; display: none; }
 }
 
-/* Swipeable OS Pages */
+/* Swipeable OS Container */
 #os-container {
   display: flex;
   overflow-x: scroll;
@@ -143,7 +143,7 @@ html, body {
 .app-item:active .icon { transform: scale(0.88); }
 .label { font-size: 11px; color: #cbd5e1; margin-top: 5px; text-align: center; }
 
-/* Colors */
+/* Themes */
 .bg-green { background: #22c55e; }
 .bg-blue { background: #0284c7; }
 .bg-slate { background: #475569; }
@@ -175,9 +175,10 @@ html, body {
   justify-content: space-around;
   align-items: center;
   z-index: 50;
+  transition: bottom 0.2s ease;
 }
 
-/* Android Navigation Bar */
+/* Mode 1: 3-Buttons Navigation Bar */
 .nav-bar {
   position: fixed;
   bottom: 0;
@@ -196,11 +197,30 @@ html, body {
   color: #94a3b8;
   padding: 8px 24px;
   cursor: pointer;
-  transition: color 0.1s, transform 0.1s;
 }
 .nav-btn:active {
   color: #fff;
   transform: scale(0.85);
+}
+
+/* Mode 2: Gesture Navigation Bar */
+.gesture-bar-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 24px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 250;
+  cursor: pointer;
+}
+.gesture-pill {
+  width: 120px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
 }
 
 /* App Window Modal */
@@ -231,7 +251,7 @@ html, body {
 }
 .window-content { flex: 1; overflow-y: auto; padding: 18px; }
 
-/* Recents / Multi-Tasking Modal */
+/* Recents Modal */
 #recents-modal {
   position: fixed;
   inset: 0;
@@ -243,41 +263,12 @@ html, body {
   flex-direction: column;
   padding: 24px 18px;
 }
-.recents-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.clear-task-btn {
-  background: #ef4444;
-  border: none;
-  padding: 6px 14px;
-  color: #fff;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.task-list {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 20px;
-}
-.task-card {
-  flex: 0 0 220px;
-  height: 360px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  cursor: pointer;
-}
+.recents-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.clear-task-btn { background: #ef4444; border: none; padding: 6px 14px; color: #fff; border-radius: 10px; font-weight: 600; cursor: pointer; }
+.task-list { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 20px; }
+.task-card { flex: 0 0 220px; height: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
 
-/* App-Specific Controls */
+/* App UI & Cards */
 .settings-container { display: flex; flex-direction: column; gap: 12px; }
 .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
 .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; }
@@ -287,6 +278,7 @@ html, body {
 .s-title { font-size: 14px; color: #f1f5f9; font-weight: 500; }
 .item-right { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
 
+/* Switch Controls */
 .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; inset: 0; background-color: #334155; transition: .3s; border-radius: 22px; }
@@ -294,12 +286,14 @@ html, body {
 input:checked + .slider { background-color: #22c55e; }
 input:checked + .slider:before { transform: translateX(20px); }
 
+/* Calculator */
 .calc-screen { background: rgba(255, 255, 255, 0.05); padding: 20px 14px; border-radius: 14px; font-size: 32px; text-align: right; margin-bottom: 16px; min-height: 70px; }
 .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .calc-btn { padding: 14px 0; border-radius: 12px; border: none; background: #1e293b; color: #fff; font-size: 18px; font-weight: 600; cursor: pointer; }
 .calc-btn.op { background: #f59e0b; color: #000; }
 .calc-btn.action { background: #475569; }
 
+/* Dialer */
 .dialer-screen { font-size: 28px; font-weight: 600; text-align: center; min-height: 40px; margin-bottom: 14px; }
 .dial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 280px; margin: 0 auto; }
 .dial-btn { height: 58px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: #fff; font-size: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
