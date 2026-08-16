@@ -1,4 +1,4 @@
-// Clock Engine
+// Android 15 Live Clock
 function updateClock() {
   const d = new Date();
   const h = String(d.getHours()).padStart(2, '0');
@@ -26,54 +26,99 @@ let currentFacing = 'environment';
 let isMusicPlaying = false;
 let mediaRecorder = null;
 let audioChunks = [];
+let activeRecentApps = ['drivers', 'files', 'calc', 'notes'];
+
+// Recents Manager
+function toggleRecents() {
+  const recents = document.getElementById('recents-screen');
+  const container = document.getElementById('recents-cards');
+  if (!recents || !container) return;
+
+  if (recents.style.display === 'flex') {
+    recents.style.display = 'none';
+    return;
+  }
+
+  document.getElementById('app-modal').style.display = 'none';
+  container.innerHTML = '';
+  if (activeRecentApps.length === 0) {
+    container.innerHTML = '<p style="color:#64748b; margin:auto;">No background apps in memory</p>';
+  } else {
+    activeRecentApps.forEach((appName) => {
+      container.innerHTML += `
+        <div class="recent-task-card" onclick="openApp('${appName}'); document.getElementById('recents-screen').style.display='none';">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:20px;">⚡</span>
+            <b style="color:#fff; text-transform:uppercase; font-size:14px;">${appName}</b>
+          </div>
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:13px;">App is suspended in background</div>
+        </div>
+      `;
+    });
+  }
+
+  recents.style.display = 'flex';
+}
+
+function clearAllRecents() {
+  activeRecentApps = [];
+  toggleRecents();
+}
+
+function navBack() {
+  const recents = document.getElementById('recents-screen');
+  const modal = document.getElementById('app-modal');
+  if (recents && recents.style.display === 'flex') {
+    recents.style.display = 'none';
+  } else if (modal && modal.style.display === 'flex') {
+    closeApp();
+  }
+}
+
+function navHome() {
+  const recents = document.getElementById('recents-screen');
+  if (recents) recents.style.display = 'none';
+  closeApp();
+}
 
 function openApp(name) {
   const modal = document.getElementById('app-modal');
   const hdr = document.getElementById('modal-hdr');
   const title = document.getElementById('modal-title');
   const body = document.getElementById('modal-body');
+  const recents = document.getElementById('recents-screen');
+
+  if (recents) recents.style.display = 'none';
+  if (!activeRecentApps.includes(name)) activeRecentApps.push(name);
 
   modal.style.display = 'flex';
   title.innerText = name.toUpperCase();
 
-  // 1. Live Camera
+  // 1. Realme Camera Engine
   if (name === 'camera') {
     hdr.style.display = 'none';
     body.style.padding = '0';
     const lastThumb = localStorage.getItem('nexus_last_photo') || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" fill="%23334155"><rect width="52" height="52"/></svg>';
     
     body.innerHTML = `
-      <div class="cam-fullscreen">
-        <div class="cam-top-icons">
-          <button onclick="this.style.color = (this.style.color === 'rgb(245, 158, 11)') ? '#fff' : '#f59e0b'">⚡</button>
-          <button onclick="alert('HDR: Auto Active')">HDR</button>
-          <button onclick="alert('Google Lens Active')">⛶</button>
-          <button onclick="closeApp()">✕</button>
+      <div style="position:absolute; inset:0; background:#000; display:flex; flex-direction:column; justify-content:space-between;">
+        <div style="padding:14px 20px; display:flex; justify-content:space-between; z-index:10; background:linear-gradient(180deg, rgba(0,0,0,0.8), transparent);">
+          <span style="color:#f59e0b; font-size:18px;">⚡</span>
+          <span style="color:#fff; font-weight:600;">HDR AUTO</span>
+          <button onclick="closeApp()" style="background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer;">✕</button>
         </div>
-
-        <div class="cam-video-container">
-          <video id="cam-video-feed" autoplay playsinline muted></video>
-          <div id="cam-flash-fx" style="position:absolute; inset:0; background:white; opacity:0; pointer-events:none; transition:opacity 0.12s;"></div>
+        <div style="flex:1; width:100%; position:relative; background:#111; overflow:hidden;">
+          <video id="cam-feed-view" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
         </div>
-
-        <div class="cam-modes">
-          <span class="cam-mode-label" onclick="alert('Street mode ready')">STREET</span>
-          <span class="cam-mode-label" onclick="alert('Video mode ready')">VIDEO</span>
-          <span class="cam-mode-label active">PHOTO</span>
-          <span class="cam-mode-label" onclick="alert('Portrait depth on')">PORTRAIT</span>
-        </div>
-
-        <div class="cam-shutter-bar">
-          <img id="cam-gallery-thumb" onclick="openApp('photos')" class="cam-thumb-btn" src="${lastThumb}">
-          <button onclick="capturePhoto()" class="cam-shutter-button">
-            <div class="cam-shutter-core"></div>
-          </button>
-          <button onclick="toggleFacing()" class="cam-flip-btn">🔄</button>
+        <div style="display:flex; justify-content:space-around; align-items:center; padding:20px; background:#000;">
+          <img id="cam-thumb" onclick="openApp('photos')" style="width:52px; height:52px; border-radius:14px; object-fit:cover; border:2px solid #fff; background:#222;" src="${lastThumb}">
+          <button onclick="takeCamSnap()" style="width:72px; height:72px; border-radius:50%; border:4px solid #fff; background:transparent; padding:4px; cursor:pointer;"><div style="width:100%; height:100%; background:#fff; border-radius:50%;"></div></button>
+          <button onclick="flipCam()" style="width:50px; height:50px; border-radius:50%; background:#222; border:1px solid #444; color:#fff; font-size:20px; cursor:pointer;">🔄</button>
         </div>
       </div>
-      <canvas id="cam-capture-canvas" style="display:none;"></canvas>
+      <canvas id="cam-canvas-snap" style="display:none;"></canvas>
     `;
-    startCameraStream();
+    startCamera();
     return;
   }
 
@@ -81,25 +126,23 @@ function openApp(name) {
   body.style.padding = '18px';
 
   switch(name) {
-    // 2. Photos / Gallery
     case 'photos':
       const savedPhoto = localStorage.getItem('nexus_last_photo');
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:16px;">
-          <h3 style="font-size:15px; color:#94a3b8;">Captured Gallery Album</h3>
+          <h3 style="font-size:15px; color:#94a3b8;">Gallery Album</h3>
           <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
             ${savedPhoto ? `
-              <div style="position:relative; aspect-ratio:1; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,0.2);">
+              <div style="position:relative; aspect-ratio:1; border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,0.2);">
                 <img src="${savedPhoto}" style="width:100%; height:100%; object-fit:cover;">
               </div>
-            ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos clicked yet.<br>Open Camera to capture photos!</p>'}
+            ` : '<p style="color:#64748b; grid-column:span 3; text-align:center; padding:40px 0;">No photos in storage.<br>Open Camera to capture!</p>'}
           </div>
-          ${savedPhoto ? `<button onclick="localStorage.removeItem('nexus_last_photo'); openApp('photos')" class="calc-btn action" style="padding:10px; font-size:13px;">Delete Stored Photos</button>` : ''}
+          ${savedPhoto ? `<button onclick="localStorage.removeItem('nexus_last_photo'); openApp('photos')" class="calc-btn action" style="padding:12px; font-size:13px; border-radius:16px;">Clear Gallery</button>` : ''}
         </div>
       `;
       break;
 
-    // 3. Calculator
     case 'calc':
       calcBuffer = '';
       body.innerHTML = `
@@ -127,163 +170,150 @@ function openApp(name) {
       `;
       break;
 
-    // 4. Notes Notepad
     case 'notes':
       const savedNotes = localStorage.getItem('nexus_notes') || '';
       body.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <textarea id="note-input" oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:60vh; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:14px; color:#fff; font-size:16px; resize:none;" placeholder="Write your notes here...">${savedNotes}</textarea>
-          <button onclick="localStorage.removeItem('nexus_notes'); document.getElementById('note-input').value='';" class="calc-btn action" style="padding:10px; font-size:13px;">Clear Notes</button>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <textarea id="note-input" oninput="localStorage.setItem('nexus_notes', this.value)" style="width:100%; height:60vh; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:16px; color:#fff; font-size:16px; resize:none;" placeholder="Write your notes here...">${savedNotes}</textarea>
+          <button onclick="localStorage.removeItem('nexus_notes'); document.getElementById('note-input').value='';" class="calc-btn action" style="padding:12px; font-size:13px; border-radius:16px;">Clear Notes</button>
         </div>
       `;
       break;
 
-    // 5. Music Player
     case 'music':
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 0; gap:18px;">
-          <div id="vinyl-disc" style="width:180px; height:180px; border-radius:50%; background:radial-gradient(circle, #334155 20%, #0f172a 70%); border:4px solid #ec4899; display:flex; align-items:center; justify-content:center; font-size:48px; box-shadow:0 8px 25px rgba(236,72,153,0.3);">
+          <div style="width:190px; height:190px; border-radius:50%; background:radial-gradient(circle, #334155 20%, #0f172a 70%); border:4px solid #ec4899; display:flex; align-items:center; justify-content:center; font-size:52px; box-shadow:0 8px 30px rgba(236,72,153,0.3);">
             🎵
           </div>
           <div>
-            <h2 style="font-size:18px; font-weight:600;">Nexus Synthwave Cyber</h2>
-            <p style="color:#94a3b8; font-size:13px; margin-top:2px;">Digital Audio Studio</p>
+            <h2 style="font-size:20px; font-weight:700;">Nexus Cyberpunk Studio</h2>
+            <p style="color:#94a3b8; font-size:13px; margin-top:2px;">Digital Audio Hi-Res</p>
           </div>
-          <input type="range" min="0" max="100" value="40" style="width:85%; accent-color:#ec4899;">
+          <input type="range" min="0" max="100" value="45" style="width:85%; accent-color:#ec4899;">
           <div style="display:flex; gap:20px; align-items:center;">
-            <button class="calc-btn action" style="width:50px; height:50px; border-radius:50%;">⏮</button>
-            <button onclick="toggleMusic()" id="music-play-btn" style="width:65px; height:65px; border-radius:50%; background:#ec4899; border:none; color:#fff; font-size:24px; cursor:pointer;">▶</button>
-            <button class="calc-btn action" style="width:50px; height:50px; border-radius:50%;">⏭</button>
+            <button class="calc-btn action" style="width:52px; height:52px; border-radius:50%;">⏮</button>
+            <button onclick="toggleMusic()" id="music-play-btn" style="width:68px; height:68px; border-radius:50%; background:#ec4899; border:none; color:#fff; font-size:26px; cursor:pointer;">▶</button>
+            <button class="calc-btn action" style="width:52px; height:52px; border-radius:50%;">⏭</button>
           </div>
         </div>
       `;
       break;
 
-    // 6. Voice Recorder
     case 'recorder':
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:60vh; gap:24px; text-align:center;">
-          <h2 id="rec-timer" style="font-size:36px; font-variant-numeric:tabular-nums;">00:00</h2>
-          <button onclick="toggleRecording()" id="mic-btn" style="width:75px; height:75px; border-radius:50%; background:#ef4444; border:none; color:#fff; font-size:28px; cursor:pointer; box-shadow:0 6px 20px rgba(239,68,68,0.4);">🎙️</button>
+          <h2 id="rec-timer" style="font-size:40px; font-variant-numeric:tabular-nums;">00:00</h2>
+          <button onclick="toggleRecording()" id="mic-btn" style="width:80px; height:80px; border-radius:50%; background:#ef4444; border:none; color:#fff; font-size:32px; cursor:pointer; box-shadow:0 8px 25px rgba(239,68,68,0.4);">🎙️</button>
           <p id="rec-status-text" style="color:#94a3b8; font-size:13px;">Tap mic to record audio</p>
-          <audio id="recorded-audio" controls style="display:none; width:90%;"></audio>
+          <audio id="recorded-audio" controls style="display:none; width:90%; margin-top:10px;"></audio>
         </div>
       `;
       break;
 
-    // 7. Files Storage
     case 'files':
       body.innerHTML = `
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h4 style="color:#38bdf8;">Device Storage</h4>
+            <h4 style="color:#38bdf8;">UFS 4.0 Storage</h4>
             <span style="font-size:12px; color:#94a3b8;">42 GB / 128 GB</span>
           </div>
-          <div style="width:100%; height:6px; background:#222; border-radius:3px; margin:10px 0; overflow:hidden;">
+          <div style="width:100%; height:8px; background:#222; border-radius:4px; margin:10px 0; overflow:hidden;">
             <div style="width:33%; height:100%; background:linear-gradient(90deg, #38bdf8, #22c55e);"></div>
           </div>
-          <p style="color:#94a3b8; font-size:12px;">86 GB Free Space</p>
+          <p style="color:#94a3b8; font-size:12px;">86 GB Available</p>
         </div>
         <div class="card">
-          <div class="card-item" onclick="alert('Opening Documents Folder')"><span>📄 Documents (PDF, DOCX)</span><span style="color:#94a3b8;">24 files ›</span></div>
+          <div class="card-item"><span>📄 Documents (PDF, DOCX)</span><span style="color:#94a3b8;">24 files ›</span></div>
           <div class="card-item" onclick="openApp('photos')"><span>🖼️ Images & Camera</span><span style="color:#94a3b8;">186 photos ›</span></div>
-          <div class="card-item" onclick="alert('Opening Downloads Folder')"><span>⬇️ Downloads</span><span style="color:#94a3b8;">12 files ›</span></div>
-          <div class="card-item" onclick="alert('Opening Audio Recordings')"><span>🎵 Audio Tracks</span><span style="color:#94a3b8;">8 tracks ›</span></div>
+          <div class="card-item"><span>⬇️ Downloads</span><span style="color:#94a3b8;">12 files ›</span></div>
+          <div class="card-item"><span>🎵 Audio Tracks</span><span style="color:#94a3b8;">8 tracks ›</span></div>
         </div>
       `;
       break;
 
-    // 8. Drivers & Hardware
     case 'drivers':
       body.innerHTML = `
         <div class="card">
-          <h4 style="color:#38bdf8;">Hardware Driver Bridges</h4>
-          <p style="font-size:12px; color:#94a3b8; margin-top:2px;">Real-time hardware interfaces connected</p>
+          <h4 style="color:#38bdf8;">Hardware Driver Interfaces</h4>
+          <p style="font-size:12px; color:#94a3b8; margin-top:2px;">Real-time hardware kernel active</p>
         </div>
         <div class="card">
-          <div class="card-item"><span>📷 Camera Sensor Driver</span><b style="color:#22c55e;">Online (v2.4)</b></div>
-          <div class="card-item"><span>🎙️ Audio DAC Driver</span><b style="color:#22c55e;">48kHz Hi-Res</b></div>
-          <div class="card-item"><span>🧭 IMU Gyroscope Motion</span><b style="color:#22c55e;">Active</b></div>
-          <div class="card-item"><span>⚡ GPU Acceleration</span><b style="color:#22c55e;">120Hz Native</b></div>
-          <div class="card-item"><span>📶 5G Modem Baseband</span><b style="color:#22c55e;">Connected</b></div>
+          <div class="card-item"><span>📷 Camera Sensor</span><b style="color:#22c55e;">Sony IMX890 (Online)</b></div>
+          <div class="card-item"><span>🎙️ Audio DAC</span><b style="color:#22c55e;">48kHz Hi-Res Active</b></div>
+          <div class="card-item"><span>🧭 IMU Motion</span><b style="color:#22c55e;">Calibrated</b></div>
+          <div class="card-item"><span>⚡ GPU Adreno/Mali</span><b style="color:#22c55e;">120Hz Native</b></div>
+          <div class="card-item"><span>📶 5G Modem Subsystem</span><b style="color:#22c55e;">5G SA Connected</b></div>
         </div>
-        <button onclick="alert('Diagnostics Passed: All peripheral drivers active.')" class="calc-btn action" style="width:100%; padding:10px; font-size:13px;">Run Hardware Diagnostic</button>
       `;
       break;
 
-    // 9. Phone Dialer
+    case 'settings':
+      body.innerHTML = `
+        <div class="card">
+          <div class="card-item"><span>Device Model</span><b style="color:#38bdf8;">Nexus Alpha (Realme UI 6.0)</b></div>
+          <div class="card-item"><span>Android Version</span><b style="color:#22c55e;">Android 15 / 16 Preview</b></div>
+          <div class="card-item"><span>Processor</span><b>MediaTek Dimensity 7400</b></div>
+          <div class="card-item"><span>RAM</span><b>8.00 GB LPDDR5X</b></div>
+          <div class="card-item"><span>Storage</span><b>128 GB UFS 4.0</b></div>
+        </div>
+      `;
+      break;
+
+    case 'weather':
+      body.innerHTML = `
+        <div style="text-align:center; padding:30px 0;">
+          <h1 style="font-size:48px; margin-bottom:4px;">29°C</h1>
+          <p style="color:#38bdf8; font-size:18px;">Partly Cloudy</p>
+          <div class="card" style="margin-top:24px;">
+            <div class="card-item"><span>Humidity</span><b>65%</b></div>
+            <div class="card-item"><span>Wind Speed</span><b>12 km/h</b></div>
+            <div class="card-item"><span>Air Quality Index</span><b style="color:#22c55e;">Good (AQI 42)</b></div>
+          </div>
+        </div>
+      `;
+      break;
+
     case 'dialer':
       dialPadStr = '';
       body.innerHTML = `
-        <div class="dialer-screen" id="dial-number"></div>
-        <div class="dial-grid">
-          <div class="dial-btn" onclick="dialDigit('1')">1</div>
-          <div class="dial-btn" onclick="dialDigit('2')">2</div>
-          <div class="dial-btn" onclick="dialDigit('3')">3</div>
-          <div class="dial-btn" onclick="dialDigit('4')">4</div>
-          <div class="dial-btn" onclick="dialDigit('5')">5</div>
-          <div class="dial-btn" onclick="dialDigit('6')">6</div>
-          <div class="dial-btn" onclick="dialDigit('7')">7</div>
-          <div class="dial-btn" onclick="dialDigit('8')">8</div>
-          <div class="dial-btn" onclick="dialDigit('9')">9</div>
-          <div class="dial-btn" onclick="dialDigit('*')">*</div>
-          <div class="dial-btn" onclick="dialDigit('0')">0</div>
-          <div class="dial-btn" onclick="dialDigit('#')">#</div>
-          <div class="dial-btn" onclick="dialClear()">⌫</div>
-          <div class="dial-btn" onclick="if(dialPadStr) window.location.href='tel:'+dialPadStr" style="background:#22c55e;">📞</div>
+        <div class="calc-screen" id="dial-number" style="font-size:28px; text-align:center; min-height:50px;"></div>
+        <div class="calc-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <button class="calc-btn" onclick="dialDigit('1')">1</button>
+          <button class="calc-btn" onclick="dialDigit('2')">2</button>
+          <button class="calc-btn" onclick="dialDigit('3')">3</button>
+          <button class="calc-btn" onclick="dialDigit('4')">4</button>
+          <button class="calc-btn" onclick="dialDigit('5')">5</button>
+          <button class="calc-btn" onclick="dialDigit('6')">6</button>
+          <button class="calc-btn" onclick="dialDigit('7')">7</button>
+          <button class="calc-btn" onclick="dialDigit('8')">8</button>
+          <button class="calc-btn" onclick="dialDigit('9')">9</button>
+          <button class="calc-btn" onclick="dialDigit('*')">*</button>
+          <button class="calc-btn" onclick="dialDigit('0')">0</button>
+          <button class="calc-btn" onclick="dialDigit('#')">#</button>
+          <button class="calc-btn action" onclick="dialClear()">⌫</button>
+          <button class="calc-btn op" style="background:#22c55e;" onclick="if(dialPadStr) window.location.href='tel:'+dialPadStr">📞</button>
           <div></div>
         </div>
       `;
       break;
 
-    // 10. Web Browser
     case 'browser':
       body.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:16px;">
           <div style="display:flex; gap:8px;">
-            <input type="text" id="web-search-query" style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:10px; color:#fff;" placeholder="Search or type URL...">
-            <button onclick="launchSearch()" class="calc-btn op" style="padding:0 16px;">Go</button>
+            <input type="text" id="web-search-query" style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:12px; color:#fff;" placeholder="Search or type URL...">
+            <button onclick="launchSearch()" class="calc-btn op" style="padding:0 18px; border-radius:14px;">Go</button>
           </div>
           <div class="card">
-            <h4 style="font-size:14px; color:#38bdf8; margin-bottom:12px;">Quick Shortcuts</h4>
+            <h4 style="font-size:14px; color:#38bdf8; margin-bottom:14px;">Shortcuts</h4>
             <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; text-align:center;">
-              <a href="https://google.com" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon bg-blue" style="width:48px; height:48px; margin:0 auto 4px;">G</div>Google</a>
-              <a href="https://youtube.com" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon bg-red" style="width:48px; height:48px; margin:0 auto 4px;">▶</div>YouTube</a>
-              <a href="https://github.com" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon bg-zinc" style="width:48px; height:48px; margin:0 auto 4px;">🐙</div>GitHub</a>
-              <a href="https://wikipedia.org" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon bg-slate" style="width:48px; height:48px; margin:0 auto 4px;">W</div>Wikipedia</a>
+              <a href="https://google.com" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon-box mat-blue" style="width:48px; height:48px; margin:0 auto 6px;">G</div>Google</a>
+              <a href="https://youtube.com" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon-box mat-red" style="width:48px; height:48px; margin:0 auto 6px;">▶</div>YouTube</a>
+              <a href="https://github.com" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon-box mat-zinc" style="width:48px; height:48px; margin:0 auto 6px;">🐙</div>GitHub</a>
+              <a href="https://wikipedia.org" target="_blank" style="text-decoration:none; color:#fff; font-size:12px;"><div class="icon-box mat-slate" style="width:48px; height:48px; margin:0 auto 6px;">W</div>Wikipedia</a>
             </div>
           </div>
-        </div>
-      `;
-      break;
-
-    // 11. Weather
-    case 'weather':
-      body.innerHTML = `
-        <div style="text-align:center; padding:30px 0;">
-          <h1 style="font-size:44px; margin-bottom:4px;">29°C</h1>
-          <p style="color:#38bdf8; font-size:18px;">Partly Cloudy</p>
-          <div class="card" style="margin-top:24px;">
-            <div class="card-item"><span>Humidity</span><b>65%</b></div>
-            <div class="card-item"><span>Wind Speed</span><b>12 km/h</b></div>
-            <div class="card-item"><span>Air Quality</span><b style="color:#22c55e;">Good (AQI 42)</b></div>
-          </div>
-        </div>
-      `;
-      break;
-
-    // 12. Settings
-    case 'settings':
-      body.innerHTML = `
-        <div class="card">
-          <div class="card-item"><span>Device Name</span><b style="color:#38bdf8;">Nexus Alpha</b></div>
-          <div class="card-item"><span>Processor</span><b>MediaTek Dimensity 7400</b></div>
-          <div class="card-item"><span>RAM</span><b>8.00 GB</b></div>
-          <div class="card-item"><span>Storage</span><b>128 GB</b></div>
-        </div>
-        <div class="card">
-          <div class="card-item" onclick="alert('Wi-Fi scanning...')"><span>Wi-Fi Network</span><span style="color:#94a3b8;">Off ›</span></div>
-          <div class="card-item" onclick="alert('Bluetooth ready')"><span>Bluetooth</span><span style="color:#94a3b8;">Off ›</span></div>
         </div>
       `;
       break;
@@ -298,19 +328,14 @@ function closeApp() {
   }
 }
 
-function showRecents() {
-  alert('Recents: All apps are actively preserved in memory.');
-}
-
-// Camera Helper
-function startCameraStream() {
+function startCamera() {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({
       video: { facingMode: currentFacing, width: { ideal: 1280 }, height: { ideal: 720 } }
     })
     .then(stream => {
       mediaStream = stream;
-      const v = document.getElementById('cam-video-feed');
+      const v = document.getElementById('cam-feed-view');
       if (v) {
         v.srcObject = stream;
         v.onloadedmetadata = () => v.play().catch(() => {});
@@ -320,19 +345,17 @@ function startCameraStream() {
   }
 }
 
-function toggleFacing() {
+function flipCam() {
   currentFacing = (currentFacing === 'environment') ? 'user' : 'environment';
   if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-  startCameraStream();
+  startCamera();
 }
 
-function capturePhoto() {
-  const v = document.getElementById('cam-video-feed');
-  const c = document.getElementById('cam-capture-canvas');
-  const t = document.getElementById('cam-gallery-thumb');
-  const f = document.getElementById('cam-flash-fx');
+function takeCamSnap() {
+  const v = document.getElementById('cam-feed-view');
+  const c = document.getElementById('cam-canvas-snap');
+  const t = document.getElementById('cam-thumb');
   if (v && c) {
-    if (f) { f.style.opacity = '0.9'; setTimeout(() => f.style.opacity = '0', 120); }
     c.width = v.videoWidth || 640;
     c.height = v.videoHeight || 480;
     const ctx = c.getContext('2d');
@@ -344,7 +367,6 @@ function capturePhoto() {
   }
 }
 
-// Utilities
 function calcKey(k) {
   const v = document.getElementById('calc-view');
   if (k === 'C') { calcBuffer = ''; v.innerText = '0'; }
@@ -370,27 +392,4 @@ async function toggleRecording() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder = new MediaRecorder(stream);
       audioChunks = [];
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunks, { type: 'audio/mp3' });
-        const pb = document.getElementById('recorded-audio');
-        pb.src = URL.createObjectURL(blob);
-        pb.style.display = 'block';
-      };
-      mediaRecorder.start();
-      btn.innerText = '⏹';
-      status.innerText = 'Recording audio live...';
-    } catch(e) { alert('Microphone permission required.'); }
-  } else {
-    mediaRecorder.stop();
-    btn.innerText = '🎙️';
-    status.innerText = 'Recording saved!';
-  }
-}
-
-function launchSearch() {
-  const query = document.getElementById('web-search-query').value;
-  if (query) {
-    window.open(query.startsWith('http') ? query : `https://google.com/search?q=${query}`, '_blank');
-  }
-}
+      mediaR
