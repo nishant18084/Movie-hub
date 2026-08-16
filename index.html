@@ -8,43 +8,34 @@
 </head>
 <body>
 
-  <!-- 1. Startup Hello Animation -->
+  <!-- Startup Splash -->
   <div id="hello-splash">
-    <div class="hello-content">
+    <div>
       <h1 class="hello-text">Hello</h1>
       <p class="hello-sub">Nexus OS 2.5</p>
     </div>
   </div>
 
-  <!-- 2. System Lock Screen -->
-  <section id="lock-screen">
-    <div class="lock-header">
-      <div class="lock-icon">🔒</div>
-      <h1 id="lock-clock">--:--</h1>
-      <p id="lock-date">--</p>
+  <!-- Real Smartphone Lock Screen (Swipe Up or Tap to Unlock) -->
+  <section id="lock-screen" onclick="unlockDevice()">
+    <div class="lock-top-info">
+      <span id="lock-status-time">--:--</span>
+      <span>5G 📶 100% 🔋</span>
     </div>
-    <div class="pin-box">
-      <div class="pin-dots" id="pin-dots">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      </div>
-      <div class="pin-grid">
-        <button class="pin-btn" onclick="pressPin('1')">1</button>
-        <button class="pin-btn" onclick="pressPin('2')">2</button>
-        <button class="pin-btn" onclick="pressPin('3')">3</button>
-        <button class="pin-btn" onclick="pressPin('4')">4</button>
-        <button class="pin-btn" onclick="pressPin('5')">5</button>
-        <button class="pin-btn" onclick="pressPin('6')">6</button>
-        <button class="pin-btn" onclick="pressPin('7')">7</button>
-        <button class="pin-btn" onclick="pressPin('8')">8</button>
-        <button class="pin-btn" onclick="pressPin('9')">9</button>
-        <button class="pin-btn" onclick="clearPin()">⌫</button>
-        <button class="pin-btn" onclick="pressPin('0')">0</button>
-        <button class="pin-btn op" onclick="submitPin()">✓</button>
-      </div>
+    
+    <div class="lock-center-widget">
+      <p id="lock-date-display">Sun, 16 Aug</p>
+      <h1 id="lock-big-clock">18:04</h1>
+      <p class="swipe-hint">Swipe up or Tap to unlock</p>
+    </div>
+
+    <div class="lock-bottom-shortcuts">
+      <div class="lock-round-btn" onclick="event.stopPropagation(); alert('AI Assistant Ready');">✨</div>
+      <div class="lock-round-btn" onclick="event.stopPropagation(); unlockDevice(); openApp('camera');">📷</div>
     </div>
   </section>
 
-  <!-- 3. Top Status Bar -->
+  <!-- Top Status Bar -->
   <header class="status-bar">
     <span id="top-time">--:--</span>
     <div class="status-icons">
@@ -54,8 +45,8 @@
     </div>
   </header>
 
-  <!-- 4. Home Screen Widgets & Grid -->
-  <main class="home-screen" id="home-screen">
+  <!-- Home Screen -->
+  <main class="home-screen">
     <section class="widget-container">
       <div class="clock-card">
         <h1 id="main-clock">--:--</h1>
@@ -70,7 +61,7 @@
       </div>
     </section>
 
-    <!-- 8 Main System Apps -->
+    <!-- 8 Apps Grid -->
     <section class="grid">
       <button class="app-btn" onclick="openApp('photos')"><div class="icon-box mat-purple">🖼️</div><span class="label">Photos</span></button>
       <button class="app-btn" onclick="openApp('calc')"><div class="icon-box mat-blue">🔢</div><span class="label">Calculator</span></button>
@@ -83,7 +74,7 @@
     </section>
   </main>
 
-  <!-- 5. Bottom Floating Dock -->
+  <!-- Bottom Dock -->
   <nav class="dock">
     <button class="app-btn" onclick="openApp('dialer')"><div class="icon-box mat-green">📞</div></button>
     <button class="app-btn" onclick="openApp('browser')"><div class="icon-box mat-sky">🌐</div></button>
@@ -91,14 +82,14 @@
     <button class="app-btn" onclick="openApp('settings')"><div class="icon-box mat-zinc">⚙️</div></button>
   </nav>
 
-  <!-- 6. Bottom Navigation Bar -->
+  <!-- 3-Button Nav Bar -->
   <footer class="nav-bar">
     <div class="nav-btn" onclick="openApp('drivers')">⏹</div>
     <div class="nav-btn" onclick="closeApp()">⚪</div>
     <div class="nav-btn" onclick="closeApp()">◀</div>
   </footer>
 
-  <!-- 7. Fullscreen App Modal Window -->
+  <!-- App Window Modal -->
   <section id="app-modal">
     <div class="modal-hdr" id="modal-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
@@ -108,7 +99,7 @@
     <div class="modal-body" id="modal-body"></div>
   </section>
 
-  <!-- 8. Native Power Options Overlay -->
+  <!-- Power Menu Overlay -->
   <div id="power-overlay">
     <div class="power-card">
       <h3 style="font-size:18px; margin-bottom:4px;">Power Options</h3>
