@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Nexus OS</title>
-  <!-- Tailwind CSS & Lucide Icons for WhatsApp -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -42,7 +41,7 @@
       padding: env(safe-area-inset-top, 12px) 16px 0 16px;
     }
 
-    /* Startup Splash Animation */
+    /* 1. Startup Splash Animation (Auto-removed from DOM) */
     #hello-splash {
       position: fixed;
       inset: 0;
@@ -51,7 +50,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: splashFade 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      pointer-events: none; /* Never blocks touch */
+      animation: splashFade 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .hello-text {
       font-size: 52px;
@@ -62,9 +62,9 @@
       text-align: center;
     }
     .hello-sub { color: var(--muted); font-size: 14px; text-align: center; margin-top: 6px; letter-spacing: 2px; }
-    @keyframes splashFade { 0%, 70% { opacity: 1; pointer-events: all; } 100% { opacity: 0; pointer-events: none; } }
+    @keyframes splashFade { 0%, 65% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
 
-    /* Lock Screen System */
+    /* 2. Responsive Lock Screen */
     #lock-screen {
       position: fixed;
       inset: 0;
@@ -74,7 +74,8 @@
       z-index: 50000;
       display: flex;
       flex-direction: column;
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      cursor: pointer;
     }
     #lock-clock-view {
       position: absolute;
@@ -83,14 +84,15 @@
       flex-direction: column;
       justify-content: space-between;
       padding: 16px 20px 24px 20px;
-      background: rgba(0, 0, 0, 0.25);
-      cursor: pointer;
+      background: rgba(0, 0, 0, 0.35);
     }
-    .lock-top-info { display: flex; justify-content: space-between; font-size: 13px; color: #fff; font-weight: 600; }
-    .lock-center-widget { text-align: center; margin-top: 20px; }
+    .lock-top-info { display: flex; justify-content: space-between; font-size: 13px; color: #fff; font-weight: 600; pointer-events: none; }
+    .lock-center-widget { text-align: center; margin-top: 40px; pointer-events: none; }
     #lock-date-display { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 4px; }
     #lock-big-clock { font-size: 82px; font-weight: 800; line-height: 1; color: #fff; letter-spacing: -2px; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); }
-    .swipe-hint { font-size: 13px; color: rgba(255, 255, 255, 0.8); margin-top: 14px; }
+    .swipe-hint { font-size: 13px; color: rgba(255, 255, 255, 0.8); margin-top: 14px; animation: pulseHint 2s infinite ease-in-out; }
+    @keyframes pulseHint { 0%, 100% { opacity: 0.6; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-4px); } }
+
     .lock-bottom-shortcuts { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
     .lock-round-btn {
       width: 52px;
@@ -105,12 +107,13 @@
       font-size: 22px;
       cursor: pointer;
     }
+    .lock-round-btn:active { transform: scale(0.9); }
 
     /* Lock PIN Keypad */
     #lock-pin-view {
       position: absolute;
       inset: 0;
-      background: rgba(3, 7, 18, 0.85);
+      background: rgba(3, 7, 18, 0.88);
       backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(30px);
       display: none;
@@ -119,6 +122,7 @@
       align-items: center;
       gap: 22px;
       padding: 20px;
+      cursor: default;
     }
     .pin-header { text-align: center; }
     .lock-padlock { font-size: 28px; margin-bottom: 6px; }
@@ -195,7 +199,7 @@
     }
     .label { font-size: 12px; color: var(--text); margin-top: 6px; text-align: center; font-weight: 500; pointer-events: none; }
 
-    /* Colors */
+    /* Color Classes */
     .mat-green-wa { background: linear-gradient(135deg, #25d366, #128c7e); }
     .mat-purple { background: linear-gradient(135deg, #a855f7, #6b21a8); }
     .mat-blue { background: linear-gradient(135deg, #0284c7, #0369a1); }
@@ -208,7 +212,7 @@
     .mat-slate { background: linear-gradient(135deg, #475569, #1e293b); }
     .mat-zinc { background: linear-gradient(135deg, #64748b, #334155); }
 
-    /* Bottom Dock */
+    /* Dock & Navigation */
     .dock {
       background: var(--glass);
       backdrop-filter: blur(30px);
@@ -226,7 +230,7 @@
     .nav-btn { font-size: 16px; color: var(--muted); padding: 8px 30px; cursor: pointer; }
     .nav-btn:active { color: #fff; transform: scale(0.85); }
 
-    /* App Modal (Full-Cover, Zero Bleed) */
+    /* App Modal (Edge-to-Edge) */
     #app-modal {
       position: fixed;
       inset: 0;
@@ -254,7 +258,7 @@
     .calc-btn.op { background: var(--yellow); color: #000; }
     .calc-btn.action { background: #334155; }
 
-    /* Power Menu */
+    /* Power Overlay */
     #power-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(25px); z-index: 10000; display: none; justify-content: center; align-items: center; }
     .power-card { width: 85%; max-width: 320px; background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 26px; padding: 24px; text-align: center; display: flex; flex-direction: column; gap: 12px; }
     .p-btn { width: 100%; padding: 14px; border-radius: 16px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
@@ -262,7 +266,7 @@
     .p-off { background: #ef4444; color: #fff; }
     .p-cancel { background: #334155; color: #fff; }
 
-    /* WhatsApp Overrides inside OS */
+    /* WhatsApp Overrides */
     #whatsapp-app-window {
       position: fixed;
       inset: 0;
@@ -286,32 +290,31 @@
   </div>
 
   <!-- Real Smartphone Lock Screen -->
-  <section id="lock-screen">
-    <!-- View 1: Big Clock Wallpaper View -->
-    <div id="lock-clock-view" onclick="handleLockSwipe()">
+  <section id="lock-screen" onclick="handleLockTap()">
+    <div id="lock-clock-view">
       <div class="lock-top-info">
         <span id="lock-status-time">--:--</span>
         <span>5G 📶 100% 🔋</span>
       </div>
       
       <div class="lock-center-widget">
-        <p id="lock-date-display">Sun, 16 Aug</p>
-        <h1 id="lock-big-clock">18:53</h1>
-        <p class="swipe-hint">Swipe up or Tap to unlock</p>
+        <p id="lock-date-display">--</p>
+        <h1 id="lock-big-clock">--:--</h1>
+        <p class="swipe-hint">Tap anywhere to unlock</p>
       </div>
 
       <div class="lock-bottom-shortcuts">
-        <div class="lock-round-btn" onclick="event.stopPropagation(); alert('AI Assistant Ready');">✨</div>
+        <div class="lock-round-btn" onclick="event.stopPropagation(); alert('Nexus AI Ready');">✨</div>
         <div class="lock-round-btn" onclick="event.stopPropagation(); directUnlock(); openApp('camera');">📷</div>
       </div>
     </div>
 
-    <!-- View 2: PIN Security Keypad -->
-    <div id="lock-pin-view">
+    <!-- PIN Keypad -->
+    <div id="lock-pin-view" onclick="event.stopPropagation()">
       <div class="pin-header">
         <div class="lock-padlock">🔒</div>
         <h3>Enter PIN</h3>
-        <p id="pin-sub-text">Enter your 4-digit code</p>
+        <p id="pin-sub-text">Enter 4-digit PIN</p>
       </div>
 
       <div class="pin-dots-wrap" id="pin-dots">
@@ -361,7 +364,7 @@
       </div>
     </section>
 
-    <!-- App Grid (WhatsApp Added) -->
+    <!-- App Grid -->
     <section class="grid-nexus">
       <button class="app-btn" onclick="openWhatsApp()"><div class="icon-box mat-green-wa">💬</div><span class="label">WhatsApp</span></button>
       <button class="app-btn" onclick="openApp('photos')"><div class="icon-box mat-purple">🖼️</div><span class="label">Photos</span></button>
@@ -382,14 +385,14 @@
     <button class="app-btn" onclick="openApp('settings')"><div class="icon-box mat-zinc">⚙️</div></button>
   </nav>
 
-  <!-- 3-Button Navigation Bar -->
+  <!-- Navigation Bar -->
   <footer class="nav-bar">
     <div class="nav-btn" onclick="openApp('drivers')">⏹</div>
     <div class="nav-btn" onclick="closeAllModals()">⚪</div>
     <div class="nav-btn" onclick="closeAllModals()">◀</div>
   </footer>
 
-  <!-- System Modal Window (Standard Nexus Apps) -->
+  <!-- App Window Modal -->
   <section id="app-modal">
     <div class="modal-hdr" id="modal-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
@@ -399,15 +402,13 @@
     <div class="modal-body" id="modal-body"></div>
   </section>
 
-  <!-- ================= WHATSAPP FULL APP CONTAINER ================= -->
+  <!-- WhatsApp Window -->
   <div id="whatsapp-app-window">
-    <!-- Close WA to Home -->
     <div class="bg-[#0b141a] px-3 pt-2 pb-1 flex justify-between items-center text-xs text-[#8696a0] border-b border-[#1f2c34]">
       <button onclick="closeWhatsApp()" class="flex items-center gap-1 text-[#38bdf8] font-semibold">‹ Nexus OS Home</button>
-      <span>WhatsApp Embedded</span>
+      <span>WhatsApp</span>
     </div>
 
-    <!-- AUTH POPUP -->
     <div id="authBox" class="fixed inset-0 z-50 bg-[#0b141a] flex items-center justify-center p-4">
       <div class="bg-[#1f2c34] p-6 rounded-2xl w-full max-w-xs text-center shadow-2xl border border-[#2a3942]">
         <div class="w-14 h-14 bg-[#25d366] rounded-full flex items-center justify-center mx-auto mb-3 text-white font-bold text-2xl shadow-lg">W</div>
@@ -418,7 +419,6 @@
       </div>
     </div>
 
-    <!-- CALL SCREEN MODAL -->
     <div id="callScreen" class="hidden fixed inset-0 z-50 bg-[#111b21] flex flex-col items-center justify-between py-12 px-6">
       <div class="text-center">
         <div id="callAvatar" class="w-24 h-24 rounded-full bg-[#1f2c34] text-4xl flex items-center justify-center mx-auto mb-4 border-2 border-[#25d366]">👤</div>
@@ -432,7 +432,6 @@
       </div>
     </div>
 
-    <!-- CREATE CHAT MODAL -->
     <div id="newChatModal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
       <div class="bg-[#1f2c34] p-5 rounded-2xl w-full max-w-xs border border-[#2a3942]">
         <h3 class="text-base font-bold text-white mb-3">Add Contact / Group</h3>
@@ -444,9 +443,8 @@
       </div>
     </div>
 
-    <!-- MAIN TABS CONTAINER -->
     <div id="mainContainer" class="flex flex-col flex-1 h-full w-full overflow-hidden">
-      <!-- Top Header -->
       <div class="pt-2 px-4 pb-2 bg-[#0b141a] flex justify-between items-center">
         <h1 class="text-xl font-bold text-[#e9edef] tracking-wide">WhatsApp</h1>
-        <div class="flex items-ce
+        <div class="flex items-center gap-5 text-[#aebac1]">
+          
