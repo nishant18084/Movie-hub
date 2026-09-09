@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Nexus OS</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
       --bg: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #090d16 60%, #030712 100%);
@@ -41,30 +39,7 @@
       padding: env(safe-area-inset-top, 12px) 16px 0 16px;
     }
 
-    /* 1. Startup Splash Animation (Auto-removed from DOM) */
-    #hello-splash {
-      position: fixed;
-      inset: 0;
-      background: #030712;
-      z-index: 99999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none; /* Never blocks touch */
-      animation: splashFade 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    .hello-text {
-      font-size: 52px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #38bdf8, #a855f7, #f59e0b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-align: center;
-    }
-    .hello-sub { color: var(--muted); font-size: 14px; text-align: center; margin-top: 6px; letter-spacing: 2px; }
-    @keyframes splashFade { 0%, 65% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
-
-    /* 2. Responsive Lock Screen */
+    /* Lock Screen */
     #lock-screen {
       position: fixed;
       inset: 0;
@@ -74,25 +49,32 @@
       z-index: 50000;
       display: flex;
       flex-direction: column;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      justify-content: space-between;
+      padding: 16px 20px 24px 20px;
       cursor: pointer;
+      transition: transform 0.35s ease, opacity 0.3s ease;
     }
-    #lock-clock-view {
+    #lock-screen::before {
+      content: '';
       position: absolute;
       inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 1;
+    }
+    .lock-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 16px 20px 24px 20px;
-      background: rgba(0, 0, 0, 0.35);
     }
-    .lock-top-info { display: flex; justify-content: space-between; font-size: 13px; color: #fff; font-weight: 600; pointer-events: none; }
-    .lock-center-widget { text-align: center; margin-top: 40px; pointer-events: none; }
+    .lock-top-info { display: flex; justify-content: space-between; font-size: 13px; color: #fff; font-weight: 600; }
+    .lock-center-widget { text-align: center; margin-top: 40px; }
     #lock-date-display { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 4px; }
     #lock-big-clock { font-size: 82px; font-weight: 800; line-height: 1; color: #fff; letter-spacing: -2px; text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); }
-    .swipe-hint { font-size: 13px; color: rgba(255, 255, 255, 0.8); margin-top: 14px; animation: pulseHint 2s infinite ease-in-out; }
-    @keyframes pulseHint { 0%, 100% { opacity: 0.6; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-4px); } }
-
+    .swipe-hint { font-size: 13px; color: rgba(255, 255, 255, 0.85); margin-top: 14px; }
     .lock-bottom-shortcuts { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
     .lock-round-btn {
       width: 52px;
@@ -100,6 +82,7 @@
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       border: 1px solid rgba(255, 255, 255, 0.3);
       display: flex;
       align-items: center;
@@ -107,43 +90,6 @@
       font-size: 22px;
       cursor: pointer;
     }
-    .lock-round-btn:active { transform: scale(0.9); }
-
-    /* Lock PIN Keypad */
-    #lock-pin-view {
-      position: absolute;
-      inset: 0;
-      background: rgba(3, 7, 18, 0.88);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 22px;
-      padding: 20px;
-      cursor: default;
-    }
-    .pin-header { text-align: center; }
-    .lock-padlock { font-size: 28px; margin-bottom: 6px; }
-    .pin-header h3 { font-size: 20px; font-weight: 700; color: #fff; }
-    .pin-header p { font-size: 13px; color: var(--muted); margin-top: 2px; }
-    .pin-dots-wrap { display: flex; gap: 16px; }
-    .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border); background: transparent; transition: background 0.15s; }
-    .dot.filled { background: var(--accent); border-color: var(--accent); }
-    .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 280px; }
-    .p-key {
-      height: 64px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
-      font-size: 22px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .p-key:active { background: rgba(255, 255, 255, 0.25); transform: scale(0.92); }
-    .p-key.cancel { font-size: 13px; border: none; background: transparent; color: var(--muted); }
 
     /* Top Status Bar */
     .status-bar { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); font-weight: 600; }
@@ -181,9 +127,9 @@
     .weather-chip b { font-size: 16px; display: block; }
     .weather-chip small { color: #22c55e; font-weight: 600; font-size: 11px; }
 
-    /* App Grid */
+    /* Grid */
     .grid-nexus { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 10px; }
-    .app-btn { background: transparent; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; touch-action: manipulation; }
+    .app-btn { background: transparent; border: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .app-btn:active .icon-box { transform: scale(0.88); }
     .icon-box {
       width: 58px;
@@ -199,7 +145,7 @@
     }
     .label { font-size: 12px; color: var(--text); margin-top: 6px; text-align: center; font-weight: 500; pointer-events: none; }
 
-    /* Color Classes */
+    /* Color styles */
     .mat-green-wa { background: linear-gradient(135deg, #25d366, #128c7e); }
     .mat-purple { background: linear-gradient(135deg, #a855f7, #6b21a8); }
     .mat-blue { background: linear-gradient(135deg, #0284c7, #0369a1); }
@@ -208,11 +154,10 @@
     .mat-pink { background: linear-gradient(135deg, #ec4899, #be185d); }
     .mat-red { background: linear-gradient(135deg, #ef4444, #b91c1c); }
     .mat-amber { background: linear-gradient(135deg, #f59e0b, #b45309); }
-    .mat-cyan { background: linear-gradient(135deg, #06b6d4, #0e7490); }
-    .mat-slate { background: linear-gradient(135deg, #475569, #1e293b); }
     .mat-zinc { background: linear-gradient(135deg, #64748b, #334155); }
+    .mat-slate { background: linear-gradient(135deg, #475569, #1e293b); }
 
-    /* Dock & Navigation */
+    /* Dock */
     .dock {
       background: var(--glass);
       backdrop-filter: blur(30px);
@@ -230,7 +175,7 @@
     .nav-btn { font-size: 16px; color: var(--muted); padding: 8px 30px; cursor: pointer; }
     .nav-btn:active { color: #fff; transform: scale(0.85); }
 
-    /* App Modal (Edge-to-Edge) */
+    /* Modal System */
     #app-modal {
       position: fixed;
       inset: 0;
@@ -246,7 +191,6 @@
     .back-btn { background: transparent; border: none; color: var(--accent); font-size: 16px; font-weight: 600; cursor: pointer; }
     .modal-body { flex: 1; overflow-y: auto; padding: 16px 4px; position: relative; }
 
-    /* Cards */
     .card { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 12px; backdrop-filter: blur(20px); }
     .card-item { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer; }
     .card-item:last-child { border-bottom: none; }
@@ -266,32 +210,26 @@
     .p-off { background: #ef4444; color: #fff; }
     .p-cancel { background: #334155; color: #fff; }
 
-    /* WhatsApp Overrides */
+    /* WhatsApp Clean Vanilla Layout */
     #whatsapp-app-window {
       position: fixed;
       inset: 0;
-      z-index: 3000;
       background: #0b141a;
+      z-index: 3000;
       display: none;
       flex-direction: column;
     }
-    .custom-scroll::-webkit-scrollbar { width: 3px; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #374248; border-radius: 4px; }
+    .wa-nav-bar { display: flex; justify-content: space-around; background: #1f2c34; padding: 12px 0; border-top: 1px solid #2a3942; }
+    .wa-nav-item { background: transparent; border: none; color: #8696a0; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .wa-nav-item.active { color: #25d366; }
+    .wa-chat-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
   </style>
 </head>
 <body>
 
-  <!-- Startup Splash -->
-  <div id="hello-splash">
-    <div>
-      <h1 class="hello-text">Hello</h1>
-      <p class="hello-sub">Nexus OS 2.5</p>
-    </div>
-  </div>
-
-  <!-- Real Smartphone Lock Screen -->
-  <section id="lock-screen" onclick="handleLockTap()">
-    <div id="lock-clock-view">
+  <!-- Instant Responsive Lock Screen -->
+  <section id="lock-screen" onclick="unlockDeviceNow()">
+    <div class="lock-content">
       <div class="lock-top-info">
         <span id="lock-status-time">--:--</span>
         <span>5G 📶 100% 🔋</span>
@@ -305,35 +243,7 @@
 
       <div class="lock-bottom-shortcuts">
         <div class="lock-round-btn" onclick="event.stopPropagation(); alert('Nexus AI Ready');">✨</div>
-        <div class="lock-round-btn" onclick="event.stopPropagation(); directUnlock(); openApp('camera');">📷</div>
-      </div>
-    </div>
-
-    <!-- PIN Keypad -->
-    <div id="lock-pin-view" onclick="event.stopPropagation()">
-      <div class="pin-header">
-        <div class="lock-padlock">🔒</div>
-        <h3>Enter PIN</h3>
-        <p id="pin-sub-text">Enter 4-digit PIN</p>
-      </div>
-
-      <div class="pin-dots-wrap" id="pin-dots">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      </div>
-
-      <div class="pin-keypad">
-        <button class="p-key" onclick="typePin('1')">1</button>
-        <button class="p-key" onclick="typePin('2')">2</button>
-        <button class="p-key" onclick="typePin('3')">3</button>
-        <button class="p-key" onclick="typePin('4')">4</button>
-        <button class="p-key" onclick="typePin('5')">5</button>
-        <button class="p-key" onclick="typePin('6')">6</button>
-        <button class="p-key" onclick="typePin('7')">7</button>
-        <button class="p-key" onclick="typePin('8')">8</button>
-        <button class="p-key" onclick="typePin('9')">9</button>
-        <button class="p-key cancel" onclick="backToClockView()">Cancel</button>
-        <button class="p-key" onclick="typePin('0')">0</button>
-        <button class="p-key" onclick="deletePin()">⌫</button>
+        <div class="lock-round-btn" onclick="event.stopPropagation(); unlockDeviceNow(); openApp('camera');">📷</div>
       </div>
     </div>
   </section>
@@ -385,9 +295,9 @@
     <button class="app-btn" onclick="openApp('settings')"><div class="icon-box mat-zinc">⚙️</div></button>
   </nav>
 
-  <!-- Navigation Bar -->
+  <!-- Nav Bar -->
   <footer class="nav-bar">
-    <div class="nav-btn" onclick="openApp('drivers')">⏹</div>
+    <div class="nav-btn" onclick="openApp('settings')">⏹</div>
     <div class="nav-btn" onclick="closeAllModals()">⚪</div>
     <div class="nav-btn" onclick="closeAllModals()">◀</div>
   </footer>
@@ -396,7 +306,7 @@
   <section id="app-modal">
     <div class="modal-hdr" id="modal-hdr">
       <button class="back-btn" onclick="closeApp()">‹ Back</button>
-      <h3 id="modal-title">SETTINGS</h3>
+      <h3 id="modal-title">APP</h3>
       <div style="width: 40px;"></div>
     </div>
     <div class="modal-body" id="modal-body"></div>
@@ -404,47 +314,150 @@
 
   <!-- WhatsApp Window -->
   <div id="whatsapp-app-window">
-    <div class="bg-[#0b141a] px-3 pt-2 pb-1 flex justify-between items-center text-xs text-[#8696a0] border-b border-[#1f2c34]">
-      <button onclick="closeWhatsApp()" class="flex items-center gap-1 text-[#38bdf8] font-semibold">‹ Nexus OS Home</button>
-      <span>WhatsApp</span>
+    <div style="background:#1f2c34; padding:14px 16px; display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="font-size:18px; font-weight:bold; color:#fff;">WhatsApp</h2>
+      <button onclick="closeWhatsApp()" style="background:transparent; border:none; color:#38bdf8; font-size:14px; font-weight:600;">‹ Nexus Home</button>
     </div>
 
-    <div id="authBox" class="fixed inset-0 z-50 bg-[#0b141a] flex items-center justify-center p-4">
-      <div class="bg-[#1f2c34] p-6 rounded-2xl w-full max-w-xs text-center shadow-2xl border border-[#2a3942]">
-        <div class="w-14 h-14 bg-[#25d366] rounded-full flex items-center justify-center mx-auto mb-3 text-white font-bold text-2xl shadow-lg">W</div>
-        <h2 class="text-xl font-bold mb-1 text-white">WhatsApp</h2>
-        <p class="text-xs text-[#8696a0] mb-4">Enter your name to start</p>
-        <input id="userNameInput" type="text" placeholder="Your Name" class="w-full bg-[#2a3942] px-4 py-2.5 rounded-lg text-sm outline-none text-white mb-4 placeholder-[#8696a0]" />
-        <button onclick="loginUser()" class="w-full bg-[#00a884] text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-[#02906f]">Agree & Continue</button>
+    <div style="flex:1; overflow-y:auto;">
+      <div class="wa-chat-item" onclick="openChatRoom('CR Electronics', '⚡')">
+        <div style="width:48px; height:48px; border-radius:50%; background:#2a3942; display:flex; align-items:center; justify-content:center; font-size:20px;">⚡</div>
+        <div style="flex:1;">
+          <div style="display:flex; justify-content:space-between;"><b>CR Electronics</b><span style="font-size:11px; color:#8696a0;">16:29</span></div>
+          <p style="font-size:12px; color:#8696a0; margin-top:2px;">defence buddy added +91...</p>
+        </div>
       </div>
-    </div>
-
-    <div id="callScreen" class="hidden fixed inset-0 z-50 bg-[#111b21] flex flex-col items-center justify-between py-12 px-6">
-      <div class="text-center">
-        <div id="callAvatar" class="w-24 h-24 rounded-full bg-[#1f2c34] text-4xl flex items-center justify-center mx-auto mb-4 border-2 border-[#25d366]">👤</div>
-        <h2 id="callTargetName" class="text-xl font-bold text-white">User</h2>
-        <p id="callStatusText" class="text-sm text-[#25d366] mt-1 animate-pulse">Calling...</p>
-      </div>
-      <div class="flex gap-6 items-center">
-        <button onclick="endCall()" class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg text-white">
-          <i data-lucide="phone-off" class="w-7 h-7"></i>
-        </button>
-      </div>
-    </div>
-
-    <div id="newChatModal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-      <div class="bg-[#1f2c34] p-5 rounded-2xl w-full max-w-xs border border-[#2a3942]">
-        <h3 class="text-base font-bold text-white mb-3">Add Contact / Group</h3>
-        <input id="newChatName" type="text" placeholder="Contact or Group Name" class="w-full bg-[#2a3942] px-3 py-2 rounded-lg text-sm outline-none text-white mb-3" />
-        <div class="flex justify-end gap-2 text-sm">
-          <button onclick="toggleNewChatModal(false)" class="px-3 py-1.5 text-[#8696a0]">Cancel</button>
-          <button onclick="saveNewChat()" class="px-4 py-1.5 bg-[#00a884] text-white rounded-lg font-semibold">Add</button>
+      <div class="wa-chat-item" onclick="openChatRoom('Electronics Group', '🎓')">
+        <div style="width:48px; height:48px; border-radius:50%; background:#2a3942; display:flex; align-items:center; justify-content:center; font-size:20px;">🎓</div>
+        <div style="flex:1;">
+          <div style="display:flex; justify-content:space-between;"><b>Electronics Group</b><span style="font-size:11px; color:#8696a0;">12:51</span></div>
+          <p style="font-size:12px; color:#8696a0; margin-top:2px;">Check urgent update...</p>
         </div>
       </div>
     </div>
 
-    <div id="mainContainer" class="flex flex-col flex-1 h-full w-full overflow-hidden">
-      <div class="pt-2 px-4 pb-2 bg-[#0b141a] flex justify-between items-center">
-        <h1 class="text-xl font-bold text-[#e9edef] tracking-wide">WhatsApp</h1>
-        <div class="flex items-center gap-5 text-[#aebac1]">
-          
+    <!-- Active Chat Screen -->
+    <div id="wa-chat-room" style="display:none; position:fixed; inset:0; background:#0b141a; z-index:3500; flex-direction:column;">
+      <div style="background:#1f2c34; padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button onclick="document.getElementById('wa-chat-room').style.display='none'" style="background:none; border:none; color:#fff; font-size:18px;">‹</button>
+          <b id="wa-active-name" style="color:#fff;">Room</b>
+        </div>
+        <button onclick="alert('Voice calling...')" style="background:none; border:none; font-size:18px;">📞</button>
+      </div>
+      <div id="wa-msg-pane" style="flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;"></div>
+      <div style="padding:10px; background:#1f2c34; display:flex; gap:8px;">
+        <input id="wa-text-input" type="text" placeholder="Type a message..." style="flex:1; background:#2a3942; border:none; border-radius:20px; padding:10px 16px; color:#fff; outline:none;">
+        <button onclick="sendWaMsg()" style="background:#00a884; border:none; border-radius:50%; width:42px; height:42px; color:#fff;">➤</button>
+      </div>
+    </div>
+
+    <div class="wa-nav-bar">
+      <button class="wa-nav-item active">Chats</button>
+      <button class="wa-nav-item" onclick="alert('Status list updated')">Updates</button>
+      <button class="wa-nav-item" onclick="alert('Communities ready')">Communities</button>
+      <button class="wa-nav-item" onclick="alert('Calling history')">Calls</button>
+    </div>
+  </div>
+
+  <!-- Power Menu Overlay -->
+  <div id="power-overlay">
+    <div class="power-card">
+      <h3 style="font-size:18px; margin-bottom:4px;">Power Options</h3>
+      <button class="p-btn p-restart" onclick="restartDevice()">🔄 Restart</button>
+      <button class="p-btn p-off" onclick="powerOffDevice()">⚡ Power Off</button>
+      <button class="p-btn p-cancel" onclick="hidePowerMenu()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // 1. Direct Time Engine (Guaranteed Execution)
+    function syncTimeNow() {
+      const d = new Date();
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const timeStr = h + ':' + m;
+      const dateStr = days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()];
+
+      const elTop = document.getElementById('top-time');
+      const elClock = document.getElementById('main-clock');
+      const elDate = document.getElementById('main-date');
+      const elLockClock = document.getElementById('lock-big-clock');
+      const elLockDate = document.getElementById('lock-date-display');
+      const elLockTop = document.getElementById('lock-status-time');
+
+      if (elTop) elTop.innerText = timeStr;
+      if (elClock) elClock.innerText = timeStr;
+      if (elDate) elDate.innerText = dateStr;
+      if (elLockClock) elLockClock.innerText = timeStr;
+      if (elLockDate) elLockDate.innerText = dateStr;
+      if (elLockTop) elLockTop.innerText = timeStr;
+    }
+    syncTimeNow();
+    setInterval(syncTimeNow, 1000);
+
+    let calcBuffer = '';
+    let mediaStream = null;
+
+    // Load Wallpaper
+    const savedWp = localStorage.getItem('nexus_wallpaper');
+    if (savedWp) {
+      document.body.style.backgroundImage = 'url(' + savedWp + ')';
+      const ls = document.getElementById('lock-screen');
+      if (ls) ls.style.backgroundImage = 'url(' + savedWp + ')';
+    }
+
+    // Direct Instant Unlock
+    function unlockDeviceNow() {
+      const ls = document.getElementById('lock-screen');
+      if (ls) {
+        ls.style.transform = 'translateY(-100%)';
+        ls.style.opacity = '0';
+        setTimeout(function() { ls.style.display = 'none'; }, 350);
+      }
+    }
+
+    function lockDeviceNow() {
+      const ls = document.getElementById('lock-screen');
+      if (ls) {
+        ls.style.display = 'flex';
+        setTimeout(function() {
+          ls.style.transform = 'translateY(0)';
+          ls.style.opacity = '1';
+        }, 10);
+      }
+      closeAllModals();
+    }
+
+    // Modal Manager
+    function closeAllModals() {
+      closeApp();
+      closeWhatsApp();
+    }
+
+    function openWhatsApp() {
+      closeApp();
+      document.getElementById('whatsapp-app-window').style.display = 'flex';
+    }
+
+    function closeWhatsApp() {
+      document.getElementById('whatsapp-app-window').style.display = 'none';
+    }
+
+    let activeChatTitle = '';
+    function openChatRoom(title, icon) {
+      activeChatTitle = title;
+      document.getElementById('wa-active-name').innerText = title;
+      document.getElementById('wa-chat-room').style.display = 'flex';
+      renderWaMessages();
+    }
+
+    function sendWaMsg() {
+      const inp = document.getElementById('wa-text-input');
+      const txt = inp.value.trim();
+      if (!txt) return;
+
+      const msgs = JSON.parse(localStorage.getItem('wa_msgs_' + activeChatTitle) || '[]');
+      msgs.push({ text: txt, time: new Date().toL
